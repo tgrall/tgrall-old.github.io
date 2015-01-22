@@ -1,0 +1,8 @@
+---
+layout: post
+title: "Groovy, Java's New Scripting Language"
+date: 2004-10-04 05:07:28 +0100
+comments: true
+categories:
+---
+[Groovy, Java's New Scripting Language](http://www.onjava.com/pub/a/onjava/2004/09/29/groovy.html) by Ian F. Darwin -- When some Java developers hear about Groovy, their first reaction is often, "Oh, no, not another scripting language for Java." Ian Darwin had the same reaction, until he took a good look at Groovy.

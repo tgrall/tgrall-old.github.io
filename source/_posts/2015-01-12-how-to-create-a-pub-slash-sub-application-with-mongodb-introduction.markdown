@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "How to create a pub/sub application with MongoDB ? Introduction"
-date: 2015-01-12 15:58:03 +0100
+date: 2015-01-12 09:21:03 +0100
 comments: true
 categories: code mongodb node.js scala java
 ---
@@ -14,6 +14,8 @@ So, what needs to be done to achieve such thing:
 * another application, or thread, subscribe to these events and will received message automatically. In our case this means that the application should automatically receive newly created document out of MongoDB
 
 All this is possible with some very cool MongoDB features: [capped collections](http://docs.mongodb.org/manual/core/capped-collections/) and [tailable cursors](http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/),
+
+<!-- more -->
 
 ##Collections and Tailable Cursors
 

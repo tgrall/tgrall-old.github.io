@@ -1,0 +1,13 @@
+---
+layout: post
+title: "Is OracleAS Portal used on the Internet????"
+date: 2006-01-27 20:25:25 +0100
+comments: true
+categories: portal
+---
+Just use google with a string used byOracleAS Portal URLs...
+
+*   [servlet/page](http://www.google.com/search?hl=en&q=servlet%2Fpage&btnG=Google+Search&meta=)
+*   [pls/portal](http://www.google.com/search?hl=en&lr=&q=pls%2Fportal&btnG=Search)
+
+A little tip, but you will see that people are very creative with Oracle Portal 10g!
