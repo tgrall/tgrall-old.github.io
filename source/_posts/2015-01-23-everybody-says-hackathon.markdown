@@ -19,7 +19,7 @@ categories: mongodb events hackathon
 
 I have like many of you participated to multiple Hackathons where developers, designer and entrepreneurs are working together to build applications in few hours/days. As you probably know more and more companies are running such events internally, it is the case for example at Facebook, Google, but also ING (bank), AXA (Insurance), and many more.
 
-Last week, I have organized/participated to the first Sage Hackathon!
+Last week, I have participated to the first Sage Hackathon!
 
 In case you do not know Sage is a 30+ years old ERP vendor. I have to say that I could not imagine that coming from such company… Let me tell me more about it.
 
@@ -33,7 +33,9 @@ In case you do not know Sage is a 30+ years old ERP vendor. I have to say that I
 
 I have met the development team few months back when I learned that Sage was using MongoDB. We discussed about use cases, architecture,... And this is when I was the most surprised! The new version of Sage ERP X3 is a mix of legacy components (RDBMS, C++ based proprietary middleware), and brand new layer based on Node.js, MongoDB and HTML/CSS/JS (AngularJS like). The Sage team has open sourced some of the JS libraries, see https://github.com/sage Pretty cool isn’t?
 
-I was really excited to see how MongoDB and Node.js are used by Sage modernize the ERP. So I asked more and more questions about the product, looked at some demonstrations. This leads to a broader discussion to see how we can use this new architecture to develop more features using it. This is how I have suggested the organization of an internal hackathon. Everybody, developers, marketing and managers were very excited about the idea.
+I was really excited to see how MongoDB and Node.js are used by Sage modernize the ERP. So I asked more and more questions about the product, looked at some demonstrations. This leads to a broader discussion to see how we can use this new architecture to develop more features using it. 
+
+This is how we started to talk about an internal hackathon. Everybody, developers, marketing and managers were very excited about the idea.
 
 
 ##### Hackathon Preparation
@@ -89,7 +91,7 @@ It was really cool. A team even created a small video clip to explain the featur
 
 {% img /images/posts/everybody-says-hackathon/08-demonstration.png %} {% img /images/posts/everybody-says-hackathon/10-demonstration.png %} {% img /images/posts/everybody-says-hackathon/11-demonstration.png %} {% img /images/posts/everybody-says-hackathon/12-demonstration.png %} {% img /images/posts/everybody-says-hackathon/13-demonstration.png %} {% img /images/posts/everybody-says-hackathon/14-demonstration.png %} {% img /images/posts/everybody-says-hackathon/15-demonstration.png %} {% img /images/posts/everybody-says-hackathon/09-demonstration.png %}
 
-It was very hard to chose a winner, but we aggreed on a very rich and promising notification platform.
+It was very hard to chose a winner, but we agreed on a very rich and promising notification platform.
 
 
 ##### What's next?
@@ -117,6 +119,6 @@ more time on none productive meetings; remember :
 
 by @ideo
 
-You will be surprised to see what can be done when you let the passionnate people do what they love, but also it will be a good opportunity to motivate your team.
+You will be surprised to see what can be done when you let the passionate people do what they love, but also it will be a good opportunity to motivate your team.
 
 I will be pleased to discuss that you will, so feel free to drop me a comment.
