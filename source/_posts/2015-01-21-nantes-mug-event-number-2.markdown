@@ -33,7 +33,7 @@ Mathieu highlighted the following points:
 * Use the proper [read preference](http://docs.mongodb.org/manual/core/read-preference/)&nbsp; (nearest in this case) to deliver the data as fast as possible,
 * Develop with JSON Documents provides lot of flexibility to the developers, that can add new features faster.
 
-{% img http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg %}
+{% img center http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg %}
 
 
 ### Aggregation Framework
@@ -49,7 +49,7 @@ Using cool demonstrations, Seb explained in a step by step approach the key feat
 
 To close his presentation, Seb talked about aggregation best practices, and behavior&nbsp;[in a sharded cluster](http://docs.mongodb.org/manual/core/aggregation-pipeline-sharded-collections/#aggregation-pipeline-sharded-collection).
 
-{% img http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg %}
+{% img center http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg %}
 
 {% slideshare 43730356 %}
 
