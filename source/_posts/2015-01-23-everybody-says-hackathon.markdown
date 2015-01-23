@@ -33,7 +33,7 @@ In case you do not know Sage is a 30+ years old ERP vendor. I have to say that I
 
 I have met the development team few months back when I learned that Sage was using MongoDB. We discussed about use cases, architecture,... And this is when I was the most surprised! The new version of Sage ERP X3 is a mix of legacy components (RDBMS, C++ based proprietary middleware), and brand new layer based on Node.js, MongoDB and HTML/CSS/JS (AngularJS like). The Sage team has open sourced some of the JS libraries, see https://github.com/sage Pretty cool isn’t?
 
-I was really excited to see how MongoDB and Node.js are used by Sage modernize the ERP. So I asked more and more questions about the product, looked at some demonstrations. This leads to a broader discussion to see how we can use this new architecture to develop more features using it. 
+I was really excited to see how MongoDB and Node.js are used by Sage modernize the ERP. So I asked more and more questions about the product, looked at some demonstrations. This leads to a broader discussion to see how we can use this new architecture to develop more features using it.
 
 This is how we started to talk about an internal hackathon. Everybody, developers, marketing and managers were very excited about the idea.
 
@@ -115,7 +115,7 @@ more time on none productive meetings; remember :
 
 > If a picture is worth 1000 words
 >
-> A prototype is worth 1000 meeetings!
+> A prototype is worth 1000 meetings!
 
 by @ideo
 
