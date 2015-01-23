@@ -13,6 +13,8 @@ categories: events mongodb mug
 * How “MyScript Cloud” uses MongoDB by [Mathieu Ruellan](https://twitter.com/mathieuruellan)
 * Aggregation Framework by [Sebastien Prunier](https://twitter.com/sebprunier)
 
+<!-- more -->
+
 ### How “MyScript Cloud” uses MongoDB
 
 First of all, if you do not know [MyScript](http://myscript.com/)&nbsp;I invite you to play with the [online demonstration](http://webdemo.myscript.com/#/home).&nbsp;I am pretty sure that you are already using this technology without noticing it, since it is embedded in many devices/applications including: your car look at the [Audi Touchpad](http://vimeo.com/49013364)!
