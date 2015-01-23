@@ -37,6 +37,8 @@ Mathieu highlighted the following points:
 
 {% img center http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg %}
 
+{% slideshare 43741214 %}
+
 
 ### Aggregation Framework
 
