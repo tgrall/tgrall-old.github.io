@@ -7,12 +7,21 @@ sharing: true
 footer: true
 ---
 
+NantesJUG *(2015-Jan-13/14)*
+
+* Java User Group Quickie about Pub/Sub with MongoDB
+  * [Demo Source](https://github.com/tgrall/mongodb-realtime-pubsub)
+
 ====
 Sage Hackathon *(2015-Jan-13/14)*
 
+* [Blog Post](http://tgrall.github.io/blog/2015/01/23/everybody-says-hackathon/)
+
 ====
+
 CH'ti JUG *(2014-Dec-17)*
 
+* Introduction to NoSQL with MongoDB
 
 ====
 MongoDB Day Paris *(2014-Nov-18)*
