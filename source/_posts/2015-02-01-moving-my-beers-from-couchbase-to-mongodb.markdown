@@ -43,6 +43,11 @@ All this, and more is configurable in the tool.
 
 As you can see in the screencast this is straightforward.*(note that I have only tested very simple use cases and deployment)*
 
+You can download the tool and the source code here:
+
+* [https://github.com/tgrall/mongodb-cb-replicator](https://github.com/tgrall/mongodb-cb-replicator)
+* Download the [MongoCBReplicator.jar](http://goo.gl/WkuHBk) file.
+
 
 ## Updating the application code
 
