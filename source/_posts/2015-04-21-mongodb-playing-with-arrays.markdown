@@ -9,6 +9,8 @@ categories: mongodb json arrays lists
 
 As you know,  you have many differences between relational and document databases. The biggest, for the developer, is probably the data model: Row versus Document. This is particularly true when we talk about "relations" versus "embedded documents *(or values)*". Let's look at some examples, then see what are the various operations provided by MongoDB to help you to deal with this.
 
+<!-- more -->
+
 I won't use this post to go in all the details about "document design", but I just want to focus on the operations you can to with these arrays/list (so useful operations once you have chosen to embed documents).
 
 Let's use a very simple example based on e-commerce platform, with two document types : ***user*** and ***orders***.
