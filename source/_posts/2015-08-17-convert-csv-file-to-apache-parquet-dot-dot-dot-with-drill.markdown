@@ -1,11 +1,3 @@
----
-layout: post
-title: "Convert CSV file to Apache Parquet... with Drill"
-date: 2015-08-17 09:21:34 +0200
-comments: true
-categories: drill hadoop parquet sql
----
-
 A very common use case when working with Hadoop is to store and query simple files (CSV, TSV, ...); then to get better performance and efficient storage convert these files into more efficient format, for example [Apache Parquet](https://parquet.apache.org/). 
 
 [Apache Parquet](https://parquet.apache.org/) is a [columnar storage format](https://en.wikipedia.org/wiki/Column-oriented_DBMS) available to any project in the Hadoop ecosystem. Apache Parquet has the following characteristics:
