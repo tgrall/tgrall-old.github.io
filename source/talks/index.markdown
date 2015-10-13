@@ -57,9 +57,10 @@ footer: true
 * 2013-09-24 - Couchbase Meetup (London) - Couchbase Document Design and Query
 * 2013-07-18 - Couchbase Meetup (London) - Introduction to Couchbase + meet the Couchbase team
 * 2013-06-13 - [Breizhcamp](http://www.breizhcamp.org/) (Rennes) - Introduction to NoSQL with Couchbase
+* 2013-06-07 - [Dot Scale](http://www.dotscale.io/) (Paris) - Lightning Talk "From 0 to 50 million user in 50 days"
 * 2013-04-26 - [NoSQL Matters](https://2013.nosql-matters.org/cgn/index.html) (Cologne)  -  Introduction to Map Reduce with Couchbase 2.0 | Generic Panel
 * 2013-04-25 - [MiX IT](http://www.mix-it.fr/mixit13) - Introduction to NoSQL with Couchbase
-* 2013-03-04 - [Bid Data Paris] - NoSQL & Big Data : Hadoop Integration Patterns and tools | Hadoop Ecosystem Panel
+* 2013-03-04 - [Big Data Paris](http://www.bigdataparis.com/) - NoSQL & Big Data : Hadoop Integration Patterns and tools | Hadoop Ecosystem Panel
 * 2013-03-29 - [Devoxx France](http://www.devoxx.com/display/FR13) - Elastifiez votre application : du SQL au NoSQL en moins d'une heure ! with [David Pilato](http://twitter.com/dadoonet) | NoSQL BOF
 
 ### 2012 and earlier
