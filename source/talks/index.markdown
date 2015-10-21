@@ -13,6 +13,8 @@ footer: true
 * 2015-11-20 - [Code Motion Milan](http://http://milan2015.codemotionworld.com/)
 * 2015-11-19 - [Data Natives](http://http://datanatives.io/) : Introduction to Machine Learning
 * 2015-11-10 - [Devoxx Be](http://devoxx.be) : Build a Time Series Application with Spark Streaming and HBase
+* 2015-10-29 - [Spark Summit](https://spark-summit.org/eu-2015/) : Adding Complex Data to Spark Stack
+* 2015-10-26 - [OSCON](http://conferences.oreilly.com/oscon/open-source-eu-2015) : The new world of open source SQL analytics
 * 2015-10-22 - [SoftShake](http://soft-shake.ch/2015/en/) : Introduction to Apache Drill : "SQL On Everything"
 * 2015-10-16 - [BDX.io](http://bdx.io) : Introduction to Apache Drill : "SQL On Everything"
 * 2015-10-07 - [IT Expo Europe](http://www.ipexpoeurope.com/) : Panel - The Future of Hadoop
@@ -21,7 +23,7 @@ footer: true
 * 2015-09-29 - [Apache Con Europe](http://events.linuxfoundation.org/events/apache-big-data-europe) : [Drilling into Data with Apache Drill](http://events.linuxfoundation.org/sites/events/files/slides/apache_drill_budapest_2015.pdf)
 * 2015-09-23 - [ToursJUG](http://www.toursjug.org/) : Introduction to Apache Drill : "SQL On Everything"
 * 2015-09-18 - [Jug Summer Camp](http://www.jugsummercamp.org/edition/6) : [Big Data Journey](http://events.linuxfoundation.org/sites/events/files/slides/apache_drill_budapest_2015.pdf) with [@dadoonet](http://twitter.com/dadoonet)
-* 2015-06-23 -  [BBL](http://www.brownbaglunch.fr/) in Retail - Introduction to Big Data & NoSQL
+* 2015-06-23 - [BBL](http://www.brownbaglunch.fr/) in Retail - Introduction to Big Data & NoSQL
 * 2015-06-11 - [RivieraDev](http://RivieraDev.fr) - [Proud to be Polyglot](www.slideshare.net/tgrall/proud-to-be-polyglot-riviera-dev-2015)
 * 2015-04-14 - [Nantes MongoDB User Group](http://www.meetup.com/Nantes-MongoDB-User-Group/) - MongoDB 3.0 & Ops Manager
 * 2015-04-10 - [Devoxx France](http://devoxx.fr): - Quickie - [Pub/Sub with MongoDB](https://github.com/tgrall/mongodb-realtime-pubsub)
