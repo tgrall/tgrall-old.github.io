@@ -1,4 +1,12 @@
-A very common use case when working with Hadoop is to store and query simple files (CSV, TSV, ...); then to get better performance and efficient storage convert these files into more efficient format, for example [Apache Parquet](https://parquet.apache.org/). 
+---
+layout: post
+title: "Convert a CSV File to Apache Parquet with Drill"
+date: 2015-08-17 13:07:00 +0100
+comments: true
+categories: drill parquet hadoop bigdata
+---
+
+A very common use case when working with Hadoop is to store and query simple files (CSV, TSV, ...); then to get better performance and efficient storage convert these files into more efficient format, for example [Apache Parquet](https://parquet.apache.org/).
 
 [Apache Parquet](https://parquet.apache.org/) is a [columnar storage format](https://en.wikipedia.org/wiki/Column-oriented_DBMS) available to any project in the Hadoop ecosystem. Apache Parquet has the following characteristics:
 
@@ -11,7 +19,7 @@ Let's take a concrete example, you can find many interesting Open Data sources t
 
 ### How to convert CSV files into Parquet files?
 
-You can use code to achieve this, as you can see in the [ConvertUtils](https://github.com/Parquet/parquet-compatibility/blob/master/parquet-compat/src/test/java/parquet/compat/test/ConvertUtils.java) sample/test class. You can use a simpler way with Apache Drill. Drill allows you save the result of a query as Parquet files. 
+You can use code to achieve this, as you can see in the [ConvertUtils](https://github.com/Parquet/parquet-compatibility/blob/master/parquet-compat/src/test/java/parquet/compat/test/ConvertUtils.java) sample/test class. You can use a simpler way with Apache Drill. Drill allows you save the result of a query as Parquet files.
 
 The following steps will show you how to do convert a simple CSV into a Parquet file using Drill.
 
@@ -30,7 +38,7 @@ The following steps will show you how to do convert a simple CSV into a Parquet 
 Let's execute a basic query:
 
 ```sql
-SELECT * 
+SELECT *
 FROM dfs.`/opendata/Passenger/SFO_Passenger_Data/MonthlyPassengerData_200507_to_201503.csv`
 LIMIT 5;
 
@@ -41,7 +49,7 @@ LIMIT 5;
 As you can see, by default Drill processes each line as an array of columns, all values being simple String. So if you need to do some operations with these values (projection or where clause) you must use the column index, and cast the value to the proper type. You can see a simple example below:
 
 ```
-SELECT 
+SELECT
 columns[0] as `DATE`,
 columns[1] as `AIRLINE`,
 CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
@@ -101,7 +109,6 @@ FROM dfs.tmp.`/stats/airport_data/*`
 
 ## Conclusion
 
-In this article you have learned how to convert a CSV file using an Apache Drill query. 
+In this article you have learned how to convert a CSV file using an Apache Drill query.
 
 You can do that with any source supported by Drill, for example from JSON to Parquet, or even a complex join query between multiple data sources. You can also chose a different output format for example JSON, or a CSV.
-
