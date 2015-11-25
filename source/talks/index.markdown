@@ -1,7 +1,7 @@
 ---
 layout: page
 title: "Talks"
-date: 2015-01-18 17:31
+date: 2015-11-25 13:31
 comments: true
 sharing: true
 footer: true
@@ -9,9 +9,12 @@ footer: true
 
 ### 2015
 
-* 2015-11-21 - [Distributed Matters BCN](https://2015.distributed-matters.org/bcn/)
-* 2015-11-20 - [Code Motion Milan](http://http://milan2015.codemotionworld.com/)
-* 2015-11-19 - [Data Natives](http://http://datanatives.io/) : Introduction to Machine Learning
+* 2015-11-28 - [CodeMotion Spain](http://2015.codemotion.es/) : [Drilling into Data with Apache Drill](http://2015.codemotion.es/agenda.html#5699289732874240/45654003)
+* 2015-11-28 - [CodeMotion Spain](http://2015.codemotion.es/) : [Build a Time Series Application with Spark Streaming and HBase](http://2015.codemotion.es/agenda.html#5699289732874240/45654003)
+* 2015-11-26 - [Codeur en Seine](http://www.codeursenseine.com/2015/) : [Apache Drill : SQL pour Hadoop.... et plus](http://www.codeursenseine.com/2015/speakers.html#orateur-21)
+* 2015-11-21 - [Distributed Matters BCN](https://2015.distributed-matters.org/bcn/) : Apache Drill: SQL On Everything
+* 2015-11-20 - [Code Motion Milan](http://http://milan2015.codemotionworld.com/) : Real World Use Cases: Hadoop and NoSQL in Production
+* 2015-11-11 - [Data-Science-London](http://www.meetup.com/Data-Science-London/events/226497389/) : Apache Drill Hands On Workshop: Big Data Discovery & Analysis with SQL
 * 2015-11-10 - [Devoxx Be](http://devoxx.be) : Build a Time Series Application with Spark Streaming and HBase
 * 2015-10-29 - [Spark Summit](https://spark-summit.org/eu-2015/) : Adding Complex Data to Spark Stack
 * 2015-10-26 - [OSCON](http://conferences.oreilly.com/oscon/open-source-eu-2015) : The new world of open source SQL analytics
