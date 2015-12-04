@@ -197,6 +197,18 @@ This code does, however, look a bit strange to somebody used to reading Java cod
 * **Do not use imports, but instead use the fully qualified class name**, this is what is done on line 10 with the `Strings` class. (coming from the Google Guava API packaged in Apache Drill)
 * The `ValueHolders` classes, in our case `VarCharHolder` and `IntHolder` should be manipulated like structs, so you must call helper methods, for example `getStringFromVarCharHolder` and `toStringFromUTF8`. Calling methods like `toString` will result in very bad problems.
 
+Starting in Apache Drill 1.3.x, it is mandatory to specify the package name of your function in the `./resources/drill-module.conf` file as follow:
+
+```
+drill {
+  classpath.scanning {
+    packages : ${?drill.classpath.scanning.packages} [
+      org.apache.drill.contrib.function
+    ]
+  }
+}
+```
+
 We are now ready to deploy and test this new function.
 
 ### Package
