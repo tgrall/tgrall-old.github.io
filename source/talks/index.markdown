@@ -9,6 +9,8 @@ footer: true
 
 ### 2015
 
+* 2015-12-16 - [Ukrain/Kiev JUG](http://jug.ua/2015/12/apache_drill_and_apache_spark/) : Drilling into Data with Apache Drill
+* 2015-12-16 - [Ukrain/Kiev JUG](http://jug.ua/2015/12/apache_drill_and_apache_spark/) : Introduction to Apache Spark
 * 2015-11-28 - [CodeMotion Spain](http://2015.codemotion.es/) : [Drilling into Data with Apache Drill](http://2015.codemotion.es/agenda.html#5699289732874240/45654003)
 * 2015-11-28 - [CodeMotion Spain](http://2015.codemotion.es/) : [Build a Time Series Application with Spark Streaming and HBase](http://2015.codemotion.es/agenda.html#5699289732874240/45654003)
 * 2015-11-26 - [Codeur en Seine](http://www.codeursenseine.com/2015/) : [Apache Drill : SQL pour Hadoop.... et plus](http://www.codeursenseine.com/2015/speakers.html#orateur-21)
