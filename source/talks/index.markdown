@@ -7,6 +7,13 @@ sharing: true
 footer: true
 ---
 
+### 2016
+
+* 2016-02-10 - [Big Data Paris Webinars](http://www.bigdataparis.com/webinars.html) : Big Data becomes Fast Data with MapR Converged Platform
+* 2016-02-04 - [Snowcamp](http://www.oop-konferenz.de/oop2016/startseite-englisch/conference/conference-program/speakerdetails/saction/detail/sspeaker/tugdual-grall.html) : [Lambda Architecture: The Best Way to Build Scalable and Reliable Applications!](http://www.slideshare.net/tgrall/lambda-architecture-the-best-way-to-build-scalable-and-reliable-applications)
+* 2016-01-20 - [Snowcamp](https://snowcamp2016.sched.org/speaker/tugdual?iframe=no) : Real World Use Cases: Hadoop & NoSQL en Production
+
+
 ### 2015
 
 * 2015-12-16 - [Ukrain/Kiev JUG](http://jug.ua/2015/12/apache_drill_and_apache_spark/) : Drilling into Data with Apache Drill
