@@ -9,6 +9,16 @@ footer: true
 
 ### 2016
 
+* 2016-05-12 - [Berlin Buzzwords](https://berlinbuzzwords.de/) : Let's Get Real: Acting on Data in Real-Time
+* 2016-05-12 - [Code Motion Amsterdam](http://amsterdam2016.codemotionworld.com/) : Anomaly Detection in Telecom with Spark
+* 2016-05-11 - [Big Data Everywhere](http://www.bigdataeverywhere.com/munich-hadoop-conference-2016/) : Anomaly Detection in Telecom with Spark
+* 2016-04-20 - [Devoxx France](http://devoxx.fr) : TBD
+* 2016-04-12 - [Hadoop Summit Europe](http://hadoopsummit.org/dublin) : Real-World NoSQL Schema Design
+* 2016-04-12 - [HUG Ireland](http://www.meetup.com/hadoop-user-group-ireland/) : Drilling into Data with Apache Drill
+* 2016-03-18 - [Code Motion Rome](http://rome2016.codemotionworld.com/) : Real World Use Cases: Hadoop and NoSQL in Production
+* 2016-03-17 - [HUG Italy](http://www.meetup.com/HUG-Italy/events/228721026/?eventId=228721026) : Drilling into data with Apache Drill
+* 2016-03-08 - [Big Data Paris](http://www.bigdataparis.com/) : Big Data becomes Fast Data and Panel "Hadoop et son data lake peuvent-ils jouer le rôle de base de données primaire en production ?"
+* 2016-03-07 - [Big Data Paris](http://www.bigdataparis.com/) : Introduction to MapR 5.1 (Atelier/Workshop)
 * 2016-02-10 - [Big Data Paris Webinars](http://www.bigdataparis.com/webinars.html) : Big Data becomes Fast Data with MapR Converged Platform
 * 2016-02-04 - [Snowcamp](http://www.oop-konferenz.de/oop2016/startseite-englisch/conference/conference-program/speakerdetails/saction/detail/sspeaker/tugdual-grall.html) : [Lambda Architecture: The Best Way to Build Scalable and Reliable Applications!](http://www.slideshare.net/tgrall/lambda-architecture-the-best-way-to-build-scalable-and-reliable-applications)
 * 2016-01-20 - [Snowcamp](https://snowcamp2016.sched.org/speaker/tugdual?iframe=no) : Real World Use Cases: Hadoop & NoSQL en Production
