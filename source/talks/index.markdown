@@ -9,12 +9,15 @@ footer: true
 
 ### 2016
 
-* 2016-05-12 - [Berlin Buzzwords](https://berlinbuzzwords.de/) : Let's Get Real: Acting on Data in Real-Time
+* 2016-06-05 - [Berlin Buzzwords](https://berlinbuzzwords.de/) : Real-World NoSQL Schema Design
 * 2016-05-12 - [Code Motion Amsterdam](http://amsterdam2016.codemotionworld.com/) : Anomaly Detection in Telecom with Spark
-* 2016-05-11 - [Big Data Everywhere](http://www.bigdataeverywhere.com/munich-hadoop-conference-2016/) : Anomaly Detection in Telecom with Spark
-* 2016-04-20 - [Devoxx France](http://devoxx.fr) : TBD
-* 2016-04-12 - [Hadoop Summit Europe](http://hadoopsummit.org/dublin) : Real-World NoSQL Schema Design
+* 2016-05-11 - [Big Data Everywhere](http://www.bigdataeverywhere.com/munich-hadoop-conference-2016/) : Let's Get Real: Acting on Data in Real-Time
+* 2016-04-20 - [Devoxx France](http://devoxx.fr) : ["SQL on Everything" avec Apache Drill](https://cfp.devoxx.fr/2016/talk/XAD-6912/%22SQL_on_Everything%22_avec_Apache_Drill)
+* 2016-04-20 - [Devoxx France](http://devoxx.fr) : [Développez une application "Time Series" avec Apache Spark, HBase et l'API Kakfa](https://cfp.devoxx.fr/2016/talk/QGG-0236/Developpez_une_application_%22Time_Series%22_avec_Apache_Spark,_HBase_et_l'API_Kakfa)
+* 2016-04-13 - [Hadoop Summit Europe](http://hadoopsummit.org/dublin) : Real-World NoSQL Schema Design
 * 2016-04-12 - [HUG Ireland](http://www.meetup.com/hadoop-user-group-ireland/) : Drilling into Data with Apache Drill
+* 2016-04-07 - [Telecom Valley](http://www.telecom-valley.fr/7-avril-tech-event-big-data/) : Big Data Journey
+* 2016-04-07 - [Telecom Valley](http://www.telecom-valley.fr/7-avril-tech-event-big-data/) : [Apache Drill Workshop](https://github.com/tgrall/drill-workshop)
 * 2016-03-18 - [Code Motion Rome](http://rome2016.codemotionworld.com/) : Real World Use Cases: Hadoop and NoSQL in Production
 * 2016-03-17 - [HUG Italy](http://www.meetup.com/HUG-Italy/events/228721026/?eventId=228721026) : Drilling into data with Apache Drill
 * 2016-03-08 - [Big Data Paris](http://www.bigdataparis.com/) : Big Data becomes Fast Data and Panel "Hadoop et son data lake peuvent-ils jouer le rôle de base de données primaire en production ?"
