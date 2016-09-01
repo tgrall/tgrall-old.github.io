@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Setting up Spark Dynamic Application on MapR"
+title: "Setting up Spark Dynamic Allocation on MapR"
 date: 2016-09-01 11:15:57 +0200
 comments: true
 categories: spark yarn mapr
