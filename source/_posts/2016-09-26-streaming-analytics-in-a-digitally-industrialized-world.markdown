@@ -10,6 +10,8 @@ Get an introduction to streaming analytics, which allows you real-time insight f
 
 Did you know that a plane flying from Texas to London can generate 30 million data points per flight? As Jim Daily of GE Aviation notes, that equals [10 billion data points](https://www.ge.com/digital/blog/industrial-iot-improving-airline-economics) in one year. And we’re talking about one plane alone. So you can understand why [another top GE executive recently told Ericsson Business Review](http://cloudblog.ericsson.com/cloud-scalability-combined-with-speed-inside-ges-cloud-transformation) that "Cloud is the future of IT," with a focus on supporting challenging applications in industries such as aviation and energy.
 
+<!-- more -->
+
 ### The benefits of big data
 
 Today, thanks to modern big data platforms, many companies are able to take advantage of the same methods as industry giant GE to store, process, and analyze massive amounts of data. This means that you can also capture core business data, such as that coming from a CRM system, or traffic sensors, or say jet engines, and associate it to other data such as social, application, blog or industrial data. Ultimately, this will result in greater data insights and can enable things like better customer segmentation and prediction.
