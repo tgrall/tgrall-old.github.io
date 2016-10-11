@@ -1,14 +1,21 @@
 ---
 layout: page
 title: "Talks"
-date: 2015-11-25 13:31
+date: 2016-10-11 20:31
 comments: true
 sharing: true
 footer: true
 ---
 
 ### 2016
-
+* 2016-11-10 - [Devoxx BE](http://cfp.devoxx.be/2016/agenda/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2016-11-03 - [DevFest Toulouse](https://devfesttoulouse.fr/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2016-10-30 - [CEE-SECR](http://cee-secr.org/) : Build a Time Series Application with Spark Streaming, MapR Streams/Kafka and HBase
+* 2016-10-28 - [SoftShake](http://soft-shake.ch/2016/fr/index.html) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2016-10-11 - [Human Talks Nantes](http://humantalks.com/cities/nantes) : Demonstration Apache Drill
+* 2016-09-16 - [JUG Summer camp](http://www.jugsummercamp.com/edition/7) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2016-06-18 - [JBCN Conf](http://www.jbcnconf.com/2016/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2016-06-17 - [Riviera Dev](http://rivieradev.fr/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
 * 2016-06-05 - [Berlin Buzzwords](https://berlinbuzzwords.de/) : Real-World NoSQL Schema Design
 * 2016-05-12 - [Code Motion Amsterdam](http://amsterdam2016.codemotionworld.com/) : Anomaly Detection in Telecom with Spark
 * 2016-05-11 - [Big Data Everywhere](http://www.bigdataeverywhere.com/munich-hadoop-conference-2016/) : Let's Get Real: Acting on Data in Real-Time
