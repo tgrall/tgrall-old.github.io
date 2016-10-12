@@ -45,7 +45,7 @@ Let’s create the project using Apache Maven:
 mvn archetype:generate \
       -DarchetypeGroupId=org.apache.flink\
       -DarchetypeArtifactId=flink-quickstart-java \
-      -DarchetypeVersion=1.1.0 \
+      -DarchetypeVersion=1.1.2 \
       -DgroupId=com.grallandco.demos \
       -DartifactId=kafka-flink-101 \
       -Dversion=1.0-SNAPSHOT \
@@ -195,7 +195,7 @@ The consumer simply reads the messages from the `flink-demo` topic, and print th
     DataStream<String> stream = env.addSource(new FlinkKafkaConsumer09<>(
     	"flink-demo", new SimpleStringSchema(), properties) );
 
-    stream.rebalance().map(new MapFunction<String, String>() {
+    stream.map(new MapFunction<String, String>() {
       private static final long serialVersionUID = -6867736771747690202L;
 
       @Override
