@@ -245,3 +245,5 @@ You can now deploy and execute this job on your Flink cluster.
 ## Conclusion
 
 In this article you have learned how to use Flink with kafka to write and read data streams.
+
+Learn about what Apache Flink can do and how it maintains consistency and provides flexibility in the "[Introduction to Apache Flink](https://www.mapr.com/introduction-to-apache-flink)" ebook.
