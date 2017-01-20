@@ -7,7 +7,7 @@ categories: iot java mqtt streaming
 ---
 
 MQTT (MQ Telemetry Transport) is a lightweight publish/subscribe messaging protocol.
-MQTT is used a lot in the Internet of Things applications, since it had been designed to
+MQTT is used a lot in the Internet of Things applications, since it has been designed to
 run on remote locations with system with small footprint.
 
 The MQTT 3.1 is an OASIS standard, and you can find all the information at http://mqtt.org/
@@ -29,7 +29,7 @@ The source code of the sample application is available on [GitHub](https://githu
 
 ### Install and Start a MQTT Broker
 
-You can find many MQTT Broker, for this example I will use one of the most common broker [Mosquitto](https://mosquitto.org).
+You can find many MQTT Brokers, for this example I will use one of the most common broker [Mosquitto](https://mosquitto.org).
 
 You can download and install from the [binary package](https://mosquitto.org/download/). I have used [Homebrew](http://brew.sh/) to install it on my Mac:
 
@@ -59,16 +59,16 @@ Publish
 $ mosquitto_pub -h 127.0.0.1 -t iot_data -m "Hello world"
 ```
 
-You should see the message `Hello world` in the subscriber window.
+You should see the message `Hello world` in the consumer/subscriber window.
 
 ### Write your first MQTT Application
 
-For this example I will write a small Java application with Apache Maven, since it is the language
+For this example I will write a small Java application, since it is the language
 that I am using in my global project.
 
 #### Maven Dependencies
 
-Add the Eclipse Paho dependency to your Maven project
+Add the [Eclipse Paho](https://eclipse.org/paho/) dependency to your Maven project
 
 ```xml
 <dependency>
@@ -94,11 +94,11 @@ client.disconnect();
 
 You have many other options, configurations that you can use when posting a message
 such as security, quality of service (QoS), and more; but in this post I want to simply
-explain how easy is to publish and consume MQTT messages.
+show how easy is to publish and consume MQTT messages.
 
 #### Consuming messages
 
-To consume messages you need to implement a `org.eclipse.paho.client.mqttv3.MqttCallback` that will receive the message and used by the MqttClient.
+To consume messages you need to implement a `org.eclipse.paho.client.mqttv3.MqttCallback` that will receive the message and used this Callback class in the MqttClient of the Subscriber application.
 
 The Callback class:
 
@@ -114,6 +114,7 @@ public class SimpleMqttCallBack implements MqttCallback {
   }
 
   public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+    // not used in this example
   }
 }
 ```
@@ -130,7 +131,7 @@ Like for the publisher, I am using the broker and client without any option (QoS
 
 ## Build and Run the Application
 
-**1- Run the MQTT broker**
+**1- Get the Sample Code**
 
 Clone the project from GitHub
 
@@ -154,7 +155,7 @@ For convenience, the example programs project is set up so that the maven packag
 
 **3- Run the Subscriber**
 
-The subscriber will received and print all the messages published on the `iot_data` topic.
+The subscriber will receive and print all messages published on the `iot_data` topic.
 
 ```
 $ ./target/mqtt-sample subscriber
