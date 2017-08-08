@@ -1,11 +1,31 @@
 ---
 layout: page
 title: "Talks"
-date: 2016-10-11 20:31
+date: 2017-08-07 20:31
 comments: true
 sharing: true
 footer: true
 ---
+
+### 2017
+* 2017-09-28 - [DevFest Toulouse](https://2017.devfesttoulouse.fr/) : Stream Processing with Apache Flink
+* 2017-09-15 - [JUG Summer Camp](http://www.jugsummercamp.org/edition/8) : Stream Processing with Apache Flink
+* 2017-07-05 - [Big Data Analytics for Financial Services](https://bigdatafs.iqpc.co.uk/) :Take control of your Data
+* 2017-06-29 - [Big Data Montpellier](https://www.meetup.com/Big-Data-Montpellier/events/240573926/) : Stream Processing with Apache Flink
+* 2017-06-13 - [Berlin Buzzwords](https://berlinbuzzwords.de/) : Streaming and the Internet of Things: Hands-on Workshop
+* 2017-06-08 - [BDX JUG](http://bordeauxjug.org/) : Stream Processing with Apache Flink
+* 2017-05-16 - [Code Motion Amsterdam](http://amsterdam2017.codemotionworld.com/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2017-05-11 - [Devoxx UK](http://www.devoxx.co.uk/) :  Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2017-04-19 - [IoT Tech Day](http://iottechday.nl/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2017-04-06 - [Devoxx France](http://devoxx.fr) : Stream Processing with Apache Flink
+* 2017-03-29 - [Code Motion Tel Aviv](http://telaviv2017.codemotionworld.com/) : Real World Use Cases: Hadoop and NoSQL in Production
+* 2017-03-24 - [Code Motion Rome](http://rome2017.codemotionworld.com/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2017-03-06 - [Big Data Paris](https://www.bigdataparis.com/) : Datascience Panel
+* 2017-02-10 - [Snowcamp](http://snowcamp.io/) : Build a Time Series Application with Spark Streaming, Kafka and HBase
+* 2017-02-09 - [Snowcamp](http://snowcamp.io/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2017-02-07 - [JFokus](https://www.jfokus.se) : Build a Time Series Application with Spark Streaming, Kafka and HBase
+* 2017-02-06 - [JFokus](https://www.jfokus.se) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+
 
 ### 2016
 * 2016-11-10 - [Devoxx BE](http://cfp.devoxx.be/2016/agenda/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
