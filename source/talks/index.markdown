@@ -7,7 +7,26 @@ sharing: true
 footer: true
 ---
 
+### 2019
+
+* 2019-11-12 - [Code Motion Berlin](https://events.codemotion.com/conferences/berlin/2019/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2019-05-20 - [NantesJug](https://nantesjug.org) : Quarkus Introduction
+* 2019-05-15 - [Riviera Dev](https://rivieradev.fr) : Développement Cloud-Natif Java avec Spring Boot, ISTIO et Eclipse Che
+* 2019-04-18 - [Devoxx France - Paris](https://devoxx.fr) : Développement et déploiement sur le cloud avec Spring Boot, ISTIO et Eclipse Che
+
+### 2018
+
+* 2019-11-22 - [Codeur en Seine](https://www.codeursenseine.com/2018/) : Découvrir par l’exemple : Microservices et Event Sourcing avec Kafka et Kubernetes
+* 2018-11-08 - [DevFest Toulouse](https://2018.devfesttoulouse.fr/) : Découvrir par l’exemple: Microservices et Event Sourcing avec Kafka et Kubernetes
+* 2018-11-06 - [Toulouse Data Sciences](https://www.tlse-data-science.fr) : Big data processing avec Apache Kafka et KSQL
+* 2018-05-16 - [Riviera Dev](https://2018.rivieradev.fr/) : Fast Data Processing Pipeline for Predicting Flight Delays Using Apache APIs: Kafka, Spark ML, Drill, With MapR-DB JSON
+* 2018-01-24 - [SnowCamp](https://snowcamp.io/fr/) : Stream Processing with Apache Flink
+
+
 ### 2017
+
+* 2017-11-23 - [Codeur En Seine](https://www.codeursenseine.com/2017/) : Stream Processing with Apache Flink
+* 2017-10-27 - [Soft Shake Geneva](http://www.soft-shake.ch/2017/) : Stream Processing with Apache Flink
 * 2017-09-28 - [DevFest Toulouse](https://2017.devfesttoulouse.fr/) : Stream Processing with Apache Flink
 * 2017-09-15 - [JUG Summer Camp](http://www.jugsummercamp.org/edition/8) : Stream Processing with Apache Flink
 * 2017-07-05 - [Big Data Analytics for Financial Services](https://bigdatafs.iqpc.co.uk/) :Take control of your Data
