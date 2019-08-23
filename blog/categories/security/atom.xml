@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Security | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/security/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Introduction to MongoDB Security]]></title>
+    <link href="http://tgrall.github.io/blog/2015/02/04/introduction-to-mongodb-security/"/>
+    <updated>2015-02-04T18:55:30+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/02/04/introduction-to-mongodb-security</id>
+    <content type="html"><![CDATA[<p>Last week at the Paris MUG, I had a quick chat about security and MongoDB, and I have decided to create this post that explains how to configure out of the box security available in MongoDB.</p>
+
+<p>You can find all information about MongoDB Security in following documentation chapter:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/security/">http://docs.mongodb.org/manual/security/</a></li>
+</ul>
+
+
+<p><img class="center" src="/images/posts/intro-mongodb-security/password.jpg"></p>
+
+<p>In this post, <em>I won&rsquo;t go</em> into the detail about how to deploy your database in a secured environment (DMZ/Network/IP/Location/&hellip;)</p>
+
+<p>I will focus on <strong>Authentication</strong> and <strong>Authorization</strong>, and provide you the steps to secure the access to your database and data.</p>
+
+<p>I have to mention that by default, when you install and start MongoDB, security is not enabled. Just to make it easier to work with.</p>
+
+<p>The first part of the security is the <strong>Authentication</strong>, you have multiple choices documented <a href="http://docs.mongodb.org/manual/core/authentication/">here</a>. Let&rsquo;s focus on &ldquo;MONGODB-CR&rdquo; mechanism.</p>
+
+<p>The second part is <strong>Authorization</strong> to select what a user can do or not once he is connected to the database. The documentation about authorization is available <a href="http://docs.mongodb.org/manual/core/authorization/">here</a>.</p>
+
+<p>Let&rsquo;s now document how-to:</p>
+
+<ol>
+<li>Create an Administrator User</li>
+<li>Create Application Users</li>
+</ol>
+
+
+<p>For each type of users I will show how to grant specific permissions.</p>
+
+<!-- more -->
+
+
+<h2>1. Start MongoDB</h2>
+
+<p>As I said before, by default security is not enabled when you start MongoDB; so the first think to do is to enable it using the <code>--auth</code> parameter.</p>
+
+<pre><code>&gt; mkdir /data/db
+
+&gt; mongod --auth
+
+....
+....
+2015-02-04T06:56:37.875+0100 [conn1] note: no users configured in admin.system.users, allowing localhost access
+...
+</code></pre>
+
+<p>MongoDB is starting, and until you have created a user you can connect from localhost to create some users (especially the administrator one). This is what is called the <em>localhost exception</em>.</p>
+
+<p>Note: I am here documenting security in simple configuration, I invite you to look to the documentation when deploying a <a href="http://docs.mongodb.org/v2.2/administration/sharded-clusters/#sharded-cluster-security-considerations">Sharded cluster</a>.</p>
+
+<p>Now that we have started MongoDB, we can create users.</p>
+
+<h2>2. Create Admin User</h2>
+
+<p>The first thing is to create an admin user, that can also create users, So we have to:</p>
+
+<ol>
+<li>go to the mongo shell</li>
+<li>connect to the `admin&#8217; database</li>
+<li>create a user and assign him the role <a href="http://docs.mongodb.org/manual/reference/built-in-roles/#userAdminAnyDatabase"><strong>userAdminAnyDatabase</strong></a></li>
+</ol>
+
+
+<pre><code>use admin
+
+var user = {
+    "user" : "admin",
+    "pwd" : "manager",
+    roles : [
+        {
+            "role" : "userAdminAnyDatabase",
+            "db" : "admin"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>Now that you have created a user, in a MongoDB running with <code>--auth</code>, anonymous connections won&rsquo;t be able to do do anything with the database.</p>
+
+<p>You can test for example to execute <code>show dbs</code> or <code>db.coll.insert({'x':0})</code> commands, you&rsquo;ll see authorization errors.</p>
+
+<h3>Connect with the Admnistrator user</h3>
+
+<p>Now that we have an admin user you can connect to the database with this user:</p>
+
+<pre><code>
+&gt; mongo admin -u admin -p
+</code></pre>
+
+<p>Our admin user, has the role <strong>userAdminAnyDatabase</strong>. With this role you can manage user; but this role cannot read/write data from application datatabases/collections.</p>
+
+<p>So we need now to create a new user for our &ldquo;eCommerce&rdquo; application.</p>
+
+<h2>3. Create Application User</h2>
+
+<p>Now we will create a new user <em>website</em> that is responsible of the ecommerce database.</p>
+
+<pre><code>&gt; mongo admin -u admin -p
+
+use ecommerce
+
+var user = {
+    "user" : "website",
+    "pwd" : "abc123",
+    roles : [
+        {
+            "role" : "readWrite",
+            "db" : "ecommerce"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>This user will be able to read/write on the <em>ecommerce</em> database</p>
+
+<h3>Connect with the application user</h3>
+
+<p>Using the mongo shell you can now connect and create/query data</p>
+
+<pre><code>&gt; mongo ecommerce -u website -p
+
+db.products.insert({ "title" : "MongoDB in Action"  });
+
+db.products.findOne();
+
+db.products.update({}, {"$set" : { "type" : "book" } })
+</code></pre>
+
+<p>As you can see this user has the perfect profile for your application.</p>
+
+<p>Note, that if you try to query or modify another database with this user you will receive authorization exceptions.</p>
+
+<h2>Create a reporting user (Read Only)</h2>
+
+<p>You may need in your application, user that can only read data, let&rsquo;s say in all databases. For this you just need to assign the role <strong>readAnyDatabase</strong>.</p>
+
+<pre><code>
+&gt; mongo admin -u admin -p
+
+var user = {
+    "user" : "reporting",
+    "pwd" : "abc123",
+    roles : [
+        {
+            "role" : "readAnyDatabase",
+            "db" : "admin"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>This user will be able to query all the databases and collections, including <code>show dbs</code> command.</p>
+
+<p>Let&rsquo;s connect with the reporting user:</p>
+
+<pre><code>&gt; mongo admin -u reporting -p
+
+show dbs
+
+use ecommerce
+
+db.products.find();
+</code></pre>
+
+<p>If you try to inser/update/delete document you will receive an exception.</p>
+
+<h2>Add new role to a user</h2>
+
+<p>Let&rsquo;s now see how to add a new role to a user. For example I want to let the admin the power of read and write any database. For this I just need to add the role <strong>readWriteAnyDatabase</strong> to the admin user.</p>
+
+<pre><code>&gt; mongo admin -u admin -p
+
+db.grantRolesToUser(
+    "admin",
+    [{ "role" : "readWriteAnyDatabase", "db" : "admin" }]
+)
+
+db.getUser("admin");
+</code></pre>
+
+<p>Using the <code>db.grantRolesToUser</code> command I have added the role to the admin user, and using the <code>db.getUser</code> I can look at the user profile.</p>
+
+<p>Now, admin user should be able to create new databases, collections and documents, let&rsquo;s try:</p>
+
+<pre><code>use hr
+
+db.employees.insert({ "name":"John Doe", "hire_date" : new Date() });
+
+db.organization.insert({ "name" : "Development" });
+
+db.employees.findOne();
+</code></pre>
+
+<h2>Create and use custom roles</h2>
+
+<p>Another feature that is used a lot around security is related to the roles. In some case you want to provide multiple roles to a user, for example:</p>
+
+<ul>
+<li>all permission on database <em>ecommerce</em></li>
+<li>read the collection <em>employees</em> in database <em>hr</em></li>
+</ul>
+
+
+<p>For this you can create a role that provide all the permissions and assign it to users. Let&rsquo;s do that using admin user.</p>
+
+<pre><code>use admin
+
+var role = {
+    "role"  : "webSiteManagerRole",
+    privileges : [
+        {
+            "resource": {"db" : "hr", "collection" : "employees"},
+            "actions": ["find"]
+        }
+    ],
+    "roles" : [
+        {
+            "role" : "readWrite",
+            "db" : "ecommerce"
+        }
+    ]
+}
+
+db.createRole( role );
+
+var user = {
+    "user" : "master",
+    "pwd" : "abc123",
+    roles : [
+        {
+            "role" : "webSiteManagerRole",
+            "db" : "admin"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>If you connect now with the user &ldquo;master&rdquo;, you will see that, the user:</p>
+
+<ul>
+<li>can do anything you want in the ecommerce database</li>
+<li>can read the &ldquo;hr.employees&rdquo; collection, on only this</li>
+<li>cannot do anything else.</li>
+</ul>
+
+
+<h2>Roles and Privileges</h2>
+
+<p>As you have seen in the previous section, you can create roles, and assign privileges to these roles. This is very powerful and you can really control each action on the database.</p>
+
+<p>I am inviting you to look in detail to the built-in roles and privileges, this will help you a lot to select the proper ones for your application:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/reference/built-in-roles/">Built-in Roles</a></li>
+<li><a href="http://docs.mongodb.org/manual/reference/privilege-actions/">Privileges</a></li>
+</ul>
+
+
+<h2>Conclusion</h2>
+
+<p>In this blog post I quickly explained, how to:</p>
+
+<ul>
+<li>Use MongoDB Authentication</li>
+<li>Create Users</li>
+<li>Assign Roles and Privileges for Users.</li>
+</ul>
+
+
+<p>It is interesting to know that everything that I have showed you in the shell could be done from a user interface in <a href="http://mms.mongodb.com">MMS</a></p>
+]]></content>
+  </entry>
+  
+</feed>

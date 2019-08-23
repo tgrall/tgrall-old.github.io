@@ -1,0 +1,1095 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Rest | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/rest/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR-DB JSON REST API]]></title>
+    <link href="http://tgrall.github.io/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/"/>
+    <updated>2018-04-23T14:37:51+02:00</updated>
+    <id>http://tgrall.github.io/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>In this project you will learn how to use the MapR-DB JSON REST API to:</p>
+
+<p>Create and Delete tables
+Create, Read, Update and Delete documents (CRUD)
+MapR Extension Package 5.0 (MEP) introduced the MapR-DB JSON REST API that allow application to use REST to interact with MapR-DB JSON.</p>
+
+<p>You can find information about the MapR-DB JSON REST API in the documentation: <a href="https://maprdocs.mapr.com/home/MapR-DB/JSON_DB/UsingMapRDBJSONRESTAPI.html">Using the MapR-DB JSON REST API</a></p>
+
+<!-- more -->
+
+
+<h2>Prerequisites</h2>
+
+<p>You system should have the following components:</p>
+
+<ul>
+<li>A running MapR 6.0.1 &amp; MEP 5.0 cluster with the MapR-DB REST API service installed</li>
+<li><code>curl</code> or equivalent tool</li>
+</ul>
+
+
+<h2>Discover the MapR-DB JSON REST API</h2>
+
+<p>The easiest way to discover it, is to use curl command (or equivalent).</p>
+
+<p><strong>1 - Create a table</strong></p>
+
+<pre><code>curl -X PUT \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the MapR-DB REST Service (MapR Data Access Gateway) is running on the mapr-node host with the default port <code>8243</code> using HTTPS</li>
+<li>the HTTP verb <code>PUT</code> on <code>/api/v2/table/</code> endoint creates a new table</li>
+<li>the protocol is HTTP since HTTPS is not enabled on this cluster</li>
+<li>the new table will be created wit the path <code>/apps/emp</code> that is encoded to <code>%2Fapps%2Femp</code></li>
+<li>the user <code>root</code> with the password <code>mapr</code> is used for authentication, using basic authentication</li>
+<li>the <code>-k</code> parameter is used to indicate to turn off curl’s verification of the certificate.</li>
+</ul>
+
+
+<p>In this example, you use the basic authentication, it is also possible to use <a href="https://jwt.io/introduction/">JSON Web Token</a>. You will learn more about this when you will write an application in Go.</p>
+
+<p><strong>2 - Insert Documents</strong></p>
+
+<p>Insert one document</p>
+
+<pre><code>curl -X POST \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -H 'Content-Type: application/json' \
+  -d '{"_id":"user001","first_name":"John","last_name":"Doe", "age" : 28}' \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the <code>/api/v2/table/{path}</code> with the verb <code>GET</code> is used with a <code>condition</code> query parameter</li>
+<li>the OJAI JSON syntax is used to express the condition: <code>{"$eq":{"last_name":"Doe"}}</code></li>
+</ul>
+
+
+<p><strong>3 - Update a document</strong></p>
+
+<p>The following example will increment the age by 1 and update the last name.</p>
+
+<pre><code>curl -X POST \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -H 'Content-Type: application/json' \
+  -d '{"$set" : {"last_name" : "New Doe"}, "$increment" : {"age":1}}' \
+  -k
+</code></pre>
+
+<p>In this comamnd:</p>
+
+<ul>
+<li>the URL points to the document <code>_id</code> to update</li>
+<li>the HTTP verb <code>POST</code> is used to modify the resource</li>
+<li>the request body <code>-d</code> is the OJAI JSON Mutation that update the last name and increment the age.</li>
+</ul>
+
+
+<p>You can check that the document has been updated using the following command:</p>
+
+<pre><code>curl -X GET \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p><strong>4 - Delete a document</strong></p>
+
+<p>Delete the document with the <code>_id</code> user001.</p>
+
+<pre><code>curl -X DELETE \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the URI <code>/api/v2/table/{path}/document/{id}</code> with the HTTP verb <code>DELETE</code> is used to delete the document</li>
+</ul>
+
+
+<p><strong>5 - Delete the MapR-DB JSON table</strong></p>
+
+<p>The last step of this tutorial is to delete the table using the following command:</p>
+
+<pre><code>curl -X DELETE \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial you have learned how to use the MapR-DB JSON REST API to:</p>
+
+<ul>
+<li>Create a table</li>
+<li>Insert and query documents</li>
+<li>Update and delete documents</li>
+<li>Drop table</li>
+</ul>
+
+
+<p>You can now use the API to create MapR-DB JSON Application using your favorite language.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With Kafka REST Proxy for MapR Streams]]></title>
+    <link href="http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/"/>
+    <updated>2017-01-20T10:31:22+01:00</updated>
+    <id>http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>MapR Ecosystem Package 2.0 (MEP) is coming with some new features related to MapR Streams:</p>
+
+<ul>
+<li><a href="http://maprdocs.mapr.com/home/Kafka/kafkaREST.html">Kafka REST Proxy for MapR Streams</a> provides a RESTful interface to MapR Streams and Kafka clusters to consume and product messages and to perform administrative operations.</li>
+<li><a href="http://maprdocs.mapr.com/home/Kafka/kafkaConnect.html">Kafka Connect for MapR Streams</a> is a utility for streaming data between MapR Streams and Apache Kafka and other storage systems.</li>
+</ul>
+
+
+<p>MapR Ecosystem Packs (MEPs) are a way to deliver ecosystem upgrades decoupled from core upgrades - allowing you to upgrade your tooling independently of your Converged Data Platform. You can lean more about MEP 2.0 in <a href="https://www.mapr.com/blog/announcing-mapr-ecosystem-pack-mep-20">this article</a>.</p>
+
+<p>In this blog we describe how to use the REST Proxy to publish and consume messages to/from MapR Streams. The REST Proxy is a great addition to the MapR Converged Data Platform allowing any programming language to use MapR Streams.</p>
+
+<p>The Kafka REST Proxy provided with the MapR Streams tools, can be used with MapR Streams (default), but also used in a hybrid mode with Apache Kafka. In this article we will focus on MapR Streams.</p>
+
+<!-- more -->
+
+
+<h2>Prerequisites</h2>
+
+<ul>
+<li>MapR Converged Data Platform 5.2 with MEP 2.0
+
+<ul>
+<li>with MapR Streams Tools</li>
+</ul>
+</li>
+<li>curl, wget or any HTTP/REST Client tool</li>
+</ul>
+
+
+<h2>Create the MapR Streams and Topic</h2>
+
+<p>A stream is a collection of topics that you can manage as a group by:</p>
+
+<ol>
+<li>Setting security policies that apply to all topics in that stream</li>
+<li>Setting a default number of partitions for each new topic that is created in the stream</li>
+<li>Set a time-to-live for messages in every topic in the stream</li>
+</ol>
+
+
+<p>You can find more information about MapR Streams concepts in the <a href="http://maprdocs.mapr.com/home/MapR_Streams/mapr_streams.html">documentation</a>.</p>
+
+<p>On your Mapr Cluster or Sandbox, run the following commands:</p>
+
+<pre><code>$ maprcli stream create -path /apps/iot-stream -produceperm p -consumeperm p -topicperm p
+
+$ maprcli stream topic create -path /apps/iot-stream -topic sensor-json -partitions 3
+
+$ maprcli stream topic create -path /apps/iot-stream -topic sensor-binary -partitions 3
+</code></pre>
+
+<h2>Start Kafka Console Producers and Consumers</h2>
+
+<p>Open two terminal windows and run the consumer Kafka utilities using the following commands:</p>
+
+<h4>Consumer</h4>
+
+<ul>
+<li>Topic sensor-json</li>
+</ul>
+
+
+<pre><code>$ /opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-consumer.sh --new-consumer --bootstrap-server this.will.be.ignored:9092 --topic /apps/iot-stream:sensor-json
+</code></pre>
+
+<ul>
+<li>Topic sensor-binary</li>
+</ul>
+
+
+<pre><code>$ /opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-consumer.sh --new-consumer --bootstrap-server this.will.be.ignored:9092 --topic /apps/iot-stream:sensor-binary
+</code></pre>
+
+<p>This two terminal windows will allow you to see the messages posted on the different topics</p>
+
+<h2>Using Kafka REST Proxy</h2>
+
+<h3>Inspect Topic Metadata</h3>
+
+<p>The endpoint <code>/topics/[topic_name]</code> allows you to get some informations about the topic. In MapR Streams, topics are part of a <em>stream</em> identified by a path;
+to use the topic using the REST API you have to use the full path, and encode it in the URL; for example:</p>
+
+<ul>
+<li><code>/apps/iot-stream:sensor-json</code> will be encoded with <code>%2Fapps%2Fiot-stream%3Asensor-json</code></li>
+</ul>
+
+
+<p>Run the following command, to get information about the <code>sensor-json</code> topic</p>
+
+<pre><code>$ curl -X GET  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>Note: For simplicity reason I am running the command from the node where the Kafka REST proxy is running, so it is possible to use <code>localhost</code>.</p>
+
+<p>You can print JSON in a pretty way, by adding a Python command such as :</p>
+
+<pre><code>$ curl -X GET  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json | python -m json.tool
+</code></pre>
+
+<p><strong>Default Stream</strong></p>
+
+<p>As mentioned above, the Stream path is part of the topic name you have to use in the command;
+however it is possible to configure the MapR Kafka REST Proxy to use a default stream.
+For this you should add the following property in the <code>/opt/mapr/kafka-rest/kafka-rest-2.0.1/config/kafka-rest.properties</code> file:</p>
+
+<ul>
+<li><code>streams.default.stream=/apps/iot-stream</code></li>
+</ul>
+
+
+<p> When you change the Kafka REST proxy configuration, you must restart the service using maprcli or MCS.</p>
+
+<p> The main reason to use the <code>streams.default.stream</code> properties is to simplify the URLs used by the application for example
+ * with <code>streams.default.stream</code> you can use <code>curl -X GET  http://localhost:8082/topics/</code>
+ * without this configuration, or if you want to use a specific stream you must specify it in the URL <code>http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json</code></p>
+
+<p> In this article, all the URLs contains the encoded stream name, like that you can start using the Kafka REST proxy without changind the configuration and also use it with different streams.</p>
+
+<h3>Publishing Messages</h3>
+
+<p>The Kafka REST Proxy for MapR Streams allows application to publish messages to MapR Streams. Messages could be send as JSON or Binary content (base64 encoding).</p>
+
+<h4>To send a JSON Message:</h4>
+
+<ul>
+<li>the query should be a HTTP <code>POST</code></li>
+<li>the Content-Type should be : <code>application/vnd.kafka.json.v1+json</code></li>
+<li>the Body:</li>
+</ul>
+
+
+<pre><code class="JSON">{
+  "records":
+  [
+    {
+      "value":
+      {
+        "temp" : 10 ,
+        "speed" : 40 ,
+        "direction" : "NW"
+        }  
+      }
+  ]
+}
+</code></pre>
+
+<p>The complete request is:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
+  --data '{"records":[{"value": {"temp" : 10 , "speed" : 40 , "direction" : "NW"}  }]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>You should see the message printed in the terminal window where the <code>/apps/iot-stream:sensor-json</code> consumer is running.</p>
+
+<h4>To send a binary Message:</h4>
+
+<ul>
+<li>the query should be a HTTP <code>POST</code></li>
+<li>the Content-Type should be : <code>application/vnd.kafka.binary.v1+json</code></li>
+<li>the Body:</li>
+</ul>
+
+
+<pre><code class="JSON">{
+  "records":
+  [
+    {
+      "value":"SGVsbG8gV29ybGQ="
+    }
+  ]
+}
+</code></pre>
+
+<p>Note that <code>SGVsbG8gV29ybGQ=</code> is the string &ldquo;Hello World&rdquo; encoded in Base64.</p>
+
+<p>The complete request is:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.binary.v1+json" \
+  --data '{"records":[{"value":"SGVsbG8gV29ybGQ="}]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>You should see the message printed in the terminal window where the <code>/apps/iot-stream:sensor-binary</code> consumer is running.</p>
+
+<h4>Sending multiple messages</h4>
+
+<p>The <code>records</code> field of the HTTP Body allows you to send multiple messages for example you can send:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
+  --data '{"records":[{"value": {"temp" : 12 , "speed" : 42 , "direction" : "NW"}  }, {"value": {"temp" : 10 , "speed" : 37 , "direction" : "N"}  } ]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>This command will send 2 messages, and increment the offset by 2. You can do the same
+with binary content, just add new element in the JSON array; for example:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.binary.v1+json" \
+  --data '{"records":[{"value":"SGVsbG8gV29ybGQ="}, {"value":"Qm9uam91cg=="}]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>As you probably know, it is possible to set a key to a message to be sure that all the messages
+with the same key will arrive in the same partition. For this, add the <code>key</code> attribute to the message as follow:</p>
+
+<pre><code class="JSON">{
+  "records":
+  [
+    {
+      "key": "K001",
+      "value":
+      {
+        "temp" : 10 ,
+        "speed" : 40 ,
+        "direction" : "NW"
+        }  
+      }
+  ]
+}
+</code></pre>
+
+<p>Now that you know how to post messages to MapR Stream topics usinf the REST Proxy, let&rsquo;s see how to consume the messages.</p>
+
+<h3>Consuming Messages</h3>
+
+<p>The REST proxy can also be used to consume messages from topics; for this you need to:</p>
+
+<ol>
+<li>Create a consumer instance.</li>
+<li>Use this URL returned by the first call to read message.</li>
+<li>Delete the consumer instanced if needed.</li>
+</ol>
+
+
+<h4>Creating the consumer instance</h4>
+
+<p>The following request creates the consumer instance:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.v1+json" \
+      --data '{"name": "iot_json_consumer", "format": "json", "auto.offset.reset": "earliest"}' \
+      http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>The response from the server looks like:</p>
+
+<pre><code class="json">{
+  "instance_id":"iot_json_consumer",
+  "base_uri":"http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-json/instances/iot_json_consumer"
+}
+</code></pre>
+
+<p>Note that we have used the <code>/consumers/[topic_name]</code> to create the consumer.</p>
+
+<p>The <code>base_uri</code> will be used by the subsequent requests to get the messages from the topic. Like any MapR Streams/Kafka consumer the <code>auto.offset.reset</code> defines its behavior. In this example the value is set to <code>earliest</code>, this means that the consumer will read the messages from the beginning. You can find more information about the consumer configuration in the <a href="http://maprdocs.mapr.com/home/MapR_Streams/configuration_parameters_for_consumers.html">MapR Streams documentation</a>.</p>
+
+<h4>Consuming the messages</h4>
+
+<p>To consume the messages, just add the Mapr Streams topic to the URL of the consumer isntance.</p>
+
+<p>The following request consumes the messages from the topic:</p>
+
+<pre><code>curl -X GET -H "Accept: application/vnd.kafka.json.v1+json" \
+http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-json/instances/iot_json_consumer/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>This call returns the messages in a JSON document:</p>
+
+<pre><code class="json">[
+  {"key":null,"value":{"temp":10,"speed":40,"direction":"NW"},"topic":"/apps/iot-stream:sensor-json","partition":1,"offset":1},
+  {"key":null,"value":{"temp":12,"speed":42,"direction":"NW"},"topic":"/apps/iot-stream:sensor-json","partition":1,"offset":2},
+  {"key":null,"value":{"temp":10,"speed":37,"direction":"N"},"topic":"/apps/iot-stream:sensor-json","partition":1,"offset":3}
+]
+</code></pre>
+
+<p>Each call to the API returns the new messages published, based on the offset of the last call.</p>
+
+<p>Note that the Consumer will be destroyed:</p>
+
+<ul>
+<li>after some idle time set by the <code>consumer.instance.timeout.ms</code> (default value set to 300000ms / 5 minutes)</li>
+<li>where it is destroyed using a REST API call (see below).</li>
+</ul>
+
+
+<h3>Consuming binary format messages</h3>
+
+<p>The approach is the same if you need to consume binary messages, you need to change the format and accept header.</p>
+
+<p>Call this URL to create a consumer instance for the binary topic:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.v1+json" \
+      --data '{"name": "iot_binary_consumer", "format": "binary", "auto.offset.reset": "earliest"}' \
+      http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>Then consume messages, the accept header is set to <code>application/vnd.kafka.binary.v1+json</code>:</p>
+
+<pre><code>curl -X GET -H "Accept: application/vnd.kafka.binary.v1+json" \
+http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-binary/instances/iot_binary_consumer/topics/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>This call returns the messages in a JSON document, and the value is encoded in Base64</p>
+
+<pre><code class="json">[
+  {"key":null,"value":"SGVsbG8gV29ybGQ=","topic":"/apps/iot-stream:sensor-binary","partition":1,"offset":1},
+  {"key":null,"value":"Qm9uam91cg==","topic":"/apps/iot-stream:sensor-binary","partition":1,"offset":2}
+]
+</code></pre>
+
+<h3>Delete consumer instances</h3>
+
+<p>As mentioned before the consumer will be destroyed automatically based on the <code>consumer.instance.timeout.ms</code> configuration of the REST Proxy;
+it is also possible to destroyed the instance using the consumer instance URI and an HTTP DELETE call, as follow:</p>
+
+<pre><code>curl -X DELETE http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-binary/instances/iot_binary_consumer
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to use the Kafka REST Proxy for MapR Streams that allow any application to
+use messages published in the MapR Converged Data Platform.</p>
+
+<p>You can find more information about the Kafka REST Proxy in the <a href="http://maprdocs.mapr.com/home/Kafka/REST-proxy.html">MapR documentation</a> and the following resources:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">Getting Started with MapR Streams</a></li>
+<li><a href="https://www.mapr.com/streaming-architecture-using-apache-kafka-mapr-streams">&ldquo;Streaming Architecture: New Designs Using Apache Kafka and MapR Streams&rdquo; ebook by Ted Dunning and Ellen Friedman</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Couchbase 101 : Install, Store and Query Data]]></title>
+    <link href="http://tgrall.github.io/blog/2012/07/06/couchbase-101-install-store-and-query-data/"/>
+    <updated>2012-07-06T09:31:00+02:00</updated>
+    <id>http://tgrall.github.io/blog/2012/07/06/couchbase-101-install-store-and-query-data</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>In this post I just want to show how easily is to get
+started with Couchbase, and also explain how to “query” the data. The basic
+steps of this tutorial are:</p>
+
+<ol>
+<li>Install Couchbase</li>
+<li>Create Data</li>
+<li>Query Data</li>
+</ol>
+
+
+<p>I will try to post more articles, if I have time to show how to use Couchbase from your applications (starting with Java).</p>
+
+<p>Prerequisites :</p>
+
+<ul>
+<li>Could not be simpler : Couchbase 2.0 available <a href="http://www.couchbase.com/downloads-all">here</a>. (Currently in Developer Preview)</li>
+</ul>
+
+
+<h2>Couchbase 101 : Insert and Query data</h2>
+
+<h3>Installation</h3>
+
+<p>I am using Couchbase on Mac OS X, so let me describe the installation in this environment. If you are using other operating system just take a look to the Couchbase documentation.</p>
+
+<p>Couchbase installation is very (very!) fast:</p>
+
+<ol>
+<li>Download the Mac OS X Zip file.</li>
+<li>Double-click the downloaded Zip installation file to extract the contents. This will create a single file, the Couchbase.app application.</li>
+<li>Drag and Drop the Couchbase.app to your chosen installation folder, such as the system Applications folder.</li>
+</ol>
+
+
+<h3>Start and Configure Couchbase Server</h3>
+
+<p>To start Couchbase Server, just double click on the Couchbase Server. Once the server is started, a new icon is added in the OS X Menu to indicate that the Server is up and running.</p>
+
+<p>You can now configure your Couchbase instance, for this you just need to access the Admin Console, available at the following location <a href="http://127.0.0.1:8091/">http://127.0.0.1:8091</a> (change the IP address if needed) or simply by going in the Couchbase menu and click on Open Admin Console entry.</p>
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-UokiHs1DlFw/T_VpJHmn8KI/AAAAAAAAAUo/oy7bh5w9nOw/s1600/couchbase-menu.png">http://4.bp.blogspot.com/-UokiHs1DlFw/T_VpJHmn8KI/AAAAAAAAAUo/oy7bh5w9nOw/s1600/couchbase-menu.png</a>&#8221;></p>
+
+<ol>
+<li>Welcome Screen : Click Setup</li>
+<li>Set the disk and cluster configuration. On my instance I keep the default location for the on disk storage. Just configure the size of the memory usage for your instance, for example 800Mb. So far, we have a single instance, so no need to join a cluster.</li>
+<li>Choose to generate sample data. This will be interesting to learn more about data and views.</li>
+<li>Create <code>the default</code> bucket (use for testing only). A bucket is used by Couchbase to store data. It could be compared to a “database” in RDBMS world.</li>
+<li>Configure update notifications to be alerted when new version of Couchbase is released</li>
+<li>Configure the server with a final step with the administrator username and password</li>
+<li>When this is done you are automatically redirected to the Admin Console.</li>
+</ol>
+
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-_a1iynqdk8w/T_VpTwa5qEI/AAAAAAAAAUw/ZGBHZsC6x_8/s320/install-step8.png">http://2.bp.blogspot.com/-_a1iynqdk8w/T_VpTwa5qEI/AAAAAAAAAUw/ZGBHZsC6x_8/s320/install-step8.png</a>&#8221;></p>
+
+<p>This is it! You are ready to use your Couchbase server.</p>
+
+<p>Couchbase has many interesting features, especially around scalability and elasticity but for not in this article let&rsquo;s focus on the basics :</p>
+
+<ul>
+<li>Insert some data and query them</li>
+</ul>
+
+
+<h3>Insert Data</h3>
+
+<p>Couchbase has many ways to manipulate data from you favorite programming language using the different client libraries : Java, Python, PHP, Ruby, .Net, C. For now let&rsquo;s use the Admin Console to create and query data.</p>
+
+<p>Couchbase can store any type of data, but when you need to manipulate some data with a structure the best way is to use JSON Documents. So let&rsquo;s use the console and create documents.</p>
+
+<p>To create new documents in your database, click on the &ldquo;Data Buckets&rdquo; tab. If you have installed the sample you see 2 buckets: <code>default</code> and <code>gamesim-sample</code>.</p>
+
+<p>Let&rsquo;s create a new documents in the <code>default</code> bucket:</p>
+
+<ol>
+<li>Click on Documents button</li>
+<li>Click on Create Document</li>
+<li>Since each document must have an id for example 100.</li>
+<li>Couchbase save the document and add some metadata such as &#95;rev, $flags, expiration</li>
+<li>Add new attributes to the document that describe an employee : Name, Departement and Salary, then save it. You just need to update the JSON object with values</li>
+</ol>
+
+
+<pre><code class="json">{
+      "_id": "100",
+      "name": "Thomas",
+      "dept": "Sales",
+      "salary": 5000
+  }
+</code></pre>
+
+<p>Repeat the operation with some other employees :</p>
+
+<pre><code class="java">  200,Jason,Technology,5500
+  300,Mayla,Technology,7000
+  400,Nisha,Marketing,9500
+  500,Randy,Technology,6000
+  501,Ritu,Accounting,5400
+</code></pre>
+
+<p>You have now a list of employees in your database. That was easy isn&rsquo;t? Let&rsquo;s now query them.</p>
+
+<h3>Query Data</h3>
+
+<p>Access document directly from its ID</p>
+
+<p>First of all you can quickly access a document using a simple HTTP request using its id. For example to access the Mayla with the id 300 just enter the following URL:</p>
+
+<ul>
+<li><code>http://127.0.0.1:8092/default/300</code></li>
+</ul>
+
+
+<p>In this URL you have :</p>
+
+<ul>
+<li><code>8092</code> is the Couch API REST port used to access data (where 8091 is the port for the Admin console)</li>
+<li><code>default</code> is the bucket in which the document is stored</li>
+<li><code>300</code> is the id of the document</li>
+</ul>
+
+
+<h4>Search your data with queries</h4>
+
+<p>So we have seen how you can access one document. But what if my need is :</p>
+
+<ul>
+<li>&ldquo;Give me all the employee of the Technology department&rdquo;</li>
+</ul>
+
+
+<p>To achieve such query it is necessary to create views. The views are used by Couchbase server to index and search your data. A view is a Map function written in JavaScript, that will generate a key value list that is compliant with logic you put in the Map function. Note that this key,value is now indexed and sorted by key. This is important when you query your data.</p>
+
+<p>So let&rsquo;s create a new view from the Admin Console:</p>
+
+<ol>
+<li>Click on the Views tab (be sure you are on the default bucket)</li>
+<li>Click on the &ldquo;Create Development View&rdquo;</li>
+<li>Enter the Document and View name:</li>
+<li>  Document Name : _design/dev_dept</li>
+<li>  View Name : dept</li>
+<li>Cick Save</li>
+<li>Click on your View to edit it</li>
+</ol>
+
+
+<p>Since we need to provide the list of employees that are part of a the Technology department, we need to create a view that use the <u>department as key</u>, so the map function looks like :</p>
+
+<pre><code class="javascript">function (doc) {
+    emit(doc.dept, null);
+}
+</code></pre>
+
+<p>Save the view</p>
+
+<p>This function takes the document and create a list that contains the &ldquo;dept&rdquo; as key and null as value. The value itself is not that important in our case. A simple rule will be : do not put too much data in the value since at the end Couchbase server creates an index with this map. Will see that Couchbase allows developer to easily get the document information when accessing a view.</p>
+
+<p>Click on the &ldquo;Show Results&rdquo; button, the result will look like:</p>
+
+<pre><code class="json">{"total_rows":6,"rows":[
+  {"id":"501","key":"Accounting","value":null},
+  {"id":"400","key":"Marketing","value":null},
+  {"id":"100","key":"Sales","value":null},
+  {"id":"200","key":"Technology","value":null},
+  {"id":"300","key":"Technology","value":null},
+  {"id":"500","key":"Technology","value":null}
+  ]
+}
+</code></pre>
+
+<p>As we have seen in earlier it is possible to access the document using a single URL, it is the same for views. You can for example access the view we have just created using the following URL:</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_dept/_view/dept">http://127.0.0.1:8092/default/<em>design/dev_dept/</em>view/dept
+</a></li>
+</ul>
+
+
+<p>Now it is possible to use query parameter to filter the results using the key parameter with the value entered using a JSON String :</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_dept/_view/dept?key=%22Technology%22">http://127.0.0.1:8092/default/<em>design/dev_dept/</em>view/dept?key=&ldquo;Technology&rdquo;</a></li>
+</ul>
+
+
+<p>The result of this query is now :</p>
+
+<pre><code class="json">{"total_rows":6,"rows":[
+  {"id":"200","key":"Technology","value":null},
+  {"id":"300","key":"Technology","value":null},
+  {"id":"500","key":"Technology","value":null}
+  ]
+}
+</code></pre>
+
+<p>You have many other parameters you can use when accessing a view to control the size, the time out, &hellip;. One of them is quite interesting is include_docs that ask Couchbase to include the full content of the document in the result. So if you call :</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_dept/_view/dept?key=%22Technology%22&amp;amp;include_docs=true">http://127.0.0.1:8092/default/<em>design/dev_dept/</em>view/dept?key=&ldquo;Technology&rdquo;&amp;include_docs=true</a></li>
+</ul>
+
+
+<p>The result is :</p>
+
+<pre><code class="json">{"total_rows":6,"rows":[
+  {"id":"200","key":"Technology","value":null,"doc":  {"_id":"200","_rev":"1-1de6e6751608eada0000003200000000","$flags":0,"$expiration":0,"name":"Jason","dept":"Technology","salary":5500}},
+  {"id":"300","key":"Technology","value":null,"doc":{"_id":"300","_rev":"1-f3e44cee742bfae10000003200000000","$flags":0,"$expiration":0,"name":"Mayla","dept":"Technology","salary":7000}},
+  {"id":"500","key":"Technology","value":null,"doc":  {"_id":"500","_rev":"1-05780359aac8f3790000003200000000","$flags":0,"$expiration":0,"name":"Randy","dept":"Technology","salary":6000}}
+]
+}
+</code></pre>
+
+<p>Let&rsquo;s now create a little more complicated view to answer the following business requirement:</p>
+
+<ul>
+<li>&ldquo;Give me all the employee with a salary between 5000 and 6000&rdquo;</li>
+</ul>
+
+
+<p>So now you know that you need to create a new view with the salary as key let&rsquo;s with the following Map function:</p>
+
+<pre><code class="javascript">function (doc) {
+  emit(doc.salary, null);
+}
+</code></pre>
+
+<p>Couchbase is automatically sorting the key when creating/updating the index so, let&rsquo;s use the <code>startkey</code>  and  <code>endkey</code> parameter when calling the view. So let&rsquo;s call the view with from the following URL:</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_salary/_view/salary?startkey=5000&amp;amp;endkey=6000&amp;amp;include_docs=true">http://127.0.0.1:8092/default/<em>design/dev_salary/</em>view/salary?startkey=5000&amp;endkey=6000&amp;include_docs=true</a></li>
+</ul>
+
+
+<p>The result is :</p>
+
+<pre><code class="json">{"total_rows":6,"rows":[
+ {"id":"100","key":5000,"value":null,"doc":{"_id":"100","_rev":"1-0f33580d780014060000002e00000000","$flags":0,"$expiration":0,"name":"Thomas","dept":"Sales","salary":5000}},
+ {"id":"501","key":5400,"value":null,"doc":{"_id":"501","_rev":"1-b1fe5bc79637720e0000003100000000","$flags":0,"$expiration":0,"name":"Ritu","dept":"Accounting","salary":5400}},
+ {"id":"200","key":5500,"value":null,"doc":{"_id":"200","_rev":"1-1de6e6751608eada0000003200000000","$flags":0,"$expiration":0,"name":"Jason","dept":"Technology","salary":5500}},
+ {"id":"500","key":6000,"value":null,"doc":{"_id":"500","_rev":"1-05780359aac8f3790000003200000000","$flags":0,"$expiration":0,"name":"Randy","dept":"Technology","salary":6000}}
+]
+}
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>In this short article you have learn how to:</p>
+
+<ul>
+<li>Install Couchbase*   Create data using the Admin Console</li>
+<li>Query data with views</li>
+</ul>
+
+
+<p>When I get more time I will write another article that do the same from Java, and other languages.</p>
+
+<hr />
+
+<p>Note from @ingenthr</p>
+
+<blockquote><p>Nice blog! Note that while querying the REST interface directly is okay, we&rsquo;ve really tried to make it easy by having high-level language support for queries in each of the official client libraries. They&rsquo;re all listed over at <a href="http://www.couchbase.com/develop">http://www.couchbase.com/develop</a></p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JAX-RS: Jersey and JSON Single Element Arrays]]></title>
+    <link href="http://tgrall.github.io/blog/2011/09/02/jax-rs-jersey-and-json-single-element-arrays/"/>
+    <updated>2011-09-02T15:30:26+02:00</updated>
+    <id>http://tgrall.github.io/blog/2011/09/02/jax-rs-jersey-and-json-single-element-arrays</id>
+    <content type="html"><![CDATA[<p>Last week I have been struggling with a small issue while developing a service using Jersey.</p>
+
+<p>The goal of this service is to provide JSON object to my Web application, so called directly from the browser. This service returns in a JSON array a list of Employees, something like:</p>
+
+<pre><code class="javascript">{"employee":[
+{"email":"jdoe@example.com","firstName":"John","lastName":"Doe"},
+{"email":"mmajor@example.com","firstName":"Mary","lastName":"Major"}
+]}
+</code></pre>
+
+<p>So an &ldquo;employee&rdquo; array, this is perfect and expected, but when my service returns a single element the returned object looks like:</p>
+
+<pre><code class="javascript">{"employee":{"email":"jdoe@example.com","firstName":"John","lastName":"Doe"}}
+</code></pre>
+
+<p>As you can see brackets <strong>[&hellip;]</strong> are missing around the employee item. This is an issue since your client code is expecting an array.</p>
+
+<!-- more -->
+
+
+<h4>A solution&hellip;</h4>
+
+<p>My application is using Jersey, the JAX-RS Reference Implementation, and JAXB for the serialization of Java Objects to JSON, as I have explained in a <a href="http://tugdualgrall.blogspot.com/2010/02/create-and-deploy-jax-rs-rest-service.html">previous blog post</a>. I found a solution to this by creating a new <a href="http://jersey.java.net/nonav/documentation/latest/json.html#d4e919">JAXB Context Resolver</a>.</p>
+
+<p>In this resolver I can control how the JSON object should be generated, here is my implementation :</p>
+
+<pre><code class="java">import com.grallandco.employee.service.converter.EmployeeConverter;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
+
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+
+@Provider
+public class JAXBContextResolver implements ContextResolver &amp;lt; JAXBContext &amp;gt; {
+
+  private JAXBContext context;
+  private Class[] types = {EmployeeConverter.class};
+
+  public JAXBContextResolver() throws Exception {
+    this.context = new JSONJAXBContext(JSONConfiguration.mapped().arrays("employee").build(),
+    types);
+
+  }
+
+  public JAXBContext getContext(Class objectType) {
+    for (Class type : types) {
+      if (type == objectType) {
+        return context;
+      }
+    }
+    return null;
+  }
+}
+</code></pre>
+
+<p>First of all I declare this new class as a <a href="http://jersey.java.net/nonav/apidocs/1.7/jersey/index.html?javax/ws/rs/ext/Provider.html"><code>@Provider</code></a> to say that it this class is of interest to the JAX-RS runtime.</p>
+
+<p>I put in the <code>types</code> array the list of the Java classes that are concerned by the serialization (line#13). Then I create the ContextResolved with the different options that fulfill my requirements. You can take a look to the <a href="http://jersey.java.net/nonav/apidocs/1.7/jersey/index.html?com/sun/jersey/api/json/JSONJAXBContext.html"><code>JAXBContextResolver</code></a> Javadoc to see all the possible options available.</p>
+
+<p>With this class, the service now returned the following JSON String:</p>
+
+<pre><code class="javascript">{"employee":[{"email":"jdoe@example.com","firstName":"John","lastName":"Doe"}]}
+</code></pre>
+
+<p>You can find a complete example (NetBeans project) <a href="https://github.com/tgrall/Sample-REST-Service-using-JSON">here</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to Protect Your REST Service and Gadget in eXo Platform]]></title>
+    <link href="http://tgrall.github.io/blog/2011/04/11/how-to-protect-your-rest-service-and-gadget-in-exo-platform/"/>
+    <updated>2011-04-11T20:22:56+02:00</updated>
+    <id>http://tgrall.github.io/blog/2011/04/11/how-to-protect-your-rest-service-and-gadget-in-exo-platform</id>
+    <content type="html"><![CDATA[<p>During a partner workshop I was showing to the developers how the eXo IDE can help them to develop new features quickly and push them to the users in few minutes. A person asked me if it is possible to put some restriction in services and gadgets based on user profile.</p>
+
+<p>As you can guess the answer is YES WE CAN!</p>
+
+<ul>
+<li>How to access the security context in a REST service</li>
+<li>How to check is a user is member of a  group and manage permission from this information</li>
+<li>How to consume this service in a gadget and leverage the security to protect resources</li>
+</ul>
+
+
+<p><img class="<a" src="href="http://1.bp.blogspot.com/-eR15bpCaiXo/TZ8yp1kkLYI/AAAAAAAAAPM/8Az5EVfVrzU/s200/rest-no-access.png">http://1.bp.blogspot.com/-eR15bpCaiXo/TZ8yp1kkLYI/AAAAAAAAAPM/8Az5EVfVrzU/s200/rest-no-access.png</a>&#8221;>
+Not-authorized</p>
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-wcfWsRgV8Xc/TZ8ypzrBsLI/AAAAAAAAAPE/U9VnHpc3q9M/s200/rest-access.png">http://2.bp.blogspot.com/-wcfWsRgV8Xc/TZ8ypzrBsLI/AAAAAAAAAPE/U9VnHpc3q9M/s200/rest-access.png</a>&#8221;>
+Authorized</p>
+
+<p>If you are not interested to follow steps by step the explanations you can directly jump to the complete <a href="#completeService">REST Service code</a> or download the full eXo IDE Project from <a href="https://github.com/tgrall/sample-gadget-with-security">GitHub</a></p>
+
+<h3>Access the User Profile from your REST Service</h3>
+
+<p>As you probably know eXo Platform uses <a href="http://jcp.org/en/jsr/detail?id=311">JAX-RS</a> as API to develop and deploy REST Services. eXo developers can create REST services using their favorite Java IDE, but here I am using the eXo IDE package with <a href="http://www.exoplatform.org/company/public/website/platform">eXo Platform</a>.</p>
+
+<p>To access the security and user information in your service method it is possible to use the <a href="http://jersey.java.net/nonav/apidocs/1.5/jersey/javax/ws/rs/core/SecurityContext.html">SecurityContext</a> class of the JAX-RS API.  Your method signature will look like:</p>
+
+<pre><code class="java">import javax.ws.rs.Path
+import javax.ws.rs.GET
+import javax.ws.rs.PathParam
+import javax.ws.rs.core.Response
+import javax.ws.rs.core.MediaType
+import javax.ws.rs.Produces
+import javax.ws.rs.core.SecurityContext
+import javax.ws.rs.core.Context
+
+@Path("/system")
+@Produces("application/json")
+public class SystemInformationService {
+
+  @GET
+  @Path("information")
+  public Response getSystemInfo(@Context SecurityContext sc) {
+    sc.getUserPrincipal();
+    return Response.ok("foo", MediaType.APPLICATION_JSON).build();
+  }
+
+}
+</code></pre>
+
+<p>In lines 7 and 8, I import the classes needed to inject the security context in the method <code>getSystemInfo()</code> in line 16. For now let&rsquo;s forget about the other part of the code.</p>
+
+<p>With the Security Context object you can now access many things in your code. Two methods are quite interesting for this example: <code>getUserPrincipal()</code> and <code>isUserInRole()</code>, since our goal is to check if a user is allowed to execute or not a part of the business logic.</p>
+
+<p>It is important here to remember that we cannot directly use the <code>isUserInRole()</code> method since this method uses the logical JavaEE roles that are defined at the Java application level. In our case we are interested to know if a user is present in a &ldquo;eXo User Identity&rdquo; Group, for example member of the <code>/platform/administrators group</code>. This information is populated during the login process and comes from the user provider that could be LDAP, the eXo Database or JCR, or any other source since developers can extend this API to plug their own provider.</p>
+
+<p>Let&rsquo;s create an helper method that check, using the eXo Identity Service, if the user that executes the method is present in a group.</p>
+
+<pre><code class="java">...
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityRegistry;
+...
+...
+
+private boolean isMemberOf(String username,String group) {
+  ExoContainer container = ExoContainerContext.getCurrentContainer();
+  IdentityRegistry identityRegistry = (IdentityRegistry) container.getComponentInstanceOfType(IdentityRegistry.class);
+  Identity identity = identityRegistry.getIdentity(username);
+  return identity.isMemberOf( group );
+}
+</code></pre>
+
+<p>So this method is quite simple, it takes as parameter:</p>
+
+<ul>
+<li>the name of the user, that you can get from the <code>UserPrincipal.getName()</code> method</li>
+<li>the eXo Group you want to check, for example <code>/platform/administrator</code></li>
+</ul>
+
+
+<p>You can now call this method from your resource to check the user, and code the &ldquo;permission business logic&rdquo;. The method could now looks like:</p>
+
+<pre><code class="java">@GET
+@Path("information")
+public Response getSystemInfo(@Context SecurityContext sc) {
+  String groupToCheck = "/platform/administrators";
+  String response = "";
+  if (sc.getUserPrincipal() == null || !this.isMemberOf(sc.getUserPrincipal().getName(), groupToCheck) ) {
+    response = "NOT-ALLOWED";
+    } else {
+      response = "ALLOWED";
+    }
+    return Response.ok(  response   , MediaType.APPLICATION_JSON).build();
+  }
+...
+</code></pre>
+
+<p>In this example for simplicity reason I have hard coded the group to check, you can obviously use smarter code to user external configuration to inject a list of group to check for example. I manage the security logic of my method using simple if statement and return a string. You can also depending of your needs, manage the status of your response and use HTTP Code for example return an <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">HTTP 403</a>. For this you just need to return a different response using following code:</p>
+
+<pre><code class="java">    return Response.status(Response.Status.FORBIDDEN).build();
+</code></pre>
+
+<p>For simplicity reason I will stay with a single Response status (OK) and manage the permission in my client code.</p>
+
+<h3>Complete REST Service</h3>
+
+<p>Let&rsquo;s take a look to the full service now, this service allows administrators to get the list of the System Properties, other users get an status string &ldquo;NOT-ALLOWED&rdquo;:</p>
+
+<pre><code class="java">import javax.ws.rs.Path
+import javax.ws.rs.GET
+import javax.ws.rs.PathParam
+import javax.ws.rs.core.Response
+import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.CacheControl
+import javax.ws.rs.Produces
+import javax.ws.rs.core.SecurityContext
+import javax.ws.rs.core.Context
+
+import org.exoplatform.container.ExoContainer;
+import org.exoplatform.container.ExoContainerContext;
+import org.exoplatform.container.component.ComponentPlugin;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityRegistry;
+
+@Path("/system")
+@Produces("application/json")
+public class SystemInformationService {
+
+
+  @GET
+  @Path("information")
+  public Response getSystemInfo(@Context SecurityContext sc) {
+    String groupToCheck = "/platform/administrators";
+    SimpleResponseWrapper response = new SimpleResponseWrapper();
+    String status = "";
+    if (sc.getUserPrincipal() == null || !this.isMemberOf(sc.getUserPrincipal().getName(), groupToCheck) ) {
+      response.status = "NOT-ALLOWED";
+    } else {
+      response.status = "OK";
+      response.data = System.getProperties();
+
+    }  
+
+    CacheControl cacheControl = new CacheControl();
+    cacheControl.setNoCache(true);
+    cacheControl.setNoStore(true);
+    return Response.ok(  response   , MediaType.APPLICATION_JSON).cacheControl(cacheControl).build();
+  }
+
+  private boolean isMemberOf(String username,String role) {
+    ExoContainer container = ExoContainerContext.getCurrentContainer();
+    IdentityRegistry identityRegistry = (IdentityRegistry) container.getComponentInstanceOfType(IdentityRegistry.class);
+    Identity identity = identityRegistry.getIdentity(username);
+    return identity.isMemberOf( role );
+  }
+
+}
+
+public class SimpleResponseWrapper {
+  String status;
+  Object data;
+}
+</code></pre>
+
+<p>To summarize:</p>
+
+<ul>
+<li>Line 24 : the <span style="font-family: Courier New,Courier,mono">SecurityContext</span> is injected to the method</li>
+<li>Line 26 : Initialization of a simple <span style="font-family: Courier New,Courier,mono">ResponseWrapper</span> defined on line 51, that contains a status and data. That will be serialized in JSON by the eXo REST engine.* Line 28 : the method check if a user is connected and member of <span style="font-family: Courier New,Courier,mono">/platform/administrator</span>. If not it send response with the status NO-ALLOWED.</li>
+<li>Line 31/32 : The response object is sent. This response contains an OK status and the data (system properties list)</li>
+<li>Line 42 : Using the eXo Identity Service, the method check if the connected user is member of a specific group.</li>
+</ul>
+
+
+<h3>Consume the service into a Gadget</h3>
+
+<p>I can now take this service and consume it into an Gadget. I also develop this Gadget using the eXo IDE.</p>
+
+<p>The following code shows the Javascript part of the Gadget that calls the service, check the security and push the response content in Gadget body. For productivity I use JQuery framework.</p>
+
+<p>&#8220;` javascript</p>
+
+<script>
+function printInfo(result) {
+  var htmlResponse= [];
+  if (result.status == "OK") {
+    var data = result.data;
+    htmlResponse.push("<tr>");
+    $.each(data, function(index, value) {
+      htmlResponse.push('<tr><td>'+ index + '</td><td>' + value + '</td></tr>');
+    });
+    htmlResponse.push("</tr>");
+    $('#systemInfo').height(200);
+  }
+  else {
+    htmlResponse.push("Not permitted");
+    $('#systemInfo').height(50);
+  }
+  $('#systemInfo').html(htmlResponse.join(''));
+  gadgets.window.adjustHeight( $('#sysInfoContainer').outerHeight()  );
+
+}
+
+function loadInformationFromServer() {
+  $.getJSON('/rest/private/system/information', function(result){ printInfo(result);   } );
+}
+
+function init() {
+  loadInformationFromServer();
+}
+
+gadgets.util.registerOnLoadHandler(init);
+
+</script>
+
+
+<p>&#8220;`</p>
+
+<p>Here some quick explanation about this code:</p>
+
+<ul>
+<li>Line 23: To call the REST service, I use the <span style="font-family: Courier New,Courier,mono">$.getJSON()</span> method. This method is really easy to use when you are executing the Gadget is in the same container than the portal that consumes it. When you are using the gadget.io.MakeRequest is interesting to proxy a request and you need to re-authenticate, for example using oAuth.</li>
+<li>Line 3 : This is the call back method, as you can see in this method I use the <span style="font-family: Courier New,Courier,mono">ResponseWrapper</span> to check the code in the status attribute. Depending of the status OK or not I do print the value.</li>
+</ul>
+
+
+<h3>Conclusion</h3>
+
+<p>In this how-to you have learned how to:</p>
+
+<ul>
+<li>Get the security context in your REST Service</li>
+<li>Check the membership of a user using the eXo Identity Service</li>
+<li>Create a gadget that consume this service and expose only data to user with correct profile</li>
+<li>Download the full project from <a href="https://github.com/tgrall/sample-gadget-with-security">GitHub</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

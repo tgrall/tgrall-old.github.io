@@ -1,0 +1,883 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Today I was working with a partner in Paris and he wanted to know how to calculate the size of a specific folder in the eXo Java Content Repository ( &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/posts/6/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/03/01/how-to-calculate-the-size-of-a-folder-in-jcr-java-content-repository/">How to Calculate the Size of a Folder in JCR (Java Content Repository)?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-03-01T11:48:03+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2011</span></span> <span class='time'>11:48 am</span></time>
+        
+           | <a href="/blog/2011/03/01/how-to-calculate-the-size-of-a-folder-in-jcr-java-content-repository/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2011/03/01/how-to-calculate-the-size-of-a-folder-in-jcr-java-content-repository/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today I was working with a partner in Paris and he wanted to know how to calculate the size of a specific folder in the <a href="http://www.exoplatform.com/company/en/resource-viewer/Features-and-Benefits/eXo-JCR-Features-and-Benefits">eXo Java Content Repository (JCR)</a>.</p>
+
+<p>For this specific need the goal is to calculate the size of all the documents stored inside a specific location in the content repository. This could be used for example to manage quotas, estimate the size of a shared or personal storage, &hellip; For this specific sample I will only take in consideration the size of the binary part of the document stored in the repository; this means I will not pay attention to the various attributes and meta-data that are also stored, neither the full text index created by <a href="http://lucene.apache.org/">Lucene</a> that is embedded in eXo JCR.</p>
+
+<h3>How the files are stored in the JCR?</h3>
+
+<p>Files are stored in eXo JCR in the standard node type <code>nt:file</code> (and <code>nt:resource</code>). So for this example I will simply list all the <code>nt:file</code> of a folder and aggregate the size of the file itself. It is important to understand how JCR is storing the binary content. The best way to understand it, is to view it. For that I am using the print information given by  <a href="http://www.exoplatform.com/company/en/resource-viewer/Tutorial/Introduction-to-Crash">CRaSH</a>, a shell for content repository developed by eXo team and lead by <a href="http://julienviet.com/">Julien Viet</a>.</p>
+
+<p>Here the structure of a PDF document :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/Documents/jsr170-1.0.pdf
+</span><span class='line'>+-properties
+</span><span class='line'><span class="p">|</span> +-jcr:primaryType: nt:file
+</span><span class='line'><span class="p">|</span> +-jcr:mixinTypes: <span class="o">[</span>mix:referenceable,mix:versionable<span class="o">]</span>
+</span><span class='line'><span class="p">|</span> +-jcr:uuid: <span class="s1">&#39;6b89b6f0c0a8006530a8617df51bb0d7&#39;</span>
+</span><span class='line'><span class="p">|</span> +-jcr:created: 2011-02-28T10:11:50.770+01:00
+</span><span class='line'>+-children
+</span><span class='line'><span class="p">|</span> +-/Groups/spaces/intranet_v2/Documents/Technical/jsr170-1.0.pdf/jcr:content
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see in this node the &lsquo;binary&rsquo; is not visible, nothing bad here. As written in the specification in the section <code>6.7.22.6 nt:file</code>, the binary content is an attribute of the child node <code>jcr:content</code> that is exposed below:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/Groups/spaces/intranet_v2/Documents/Technical/jsr170-1.0.pdf/jcr:content
+</span><span class='line'>+-properties
+</span><span class='line'><span class="p">|</span> +-jcr:primaryType: nt:resource
+</span><span class='line'><span class="p">|</span> +-jcr:mixinTypes: <span class="o">[</span>exo:owneable,exo:datetime,dc:elementSet<span class="o">]</span>
+</span><span class='line'><span class="p">|</span> +-jcr:uuid: <span class="s1">&#39;6b89b6f7c0a80065735b1a8853d389d0&#39;</span>
+</span><span class='line'><span class="p">|</span> +-jcr:data: &lt;binary&gt;
+</span><span class='line'><span class="p">|</span> +-jcr:encoding: <span class="s1">&#39;UTF-8&#39;</span>
+</span><span class='line'><span class="p">|</span> +-jcr:lastModified: 2011-02-28T10:11:50.767+01:00
+</span><span class='line'><span class="p">|</span> +-jcr:mimeType: <span class="s1">&#39;application/pdf&#39;</span>
+</span><span class='line'>+-children
+</span><span class='line'>&lt;/binary&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can see now that the <code>jcr:content</code> contains some interesting attributes:</p>
+
+<ul>
+<li><code>jcr:mimeType</code></li>
+<li><code>jcr:data</code> this is where the binary content, the PDF itself , is.
+So using the JCR API you just need to get the content length using the following java code:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">node</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;jcr:content/jcr:data&quot;</span><span class="o">).</span><span class="na">getLength</span><span class="o">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This returns the number of bits of the binary data.</p>
+
+<p>So to calculate the size of a folder you just need to navigate in all the documents (nt:file or jcr:content) and cumulate the size of all the files. In this following code, I am calculating the size of the folder &ldquo;/Documents&rdquo; by navigating into all the files contains in this folder and subfolders. (I could have chose to query all the <code>jcr:content</code> type instead of <code>nt:file</code>)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="n">getSession</span><span class="o">();</span> <span class="c1">// use RepositoryService or context to get a session</span>
+</span><span class='line'><span class="n">QueryManager</span> <span class="n">manager</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">getWorkspace</span><span class="o">().</span><span class="na">getQueryManager</span><span class="o">();</span>
+</span><span class='line'><span class="n">String</span> <span class="n">queryStatement</span> <span class="o">=</span> <span class="s">&quot;select * from nt:file where (jcr:path LIKE &#39;/Documents/%&#39;)&quot;</span><span class="o">;</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="n">queryStatement</span><span class="o">,</span> <span class="n">Query</span><span class="o">.</span><span class="na">SQL</span><span class="o">);</span>
+</span><span class='line'><span class="n">NodeIterator</span> <span class="n">nodeIterator</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="na">execute</span><span class="o">().</span><span class="na">getNodes</span><span class="o">();</span>
+</span><span class='line'><span class="n">Node</span> <span class="n">node</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'><span class="kt">long</span> <span class="n">totalSizeInMb</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while</span> <span class="o">(</span><span class="n">nodeIterator</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">node</span> <span class="o">=</span> <span class="n">nodeIterator</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">totalSizeInMb</span> <span class="o">=</span> <span class="n">totalSizeInMb</span> <span class="o">+</span> <span class="n">node</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;jcr:content/jcr:data&quot;</span><span class="o">).</span><span class="na">getLength</span><span class="o">()</span> <span class="o">/</span> <span class="o">(</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can guess since we are navigating in the hierarchy you have to be very careful when using such query. This example is just a simple code sample to show you some of the cool features provided by the JCR API.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/01/02/ios-101-how-to-convert-a-string-to-a-nsdate/">iOS 101: How to Convert a String to a NSDate</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-01-02T10:22:01+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2011</span></span> <span class='time'>10:22 am</span></time>
+        
+           | <a href="/blog/2011/01/02/ios-101-how-to-convert-a-string-to-a-nsdate/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2011/01/02/ios-101-how-to-convert-a-string-to-a-nsdate/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>During my vacations, I took some time to play with iOS development. I have been struggling with many small issues&hellip; This is the price to pay when learning a new technology, and this is part of the fun of doing it. I will try to document some of these issues in articles&hellip;  Let&rsquo;s start with a very common story : working with date.</p>
+
+<p>Objective-C and iOS SDK provide a class to help formatting date (marshaling and unmarshaling), this class is <a href="http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSDateFormatter_Class/Reference/Reference.html">NSDateFormatter</a>. No surprise, the NSDateFormatter uses the <a href="http://unicode.org/reports/tr35/#Date_Format_Patterns">Unicode Date Format Patterns</a>.</p>
+
+<p>A small example of date creating from a string:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objectivec'><span class='line'>    <span class="bp">NSDateFormatter</span> <span class="o">*</span><span class="n">dateFormatter</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSDateFormatter</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">setDateFormat</span><span class="p">:</span><span class="s">@&quot;yyyy-MM-dd&quot;</span><span class="p">];</span>
+</span><span class='line'>    <span class="bp">NSDate</span> <span class="o">*</span><span class="n">date</span> <span class="o">=</span> <span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">dateFromString</span><span class="p">:</span><span class="n">publicationDate</span> <span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">dateFormatter</span> <span class="k">release</span><span class="p">];</span>
+</span><span class='line'>     <span class="c1">// use your date object</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The date that I have to create from a sting looks like &ldquo;<code>2010-11-12</code>&rdquo;. So I do not have any time information. When I do convert this string with the code above, the result is  &ldquo;<code>2010-11-11 23:00:00 +0000</code>&rdquo;. As you can see the date is calculated from my current time zone, small reminder I am in France. So the &ldquo;date&rdquo; object itself is perfectly fine, but in my example I want to have the date independently of the time.</p>
+
+<p>To be able to manage the date without any time/timezone information, I can force the timezone I want to use when using the  <code>NSDateFormatter</code> class. I just need to use the <code>setTimeZone</code> instance method.</p>
+
+<p>The code looks like that now (see line#3):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objectivec'><span class='line'><span class="bp">NSDateFormatter</span> <span class="o">*</span><span class="n">dateFormatter</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSDateFormatter</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'><span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">setDateFormat</span><span class="p">:</span><span class="s">@&quot;yyyy-MM-dd&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">setTimeZone</span><span class="p">:[</span><span class="bp">NSTimeZone</span> <span class="nl">timeZoneForSecondsFromGMT</span><span class="p">:</span><span class="mi">0</span><span class="p">]];</span>
+</span><span class='line'><span class="bp">NSDate</span> <span class="o">*</span><span class="n">date</span> <span class="o">=</span> <span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">dateFromString</span><span class="p">:</span><span class="n">publicationDate</span> <span class="p">];</span>
+</span><span class='line'><span class="p">[</span><span class="n">dateFormatter</span> <span class="k">release</span><span class="p">];</span>
+</span><span class='line'> <span class="c1">// use your date object</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hope that helps!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/10/29/what-apples-announcement-really-means-to-java-developers/">What Apple’s Announcement Really Means to Java Developers</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-10-29T09:29:53+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>9:29 am</span></time>
+        
+           | <a href="/blog/2010/10/29/what-apples-announcement-really-means-to-java-developers/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2010/10/29/what-apples-announcement-really-means-to-java-developers/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Hey Steve, keep the bean in the Apple!</p>
+
+<p>The <a href="http://www.infoq.com/news/2010/10/apple-deprecates-java">news from last week</a> that grabbed the attention of many Java developers was Apple’s announcement of <a href="http://developer.apple.com/library/mac/#releasenotes/Java/JavaSnowLeopardUpdate3LeopardUpdate8RN/Introduction/Introduction.html">its intentions to deprecate Java in the latest OS X 10.6 update</a>. One sentence stood out in particular, “Developers should not rely on the Apple-supplied Java runtime being present in future versions of Mac OS X,” and raised the question: should Java developers (many of whom, like me, develop on Macs) freak out?</p>
+
+<p>I don’t think so. (Though it prompted additional speculation and <a href="http://gigaom.com/2010/10/26/java-is-under-siege-will-oracle-let-it-burn/">follow-on news stories</a>.)</p>
+
+<p>Let’s be realistic. Most applications run on the server side, on Unix/Linux and/or Windows Server – which has nothing to do with Apple or Mac OS X. And more and more applications are running on the cloud, where the language isn’t necessarily irrelevant, but certainly less important than the services that the application exposes. And I’m sure Java will have a big role in ‘development in the cloud,’ as we can already see with Google AppEngine and the VMWare/SpringSource effort.</p>
+
+<p>I think the more interesting question to ask is “Why did Apple do this?”</p>
+
+<p>I believe this is related Apple’s other big news last week: the new “Mac App Store,” which looks like an effort to have one single technology and language to develop “official” applications for Mac. In fact, for all Apple platforms running OS X and iOS, developers should use X Code and Objective C. That’s fine with me, as I enjoy developing small apps for my iPhone and iPad in my spare time, using these tools. But at eXo, many of our developers are using Java, often on Macs, to build our software.</p>
+
+<p>We’re not talking about the same kind of applications. If, in the future, Java does not exist on Macs, it will not cause enterprise developers to abandon Java, but simply force them to move away from their Macs. Personally, I don’t want that to happen. I switched to Mac in 2001, and I’ve been a big fan of all Apple products ever since (most of my extended family are now also on Macs, and they couldn’t care less about Java).</p>
+
+<p>As a Java developer, do I switch back to PC now? Unlikely. I am very confident (overconfident?) that Java will still be present on OS X. The difference is that Apple will simply stop caring about it &ndash; the same way that Microsoft doesn’t care now. I cannot believe that Apple will stop/block Java on their platform. So the future of Java in general, and now on Mac, is fully under the control of the Java community, driven by Oracle and OpenJDK.  I am sure we will find many skilled “MacAddicts” to maintain and improve Java on OS X, to at least allow Java developers to run their favorite IDE and test their applications before deploying them on the servers &ndash; keeping the “Write Once, Run Anywhere” a reality (almost&hellip;). The only “bad” part is the fact that “Java Desktop” will not borrow any of the cool features of Apple Mac OS X. Not a big deal, since Java Desktop has never been that successful anyway.</p>
+
+<p>So my advice to fellow Java developers is this: if you care, be vocal.  Let’s make sure Apple lets the community drive the future of Java on Mac, since the future of the Java platform is still very exciting for many of us.</p>
+
+<p>Original Post on&nbsp;<a href="http://blog.exoplatform.org/2010/10/29/what-apples-announcement-really-means-to-java-developers/">eXo Blog</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/">Create and Deploy a JAX-RS REST Service on Google App Engine</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-02-28T05:33:10+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>5:33 am</span></time>
+        
+           | <a href="/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In this article you will learn how to create a REST service using JAX-RS reference implementation (Jersey) and deploy it on Google AppEngine.</p>
+
+<h3>Prerequisites</h3>
+
+<p>For this tutorial you will need:</p>
+
+<ul>
+<li>a Google AppEngine account : <a href="http://code.google.com/appengine/">http://code.google.com/appengine/</a></li>
+<li>Eclipse Galileo (3.5.x)</li>
+<li>Google App Engine SDK for Java</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010/02/24/virtualbox-how-to-clone-a-virtual-machine/">VirtualBox: How to Clone a Virtual Machine?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-02-24T08:00:56+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>8:00 am</span></time>
+        
+           | <a href="/blog/2010/02/24/virtualbox-how-to-clone-a-virtual-machine/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2010/02/24/virtualbox-how-to-clone-a-virtual-machine/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>During some testing I had to put in place a cluster on my network. So I create a first virtual machine. It is not possible to directly copy the Virtual Disk Image (.vdi). VirtualBox saved in each disk image a UUID that is also store inside the virtual machine image. VirtualBox does not support two images with the same number. So to clone the an image you need to use the <code>VBoxManage clonehd</code> command line.</p>
+
+<p>The clonehd command copy the VDI file and assigns a new UUID into it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='Bash'><span class='line'>VBoxManage  clonehd /opt/tools/vm/vm1-rhel.vdi  /opt/tools/vm/vm2-rhel.vdi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the copy is done, you can now register this new VDI in your VirtualBox environment and create a new virtual machine.</p>
+
+<p>Note: I am running VirtualBox on MacOS X, and I needed to put complete path to VDI files, if not the command id not working</p>
+
+<p><em>Alternative approach</em></p>
+
+<p>Initially I had issue with the clonehd command since I was not using full path. So what you can do is:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cp vm1-rhel.vdi vm2-rhel.vdi
+</span><span class='line'>VBoxManage internalcommands sethduuid vm2-rhel.vdi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can now add the new VDI to your VirtualBox environment.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/">NantesJUG: Next Meeting Friday November 13th About &#8216;Google Technologies&#8217;</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-11-08T22:27:15+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>10:27 pm</span></time>
+        
+           | <a href="/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2"></p>
+
+<p>This Friday , the Nantes JUG is pleased to organize a conference about &ldquo;Google Technologies&rdquo;. Didier Girard, <a href="http://twitter.com/dgirard">http://twitter.com/dgirard</a> , will be presenting and demoing cool stuff from Google:</p>
+
+<ul>
+<li>GWT 2</li>
+<li>Android</li>
+<li>Wave</li>
+<li>App Engine</li>
+</ul>
+
+
+<p>Want to come? Register for free <a href="http://jugevents.jugpadova.it/jugevents/event/registration.form?event.id=20744">here</a></p>
+
+<p>The event will occur at the &ldquo;<a href="http://maps.google.com/maps?f=q&amp;amp;source=s_q&amp;amp;hl=en&amp;amp;geocode=&amp;amp;q=ecole+des+mines+de+nantes&amp;amp;sll=47.176415,-1.340556&amp;amp;sspn=0.078063,0.181103&amp;amp;ie=UTF8&amp;amp;hq=%C3%89cole+des+mines+de+Nantes&amp;amp;hnear=%C3%89cole+des+mines+de+Nantes,+France&amp;amp;ll=47.283363,-1.520834&amp;amp;spn=0.019476,0.045276&amp;amp;t=h&amp;amp;z=15&amp;amp;iwloc=near">Ecole des Mines de Nantes</a>&rdquo; one of our sponsor from 7 to 9 pm.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/">USI2009: The Geek and Boss French Conference</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-07-08T08:53:57+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>8:53 am</span></time>
+        
+           | <a href="/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This year I was lucky enough to have a presentation at the second edition of the &ldquo;<a href="http://www.universite-du-si.com/">Université du SI</a>&rdquo;, organized by <a href="http://octo.com/">Octo Technologies</a>. I have to say that this conference is one of the best that I have attended, for sure it is the best in France. Unfortunately I was only able to attend the first day of the conference, but even in one day, I was very happy with the content of the presentations, keynotes, and networking opportunities.</p>
+
+<p>I won&rsquo;t go in details in all the presentations that I have seen, Google for the Enterprise, Application Server Future, Usability concerns, and keynotes. If you want to have a good feedback about this conference I invite you to read, in French, the reports from <a href="http://www.touilleur-express.fr/tag/usi/">Le Touilleur Express</a>.</p>
+
+<p>Let me just share the presentation that I gave with <a href="http://massol.net/">Vincent Massol</a> from <a href="http://www.xwiki.com/">XWiki</a>, about CMS vs Wiki.</p>
+
+<p><strong>Wiki vs CMS duel</strong></p>
+
+<p>First of all, the room was packed, so it looks like it is an interesting subject for many of you, so do not hesitate to post comments or question on this entry. Vincent and I will be pleased to update our presentation for a new event.</p>
+
+<p>The main message of the talk was:</p>
+
+<ul>
+<li><strong>For collaboration on content</strong> the wiki is king</li>
+<li><strong>For publication of content</strong> the CMS is king</li>
+</ul>
+
+
+<iframe src="http://www.slideshare.net/slideshow/embed_code/1678352 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe>
+
+
+<p>
+<a href="http://www.slideshare.net/tgrall/wiki-vs-cms-1678352" title="Wiki vs CMS ">Wiki vs CMS </a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/04/07/next-generation-portals-how-opensocial-standard-adds-social-to-the-mix/">Next Generation Portals : How OpenSocial Standard Adds Social to the Mix?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-04-07T02:45:36+02:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>2:45 am</span></time>
+        
+           | <a href="/blog/2009/04/07/next-generation-portals-how-opensocial-standard-adds-social-to-the-mix/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2009/04/07/next-generation-portals-how-opensocial-standard-adds-social-to-the-mix/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I have published on SlideShare a new presentation about OpenSocial and eXo Platform.</p>
+
+<p>Feel free to test OpenSocial and eXo Platform integration by downloading latest release of eXo products.</p>
+
+<iframe src="http://www.slideshare.net/slideshow/embed_code/1258208 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe>
+
+
+<p></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/03/30/conference-season-for-exo-platform-in-paris/">Conference Season for eXo Platform in Paris</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-03-30T01:03:00+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>1:03 am</span></time>
+        
+           | <a href="/blog/2009/03/30/conference-season-for-exo-platform-in-paris/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2009/03/30/conference-season-for-exo-platform-in-paris/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>eXo Platform, and I, will be present in conferences in the upcoming weeks:</p>
+
+<ul>
+<li><a href="http://www.solutionslinux.fr/">Linux Solutions</a>, March 31st - April 2nd : In addition to the demonstration pod where you can meet eXo people, I am inviting you to joing us during the <a href="http://www.ow2.org/view/Events2009AnnualConference/">OW2 Annual Conference</a> presentations:
+
+<ul>
+<li>Next generation Portals: how OpenSocial standard adds social to the mix (April 2, 01:30 - 02:00)</li>
+<li>Which Portlet Bridge is made for you? (April 2, 02:00 - 02:30)</li>
+</ul>
+</li>
+</ul>
+
+
+<p>You can find the <a href="http://www.ow2.org/view/Events2009AnnualConference/Sessions">full program here</a>.</p>
+
+<ul>
+<li><a href="http://www.salon-intranet.com/">Salon Intranet</a>, May 12th,13th : Once again, eXo will be present with a demonstration pod, but also come to meet eXo CEO, Benjamin Mestrallet and myself during the &ldquo;eXo Platform, the Open Source solution for your Intranet&rdquo; on May 12th from 3pm-4pm.</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/">JAX-WS: How to Configure the Service End Point at Runtime?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-02-17T19:52:56+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>7:52 pm</span></time>
+        
+           | <a href="/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When deploying your Web Service client you often need to change the endpoint of the service that &nbsp;has been set during the code generation. This short post explains how you can set change it at runtime in the client code.</p>
+
+<p>You have two approaches to do that:</p>
+
+<ul>
+<li>set the endpoint in the <code>Port</code> using the <code>BindingProvider</code></li>
+<li>get the endpoint <code>URL</code> from the WSDL itself at runtime</li>
+</ul>
+
+
+<h3>Use the Binding Provider to set the endpoint URL</h3>
+
+<p>The first approach is to change the
+BindingProvider.ENDPOINT_ADDRESS_PROPERTY property value of the
+BindingProvider (Port) using the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">EmployeeServiceService</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">EmployeeServiceService</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">EmployeeService</span> <span class="n">port</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getEmployeeServicePort</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">BindingProvider</span> <span class="n">bp</span> <span class="o">=</span> <span class="o">(</span><span class="n">BindingProvider</span><span class="o">)</span><span class="n">port</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">bp</span><span class="o">.</span><span class="na">getRequestContext</span><span class="o">().</span><span class="na">put</span><span class="o">(</span><span class="n">BindingProvider</span><span class="o">.</span><span class="na">ENDPOINT_ADDRESS_PROPERTY</span><span class="o">,</span> <span class="s">&quot;http://server1.grallandco.com:8282/HumanRessources/EmployeeServiceService&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">Employee</span> <span class="n">emp</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="na">getEmployee</span><span class="o">(</span><span class="mi">123</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Result = &quot;</span><span class="o">+</span> <span class="n">emp</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{...}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Use the WSDL to get the endpoint URL</h3>
+
+<p>Another part is to set the WSDL when you are creating the Service. The
+service will be using the value that is located in the WSDL port -SOAP
+Endpoint-. This is simply done using the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">EmployeeServiceService</span> <span class="n">service</span> <span class="o">=</span>
+</span><span class='line'>  <span class="k">new</span> <span class="n">org</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">EmployeeServiceService</span>
+</span><span class='line'>  <span class="o">(</span><span class="k">new</span> <span class="nf">URL</span><span class="o">(</span><span class="s">&quot;http://server1.grallandco.com:8282/HumanRessources/EmployeeServiceService?wsdl&quot;</span><span class="o">),</span>
+</span><span class='line'>  <span class="k">new</span> <span class="nf">QName</span><span class="o">(</span><span class="s">&quot;http://service.demo.org/&quot;</span><span class="o">,</span><span class="s">&quot;EmployeeServiceService&quot;</span><span class="o">));</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">EmployeeService</span> <span class="n">port</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getEmployeeServicePort</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">Employee</span> <span class="n">emp</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="na">getEmployee</span><span class="o">(</span><span class="mi">123</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Result = &quot;</span><span class="o">+</span> <span class="n">emp</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span> <span class="o">...</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that, in Glassfish, like lot of Web Service environments the WSDL can generate dynamically the Endpoint URL based on the URL used
+    &nbsp;to get the WSDL. With this approach you can also dynamically
+    change the Soap endpoint. (If compatible with the network configuration
+      of the production environment.)</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/posts/7">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/5">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

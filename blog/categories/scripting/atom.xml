@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Scripting | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/scripting/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Choose a Scripting Language? Groovy or JRuby?]]></title>
+    <link href="http://tgrall.github.io/blog/2006/09/16/choose-a-scripting-language-groovy-or-jruby/"/>
+    <updated>2006-09-16T21:38:17+02:00</updated>
+    <id>http://tgrall.github.io/blog/2006/09/16/choose-a-scripting-language-groovy-or-jruby</id>
+    <content type="html"><![CDATA[<p>Last week I discussed dynamic languages with some consultants. This discussion was done in the context of integration of scripting technologies into Java EE environment. So the integration to the VM is important, I also think that the learning curve is a thing to consider.</p>
+
+<p>It is true that, like any developer Iike to learn things everyday, this is why I have done some development with PHP, with Ruby On Rails, and obviously with Groovy, Javascript and many other dynamic languages.</p>
+
+<p>The discussion moved quickly to an argument about which language is the best&hellip; Hard to say, but I would expect that to be more productive in enterprise it is better to use a &ldquo;Java Like&rdquo; syntax that allows you to leverage the power of scripts. Based on this comment it is for me a no brainer to say that Groovy is more interesting to a core Java developer than JRuby (or other Jython, Jacl, &hellip;). I do not even want to go in the details about VM integration, performances and so on&hellip;</p>
+
+<p>So in this context, A. Sundararajan has posted <a href="http://blogs.sun.com/sundararajan/entry/java_groovy_and_j_ruby">a very interesting comparison of Java, Groovy and JRuby syntaxes</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Online Groovy Beginners Tutorial]]></title>
+    <link href="http://tgrall.github.io/blog/2005/08/29/online-groovy-beginners-tutorial/"/>
+    <updated>2005-08-29T21:05:51+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/08/29/online-groovy-beginners-tutorial</id>
+    <content type="html"><![CDATA[<p>Interested by Groovy but never used it&hellip; You will be please to use this nice tutorial available on the Groovy site:
+* <a href="http://groovy.codehaus.org/Beginners+Tutorial">Groovy Beginners Tutorial</a></p>
+
+<p>Thanks to Graham Miller&rsquo;s contribution&hellip;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA['Scripting: Higher Level Programming for the 21st Century' Paper From John K. Ousterhout]]></title>
+    <link href="http://tgrall.github.io/blog/2005/06/03/scripting-higher-level-programming-for-the-21st-century-paper-from-john-k-ousterhout/"/>
+    <updated>2005-06-03T20:53:00+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/06/03/scripting-higher-level-programming-for-the-21st-century-paper-from-john-k-ousterhout</id>
+    <content type="html"><![CDATA[<p>With all the Java Scripting language around (Groovy, Rhino, Ruby, Jython&hellip; and so on) it is always interesting to understand where this come from&hellip; but also be able to talk with people about it, especially when they do not understand why scripting is interesting&hellip;</p>
+
+<p>Googling around looking for some information on scripting benefits for a presentation I found this very intersting article from John Ousterhout, (he wrote the article in 1998) but I am sure you will still appreciate it&hellip;</p>
+
+<p><a href="http://home.pacbell.net/ouster/scripting.html">Scripting: Higher Level Programming for the 21st Century</a>.</p>
+
+<p>One of the most interesting part in this context is the paragraph 4:</p>
+
+<blockquote><p>A scripting language is not a replacement for a system programming language or vice versa. Each is suited to a different set of tasks. For gluing and system integration, applications can be developed 5-10x faster with a scripting language; system programming languages will require large amounts of boilerplate and conversion code to connect the pieces, whereas this can be done directly with a scripting language. For complex algorithms and data structures, the strong typing of a system programming language makes programs easier to manage. Where execution speed is key, a system programming language can often run 10-20x faster than a scripting language because it makes fewer run-time checks.</p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaWorld Article: Choosing a Java Scripting Language]]></title>
+    <link href="http://tgrall.github.io/blog/2005/03/15/javaworld-article-choosing-a-java-scripting-language/"/>
+    <updated>2005-03-15T22:36:50+01:00</updated>
+    <id>http://tgrall.github.io/blog/2005/03/15/javaworld-article-choosing-a-java-scripting-language</id>
+    <content type="html"><![CDATA[<p>This new <a href="http://www.javaworld.com/javaworld/jw-03-2005/jw-0314-scripting_p.html">Java World article</a> compares the different Java scripting languages (Groovy, JudoScript, Pnuts, JRuby, Jacl, Jython, Rhino, and BeanShell), and list the issues that you have to select the good one&hellip;</p>
+
+<p>In this article that I like I would like to read a little about the JSR-223 that should help with the integration part.</p>
+
+<p>I will be very interested to know how you use Java Scripting language in your projects, so feel free to drop me a comment or mail ( <a href="mailto:tugdual[at]grallandco[dot]com">tugdual[at]grallandco[dot]com</a> )</p>
+]]></content>
+  </entry>
+  
+</feed>

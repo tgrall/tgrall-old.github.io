@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Jdeveloper | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/jdeveloper/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[A Groovier ADF With Oracle ADF 11]]></title>
+    <link href="http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/"/>
+    <updated>2007-11-08T06:39:38+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a>&#8221;></p>
+
+<p>Steve Muench has published in Oracle Magazine an article about the use of Groovy in Oracle ADF. In this article you learn how you can do validation and calculation in you business service layer.</p>
+
+<ul>
+<li><a href="http://www.oracle.com/technology/oramag/oracle/07-nov/o67frame.html">Enhanced Calculation and Validation</a></li>
+<li><a href="http://www.oracle.com/technology/products/adf/index.html">Oracle ADF</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[OracleAS &amp; JDeveloper: JavaEE 5.0 Technology Preview]]></title>
+    <link href="http://tgrall.github.io/blog/2007/05/16/oracleas-and-jdeveloper-javaee-5-dot-0-technology-preview/"/>
+    <updated>2007-05-16T03:45:19+02:00</updated>
+    <id>http://tgrall.github.io/blog/2007/05/16/oracleas-and-jdeveloper-javaee-5-dot-0-technology-preview</id>
+    <content type="html"><![CDATA[<p>During JavaOne last week Oracle has announced the availability of a the new JavaEE 5.0 Technology Preview of Oracle Containers for JavaEE and JDeveloper (release 11).</p>
+
+<p>Find more information on OTN:</p>
+
+<ul>
+<li><p><a href="http://www.oracle.com/technology/tech/java/oc4j/11/index.html">OC4J 11: Java EE 5 Technology Preview</a></p></li>
+<li><p><a href="http://www.oracle.com/technology/products/jdev/11/index.html">JDeveloper 11 Technology preview</a> includes a Mac release</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[New Groovy Plugin for Oracle JDeveloper 10g]]></title>
+    <link href="http://tgrall.github.io/blog/2007/02/07/new-groovy-plugin-for-oracle-jdeveloper-10g/"/>
+    <updated>2007-02-07T14:17:45+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/02/07/new-groovy-plugin-for-oracle-jdeveloper-10g</id>
+    <content type="html"><![CDATA[<p>You can find a first release of the Groovy extension for JDeveloper on the Groovy site:</p>
+
+<ul>
+<li><a href="http://groovy.codehaus.org/Oracle+JDeveloper+Plugin">http://groovy.codehaus.org/Oracle+JDeveloper+Plugin</a></li>
+</ul>
+
+
+<p>The plugin creates a new JDeveloper library for Groovy 1.0, allows you to create and run scripts. I hope to be able to provide more feature such as syntax coloring,  structure recognition, &hellip; lot of ideas here&hellip;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle JDeveloper (10.1.3.2) / WebCenter Available for Download]]></title>
+    <link href="http://tgrall.github.io/blog/2007/01/30/oracle-jdeveloper-10-dot-1-3-dot-2-slash-webcenter-available-for-download/"/>
+    <updated>2007-01-30T21:14:53+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/01/30/oracle-jdeveloper-10-dot-1-3-dot-2-slash-webcenter-available-for-download</id>
+    <content type="html"><![CDATA[<p>Oracle JDeveloper (10.1.3.2.0) extends the SOA development features from  the previous release by introducing the Oracle WebCenter extension.  Oracle WebCenter Suite combines the standards-based, declarative development of JavaServer Faces (JSF), the flexibility and power of portals, and a set of integrated Web 2.0 services to boost end-user productivity.   Oracle WebCenter Suite provides the tools and services to embed portlets, content, customizable components, Web 2.0 content,
+collaboration and communication services directly into your JavaServer Faces (JSF) application.  These WebCenter features are in addition to the large set of new features that were introduced in Oracle JDeveloper 10.1.3.0 and 10.1.3.1.0.  For more information on WebCenter, visit the
+<a href="http://www.oracle.com/technology/products/webcenter/index.html">Oracle WebCenter Suite page on OTN</a>.</p>
+
+<ul>
+<li>Build Portlets
+
+<ul>
+<li>Build JSR 168 portlets</li>
+<li>Build Oracle PDK-Java portlets</li>
+<li>Expose JavaServer Faces (JSF) applications as portlets</li>
+<li>Preconfigured OC4J within Oracle JDeveloper</li>
+</ul>
+</li>
+<li>Consume Portlets
+
+<ul>
+<li>Consume JSR 168 portlets through WSRP</li>
+<li>Consume other WSRP portlets</li>
+<li>Consume Oracle PDK-Java portlets</li>
+<li>Inter-component communication</li>
+</ul>
+</li>
+<li>Business User Web 2.0 Enterprise Mashup Tools
+
+<ul>
+<li>Rich Text / Blog Portlet</li>
+<li>WebClipping Portlet</li>
+<li>OmniPortlet</li>
+</ul>
+</li>
+<li>Runtime Customization
+
+<ul>
+<li>showDetailFrame</li>
+<li>panelCustomizable</li>
+</ul>
+</li>
+<li>Integrate Content using JCR 1.0
+
+<ul>
+<li>Access content using data controls</li>
+<li>Access to many content repositories</li>
+</ul>
+</li>
+<li>WebCenter Services
+
+<ul>
+<li>Secure Enterprise Search (SES)</li>
+<li>Oracle Communication and Mobility Server (OCMS)</li>
+<li>Oracle Content Database</li>
+<li>Discussions</li>
+<li>Wiki</li>
+</ul>
+</li>
+<li>Declarative Security
+
+<ul>
+<li>ADF Security Wizard</li>
+<li>Authorization Editor</li>
+</ul>
+</li>
+<li>Lifecycle Tool
+
+<ul>
+<li>Embedded Lifecycle Tool</li>
+<li>Command Line Lifecycle Tool</li>
+<li>ANT Tasks</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Some links:</p>
+
+<ul>
+<li><a href="http://www.oracle.com/technology/software/products/jdev/htdocs/soft10132.html">New Features</a></li>
+<li><a href="http://www.oracle.com/technology/software/products/jdev/htdocs/soft10132.html">Download</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JDJ Review: Oracle JDeveloper an IDE Worth a Second Look]]></title>
+    <link href="http://tgrall.github.io/blog/2007/01/27/jdj-review-oracle-jdeveloper-an-ide-worth-a-second-look/"/>
+    <updated>2007-01-27T21:13:50+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/01/27/jdj-review-oracle-jdeveloper-an-ide-worth-a-second-look</id>
+    <content type="html"><![CDATA[<p>As the saying goes you never get a second chance at a first impression. In general, that&rsquo;s true, but if you&rsquo;ve been thoroughly revitalized, matured, and cosmetically re-engineered, shouldn&rsquo;t you get a second shot at that first impression? I&rsquo;d argue that&rsquo;s true of Oracle&rsquo;s Java/J2EE Workbench, Oracle JDeveloper.</p>
+
+<ul>
+<li><a href="http://java.sys-con.com/read/313602.htm">Java Product Review — Oracle JDeveloper An IDE Worth a Second Look</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

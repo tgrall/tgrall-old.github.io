@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Big Data&#8230; Is Hadoop the Good Way to Start? - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="In the past 2 years, I have met many developers, architects that are working on “big data” projects. This sounds amazing, but quite often the truth &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Big Data&#8230; Is Hadoop the Good Way to Start?</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-11-25T07:27:36+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:27 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In the past 2 years, I have met many developers, architects that are working on “big data” projects. This sounds amazing, but quite often the truth is not that amazing.</p>
+
+<h4>TL;TR</h4>
+
+<p>You believe that you have a big data project?</p>
+
+<ul>
+<li>Do not start with the installation of an Hadoop Cluster &ndash; the &ldquo;<em>how</em>&rdquo;</li>
+<li>Start to talk to business people to understand their problem &ndash; the &ldquo;<em>why</em>&rdquo;</li>
+<li>Understand the data you must process</li>
+<li>Look at the volume &ndash; very often it is not &ldquo;that&rdquo; big</li>
+<li>Then implement it, and take a simple approach, for example start with MongoDB + Apache Spark</li>
+</ul>
+
+
+<p><img class="center center" src="http://cdn.meme.am/instances/500x/47510205.jpg" width="320" title="'Big Data'" ></p>
+
+<!-- more -->
+
+
+<h2>The infamous &ldquo;big data project&rdquo;</h2>
+
+<p>A typical discussion would look like:</p>
+
+<p>Me: <em>“Can you tell me more about this project, what do you do with your data?”</em></p>
+
+<p>Mr. Big Bytes: <em>“Sure, we have a 40 nodes Hadoop cluster&hellip;&ldquo;</em></p>
+
+<p>Me: <em>“This is cool but which type of data do you store, and what is the use case, business value?&ldquo;</em></p>
+
+<p>Mr. Big Bytes: <em>“We store, all the logs of our applications, we have hundreds of gigabits…&#8221;</em></p>
+
+<p>After a long blank: <em>“We have not yet started to analyze these data. For now it is jut  &lsquo;us, the IT team,&rsquo; we store the data, like that soon we will be able to do interesting things with them&#8221;</em></p>
+
+<p>You can meet the same person few months later; the cluster is still sitting here, with no activity on it. I even met some consultants telling me they received calls from their customer asking the following:</p>
+
+<p><em>“Hmmm, we have an Hadoop cluster installed, can you help us to find what to do with it?&ldquo;</em></p>
+
+<p><em>Wrong! That is wrong!!!!!</em> This means that the IT Team has spent lot of time for nothing, at least for the business; and I am not even sure the team has learned something technically.</p>
+
+<h3>Start with the &ldquo;Why&rdquo; not with the &ldquo;How&rdquo;!</h3>
+
+<p>The solution to this, could be obvious, start your “big data project” answering the “why/what” questions first! The “how”, the implementation, will come later.</p>
+
+<p>I am sure that most of the enterprises will benefit of a so called “big data project”, but it is really important to understand the problems first. <em>And these problems are not technical…</em> at least at the beginning. So you must spend time with the business persons to understand what could help them. Let&rsquo;s take some examples.</p>
+
+<p>You are working in a bank or insurance, business people will be more than happy to predict when/why customer will be leaving the company by doing some <em>churn analysis</em>; or it will be nice to be able to see when it makes lot of sense <em>to sell new contracts</em>, service to existing customers.</p>
+
+<p>You are working in retail/commerce, your business will be happy to see if they can <u>adjust the price</u> to the market, or <u>provide precise recommendations</u> to a user from an analysis of other customer behavior.</p>
+
+<p>We can find many other examples. But as you can see we are not talking about technology, just business and possible benefits. In fact nothing new, compare with the applications you are building, you need first to have some requirements/ideas to build a product. Here we just need to have some &ldquo;data input&rdquo; to see <u>how we can enrich the data</u> with some business value.</p>
+
+<p>Once you have started to ask all these questions you will start to see some input, and possible processing around them:</p>
+
+<ul>
+<li>You are an insurance, you customers has no contact with your representative, or the customer satisfaction is medium/bad; you start to see some customer name in quotes coming from price comparison website…. hmm you can guess that they are looking for a new insurance.</li>
+<li>Still in the insurance, when your customer are close to the requirement age, or has teenagers learning how to drive, moving to college, you know that you have some opportunity to sell new contract, or adapt existing ones to the new needs</li>
+<li>In retail, you may want to look to all customers and what they have ordered, and based on this be able to recommend some products to a customer that &ldquo;looks&rdquo; the same.</li>
+<li>Another very common use case these days, you want to do some sentiment analysis of social networks to see how your brand is perceived by your community</li>
+</ul>
+
+
+<p>As you can see now, we can start to think about the data we have to use and the type of processing we have to do on them.</p>
+
+<h3>Let&rsquo;s now talk about the &ldquo;How&rdquo;</h3>
+
+<p>Now that you have a better idea about what you want to do, it does not mean that you should dive into a large cluster installation.</p>
+
+<p>Before that, you should continue to analyze the data:</p>
+
+<ul>
+<li>What is the structure of the data that I have to analyze?</li>
+<li>How big is my dataset?</li>
+<li>How much data I have to ingest on a period of time (minute, hour, day, &hellip;)</li>
+</ul>
+
+
+<p>All these questions will help you to understand better your application. This is where it is often interesting too, and we realize that for most of us the &ldquo;big data&rdquo; is not that big!</p>
+
+<p>I was working the other day with a Telco company in Belgium, and I was talking about possible new project. I simply said:</p>
+
+<ul>
+<li>Belgium is what, 11+ millions of people</li>
+<li>If you store a 50kb object for each person this represent:</li>
+<li>Your full dataset will be 524Gb, yes not even a Terabyte!</li>
+</ul>
+
+
+<p>Do you need a large Hadoop cluster to store and process this? You can use it, but you do not need to! You can find something smaller, and easier to start with.</p>
+
+<p>Any database will do the job, starting with MongoDB. I think it is really interesting to start this project with a MongoDB cluster, not only because it will allow you to scale out as much as you need, but also because you will leverage the flexibility of the document model. This will allow you to store any type of data, and easily adapt the structure to the new data, or requirements.</p>
+
+<p>Storing the data is only one part of the equation. The other part is how you achieve the data processing. Lately I am playing a lot with <a href="https://spark.apache.org/">Apache Spark</a>. Spark provides a very powerful engine for large scale data processing, and it is a lot simpler than Map Reduce jobs. In addition to this, you can run Spark without Hadoop! This means you can connect you Spark to your MongoDB, with the <a href="http://docs.mongodb.org/ecosystem/tools/hadoop/">MongoDB Hadoop Connector</a> and other data sources and directly execute job on your main database.</p>
+
+<p>What I like also about this approach, you can when you dataset starts to grow, and it become harder to process all the data on your operational database, you can easily add Hadoop; and keep most of your data processing layer intact, and only change the data sources information. In this case you will connect MongoDB and Hadoop to get/push the data into HDFS, once again using the MongoDB Hadoop Connector.</p>
+
+<h3>Conclusion</h3>
+
+<p>Too many times, projects are driven by technology instead of focusing on the business value. This is particularly true around big data projects. So be sure you start by understanding the business problem, and find the data that could help to solve it.</p>
+
+<p>Once you have the business problem and the data, select the good technology, that could be very simple, simple files and python scripts, or more often a database like MongoDB with a data processing layer like Spark. And start to move to Hadoop when it is really mandatory&hellip; a very, very, very, large dataset.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-11-25T07:27:36+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:27 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bigdata/'>bigdata</a>, <a class='category' href='/blog/categories/hadoop/'>hadoop</a>, <a class='category' href='/blog/categories/mongodb/'>mongodb</a>, <a class='category' href='/blog/categories/spark/'>spark</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/" title="Previous Post: Introduction to MongoDB Geospatial feature">&laquo; Introduction to MongoDB Geospatial feature</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/01/12/how-to-create-a-pub-slash-sub-application-with-mongodb-introduction/" title="Next Post: How to create a pub/sub application with MongoDB ? Introduction">How to create a pub/sub application with MongoDB ? Introduction &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/';
+        var disqus_url = 'http://tgrall.github.io/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

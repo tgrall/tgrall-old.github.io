@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Couchbase 101: Create Views (MapReduce) From Your Java Application - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="When you are developing a new applications with Couchbase 2.0, you sometimes need to create view dynamically from your code. For example you may need &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Couchbase 101: Create Views (MapReduce) From Your Java Application</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-12-30T10:42:24+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>10:42 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>When you are developing a new applications with Couchbase 2.0, you sometimes need to create view dynamically from your code. For example you may need this when you are installing your application, writing some test, or you can also use that when you are building frameworks, and wants to dynamically create views to query data. This post shows how to do it.</p>
+
+<h3>Prerequisites</h3>
+
+<ul>
+<li><a href="http://www.couchbase.com/download">Couchbase Server 2.0</a></li>
+<li><a href="http://www.couchbase.com/develop/java/current">Couchbase Jave Client Library 1.1.x</a></li>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-sampledata-beer.html">Beer Sample dataset</a></li>
+</ul>
+
+
+<p>If you are using Maven you can use the following information in your <code>pom.xml</code> to add the Java Client library:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;repository&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;id&gt;</span>couchbase<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>Couchbase Maven Repository<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;layout&gt;</span>default<span class="nt">&lt;/layout&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;url&gt;</span>http://files.couchbase.com/maven2/<span class="nt">&lt;/url&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;snapshots&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;enabled&gt;</span>false<span class="nt">&lt;/enabled&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/snapshots&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/repository&gt;</span>
+</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupid&gt;</span>couchbase<span class="nt">&lt;/groupid&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactid&gt;</span>couchbase-client<span class="nt">&lt;/artifactid&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>1.1.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;type&gt;</span>jar<span class="nt">&lt;/type&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependencies&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>See online at <a href="https://gist.github.com/4337172">https://gist.github.com/4337172</a></p>
+
+<h3>Create and Manage Views From Java</h3>
+
+<p>The full Maven project is available on <a href="https://github.com/tgrall/couchbase-java-101/tree/master/java-document-design/">Github</a>.</p>
+
+<h4>Connect to Couchbase Cluster</h4>
+
+<p>The first thing to do when you want to create a view from Java is obviously to connect to the cluster.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">com.couchbase.client.CouchbaseClient</span><span class="o">;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">List</span><span class="o">&lt;</span><span class="n">uri</span><span class="o">&gt;</span> <span class="n">uris</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">uri</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="n">uris</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">URI</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">&quot;http://127.0.0.1:8091/pools&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">CouchbaseClient</span> <span class="n">client</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">CouchbaseClient</span><span class="o">(</span><span class="n">uris</span><span class="o">,</span> <span class="s">&quot;beer-sample&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// put your code here</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">client</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">err</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Error connecting to Couchbase: &quot;</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Create a list of URIs to different nodes of the cluster - lines 5-6. (In this example I am working on a single node)</li>
+<li>Connect to the bucket, in our case <code>beer-sample</code> -line 9. You can include the password if the bucket is protected ( this is not the case here so I am sending an empty string)</li>
+</ol>
+
+
+<p>If you are looking for more information about Couchbase and Java, you can read this article from DZone : <a href="http://architects.dzone.com/articles/hello-world-couchbase-and-java">Hello World with Couchbase and Java</a>.</p>
+
+<p>Let&rsquo;s now talk about Couchbase views. You use views/map-reduce functions to index and query data from Couchbase Server based on the content of the JSON document you store inside Couchbase. For more information about views you can look at the <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-basics.html">&ldquo;view basics&rdquo; chapter</a> of the Couchbase Server Manual.</p>
+
+<h4>Create Views from Java</h4>
+
+<p>Creating a view from Java is really easy : the Java Client Library contains all the classes and methods to do it. As a concrete use case we will use the Application that is described in the <a href="http://www.couchbase.com/docs/couchbase-sdk-java-1.1/tutorial.html">Couchbase Java Tutorial</a>.</p>
+
+<p>When you follow this tutorial, you need to manually create some views, as you can see <a href="http://www.couchbase.com/docs/couchbase-sdk-java-1.1/preps-views.html">here</a>. In this example, we will create our map function and directly in our Java code and then store it to Couchbase Server. The tutorial asks you to create the following artifacts:</p>
+
+<ul>
+<li>a view named &ldquo;by_name&rdquo;</li>
+<li>in the design document named <code>"dev_beer"</code> (development mode)</li>
+<li>and the map function which looks like the following :</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span> <span class="o">&amp;&amp;</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s2">&quot;beer&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following code allows you to do it from Java:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">com.couchbase.client.protocol.views.DesignDocument</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.couchbase.client.protocol.views.ViewDesign</span><span class="o">;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">DesignDocument</span> <span class="n">designDoc</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">DesignDocument</span><span class="o">(</span><span class="s">&quot;dev_beer&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">String</span> <span class="n">viewName</span> <span class="o">=</span> <span class="s">&quot;by_name&quot;</span><span class="o">;</span>
+</span><span class='line'><span class="n">String</span> <span class="n">mapFunction</span> <span class="o">=</span>
+</span><span class='line'><span class="s">&quot;function (doc, meta) {\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;  if(doc.type &amp;&amp; doc.type == \&quot;beer\&quot;) {\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;    emit(doc.name);\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;  }\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;}&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ViewDesign</span> <span class="n">viewDesign</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ViewDesign</span><span class="o">(</span><span class="n">viewName</span><span class="o">,</span><span class="n">mapFunction</span><span class="o">);</span>
+</span><span class='line'><span class="n">designDoc</span><span class="o">.</span><span class="na">getViews</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">viewDesign</span><span class="o">);</span>
+</span><span class='line'><span class="n">client</span><span class="o">.</span><span class="na">createDesignDoc</span><span class="o">(</span> <span class="n">designDoc</span> <span class="o">);</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Create a design document using the <code>com.couchbase.client.protocol.views.DesignDocument</code> class - line 4.</li>
+<li>Create a view using <code>com.couchbase.client.protocol.views.ViewDesign</code> class with a name and the map function - line 14.</li>
+<li>You can add this view to a design document - line 15</li>
+<li>Finally save the document into the cluster using the <code>CouchbaseClient.createDesignDoc</code> method.</li>
+</ul>
+
+
+<p>If you need to use a reduce function (built-in or custom) you just need to pass to the ViewDesign constructor as 3rd parameter.</p>
+
+<p>When developing view, from Java or from any other tool/language be sure you understand what are the best practices, and the life cycle of the index. This is why I am inviting you to take a look to the following chapters in the Couchbase documentation:</p>
+
+<ul>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-writing-bestpractice.html">View Writing Best Practice</a> : for example in the map function, I do not emit any value. I only emit a key (the beer name).</li>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-datastore.html">Views and Stored Data</a></li>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-types.html">Development and Production Views</a> : in the view above, I have created the view in the development environment (<span style="font-family: Courier New, Courier, monospace;">dev_</span> prefix) allowing me to test and use it on a subset of the data (cluster/index)</li>
+</ul>
+
+
+<h4>Using the view</h4>
+
+<p>First of all, the view that you just created is in &ldquo;development mode&rdquo;, and by default the Java client SDK will only access the view when it is in &ldquo;production mode&rdquo;. This means that when you are calling a view from your application it will search it into the production environment. So before connecting to Couchbase cluster you need to setup the <code>viewmode</code> to development.</p>
+
+<p>This is done using the <code>viewmode</code> environment variable from the Java SDK, that could be set using the following methods:</p>
+
+<ul>
+<li>In your code, add this line <strong>before</strong> the client connects to the cluster : <code>System.setProperty("viewmode", "development");</code></li>
+<li>At the command line <code>-Dviewmode=development</code></li>
+<li>In a properties file <code>viewmode=development</code></li>
+</ul>
+
+
+<p>Once it is done you can call the view using the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">import</span> <span class="n">com</span><span class="o">.</span><span class="na">couchbase</span><span class="o">.</span><span class="na">client</span><span class="o">.</span><span class="na">protocol</span><span class="o">.</span><span class="na">views</span><span class="o">.*;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;viewmode&quot;</span><span class="o">,</span> <span class="s">&quot;development&quot;</span><span class="o">);</span> <span class="c1">// before the connection to Couchbase</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">View</span> <span class="n">view</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">getView</span><span class="o">(</span><span class="s">&quot;beer&quot;</span><span class="o">,</span> <span class="s">&quot;by_name&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Query</span><span class="o">();</span>
+</span><span class='line'><span class="n">query</span><span class="o">.</span><span class="na">setIncludeDocs</span><span class="o">(</span><span class="kc">true</span><span class="o">).</span><span class="na">setLimit</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span>
+</span><span class='line'><span class="n">query</span><span class="o">.</span><span class="na">setStale</span><span class="o">(</span> <span class="n">Stale</span><span class="o">.</span><span class="na">FALSE</span> <span class="o">);</span>
+</span><span class='line'><span class="n">ViewResponse</span> <span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">view</span><span class="o">,</span> <span class="n">query</span><span class="o">);</span>
+</span><span class='line'><span class="k">for</span><span class="o">(</span><span class="n">ViewRow</span> <span class="n">row</span> <span class="o">:</span> <span class="n">result</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">row</span><span class="o">.</span><span class="na">getDocument</span><span class="o">();</span> <span class="c1">// deal with the document/data</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code queries the view you just created. This means Couchbase Server will generate an index based on your map function, will query the server for results. In this case, we specifically want to set a limit of 20 results and also get the most current results by setting Stale.FALSE.</p>
+
+<ul>
+<li>Set the <code>viewmode</code> to <code>development</code> - line 4</li>
+<li>Get the view using the <code>CouchbaseClient.getView()</code> method -line 6-. As you can see I just use the name beer for the design document (and not dev_beer, Couchbase will know where to search since I am in development mode)</li>
+<li>Create a query and set a limit (20) and ask the SDK to return the document itself
+<code>setIncludeDocs(true)</code> -line 8- The document will be returned from Couchbase server in the most efficient way</li>
+<li>Ask the system to update the index before returning the result using query.setStale( Stale.FALSE <code>);</code>-line 9-. Once again be careful when you use setStale method. Just to be sure here is the documentation about it : <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-writing-stale.html">Index Updates and the stale Parameter</a></li>
+<li>Execute the query - line 10</li>
+<li>And use the result - lines 11-13</li>
+</ul>
+
+
+<h3>Conclusion</h3>
+
+<p>In this article, you have learned:</p>
+
+<ul>
+<li>How to create Couchbase views from Java</li>
+<li>Call this view from Java</li>
+<li>Configure development/production mode views from Couchbase Java Client Library</li>
+</ul>
+
+
+<p>This example is limited to the creation of a view, you can take a look to the other methods related to design documents and views if you want to manage your design documents : <code>getDesignDocument()</code>, <code>deleteDesignDocument()</code>, &hellip;</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2012-12-30T10:42:24+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>10:42 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/couchbase/'>couchbase</a>, <a class='category' href='/blog/categories/java/'>java</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/" title="Previous Post: What to do if your Couchbase Server does not start?">&laquo; What to do if your Couchbase Server does not start?</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/" title="Next Post: Getting started with Couchbase and node.js on Windows">Getting started with Couchbase and node.js on Windows &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/';
+        var disqus_url = 'http://tgrall.github.io/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

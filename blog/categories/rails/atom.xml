@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Rails | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/rails/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Derek Sivers's Blog: 7 Reasons I Switched Back to PHP After 2 Years on Rails]]></title>
+    <link href="http://tgrall.github.io/blog/2007/09/25/derek-siverss-blog-7-reasons-i-switched-back-to-php-after-2-years-on-rails/"/>
+    <updated>2007-09-25T01:20:37+02:00</updated>
+    <id>http://tgrall.github.io/blog/2007/09/25/derek-siverss-blog-7-reasons-i-switched-back-to-php-after-2-years-on-rails</id>
+    <content type="html"><![CDATA[<p>The new post on the <a href="http://www.oreillynet.com/ruby/">Ruby section of O&#8217;Reilly</a> authored by Derek Sivers is quite interesting, starting with the title:</p>
+
+<ul>
+<li><a href="http://www.oreillynet.com/ruby/blog/2007/09/7_reasons_i_switched_back_to_p_1.html"> 7 reasons I switched back to PHP after 2 years on Rails</a>I am far away of being a PHP expert, or even a Ruby one, but I have the impression that I could post a similar title with Java instead of PHP. If this is true that Java EE could look a little complex for a start -this is probably less true today with the new JavaEE simplifications-. Yes&hellip; when you compare Rails and Java alone it is more complex but we should not forget that Java is now more a platform than a simple programming language. And many developers and companies have built very productive solution on this platform.</li>
+</ul>
+
+
+<p>Since I am talking about Ruby on Rails here, it is important to mention again Grails and Groovy that provide on the Java platform a simple and productive way to
+develop applications, and time to get back to the different reasons mentioned by Derek in his post:</p>
+
+<h4>1 - “IS THERE ANYTHING RAILS/RUBY CAN DO THAT <strike>PHP</strike> JAVA CAN’T DO? … (thinking)… NO.”</h4>
+
+<p>I believe that we will all agree on the fact that you can do anything you want in Java; Web applications, mobile applications, operating systems, rdbms, &hellip; the only limit is your brain! -and your skills ;) -</p>
+
+<h4>2 - OUR ENTIRE COMPANY’S STUFF WAS IN <strike>PHP</strike> JAVA: DON’T UNDERESTIMATE INTEGRATION</h4>
+
+<p>I think this is one of the key point here. Enterprise is using JavaEE a lot and it is part of the IT, moving to another technology will be expensive even if development is faster. In addition, the developers, administrators are used to develop and manage Java based applications.</p>
+
+<p>And I do not want to talk about how complex it could be when you are building a Rails application on an existing database, designed from a pure Entity/Relation methodology&hellip;.</p>
+
+<h4>3, 4 5 - I have nothing special to say here&hellip;</h4>
+
+<h4>6 - I LOVE SQL</h4>
+
+<p>I still see a lot of developers using SQL directly in Java programs. The nice thing about Java is the fact that based on your skills and what you like to do you can choose the way you want to access the database, simple SQL, powerful O-R Mappings, &hellip;</p>
+
+<h4>7 - PROGRAMMING LANGUAGES ARE LIKE GIRLFRIENDS: THE NEW ONE IS BETTER BECAUSE <em>YOU</em> ARE BETTER</h4>
+
+<p>I love this reason, but nothing special to say, I let you read the original post.</p>
+
+<p>As you can see from the number of comments in Derek&rsquo;s blog -no times to read all of them- this entry generates lot of reactions.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Grails vs Rails Performance Benchmark]]></title>
+    <link href="http://tgrall.github.io/blog/2007/03/23/grails-vs-rails-performance-benchmark/"/>
+    <updated>2007-03-23T02:56:21+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/03/23/grails-vs-rails-performance-benchmark</id>
+    <content type="html"><![CDATA[<p>Graeme, the Grails Project Lead has published a very interesting benchmark of Grails versus Rails applications, that is available on the Grails wiki:</p>
+
+<ul>
+<li><a href="http://grails.org/Grails+vs+Rails+Benchmark">Grails vs Rails Performance Benchmarking</a>I let you read and comment on the Wiki the results&hellip; Grails development team is open to comment and improvement of the bench to capture as much information as possible.</li>
+</ul>
+
+
+<p>It is also important to note that performances, productivity are very important when choosing a development environment; but something that is also key for enterprises, is the fact that Grails/Groovy &ldquo;are&rdquo; Java/J2EE based. This means that a Grails application is packaged, deployed, administered and monitored like any applications that already exist in the information system on J2EE application servers.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Toplink | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/toplink/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle Donates Toplink to Eclipse]]></title>
+    <link href="http://tgrall.github.io/blog/2007/03/06/oracle-donates-toplink-to-eclipse/"/>
+    <updated>2007-03-06T23:48:56+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/03/06/oracle-donates-toplink-to-eclipse</id>
+    <content type="html"><![CDATA[<p>Oracle has announced yesterday during  <a href="http://www.eclipsecon.org/">EclipseCon</a> in Santa Clara (California) that it <em>open-sources</em> Oracle Toplink as part of the Eclipse Project.</p>
+
+<p>The idea is to open source all the features of Toplink (ORM/JPA, OXM/JAXB, and EIS support), but also features that are currently under development and will be part of the Eclipse project:</p>
+
+<ul>
+<li>Service Data Objects (SDO) implementation and SDO Data Access Service (DAS) that leverages JPA for use with SDO.*   XR (XML-Relational) that provides a completely metadata driven approach to obtaining relational data as XML.</li>
+<li>DBWS which exposes XR as a web service. With DBWS, you can easily build web services that access relational data without any programming.</li>
+</ul>
+
+
+<p>One part will be kept by Oracle, this is the &ldquo;glue&rdquo; code that is used for the integration with OracleAS that is probably not useful for anybody but Oracle.
+For details check out the <a href="http://www.oracle.com/corporate/press/2007_mar/OpenSource-TopLink.html">press release</a> and the <a href="http://www.oracle.com/technology/tech/eclipse/pdf/eclipselink-faq.pdf">FAQ</a>.</p>
+
+<p>If you are at EclipseCon do not hesitate to visit the Oracle booth to learn more about this great news for the Java developers.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle Toplink and Spring Framework Integration]]></title>
+    <link href="http://tgrall.github.io/blog/2004/12/10/oracle-toplink-and-spring-framework-integration/"/>
+    <updated>2004-12-10T19:28:34+01:00</updated>
+    <id>http://tgrall.github.io/blog/2004/12/10/oracle-toplink-and-spring-framework-integration</id>
+    <content type="html"><![CDATA[<p>You can now find a preview of the Oracle Toplink &amp; framework integration. This allows you to easily use Toplink features in your Spring application.</p>
+
+<p>You can download it from <a href="http://www.oracle.com/technology/products/ias/toplink/preview/spring/index.html">OTN Web site</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle TopLink: Happy 10th Anniversary]]></title>
+    <link href="http://tgrall.github.io/blog/2004/11/17/oracle-toplink-happy-10th-anniversary/"/>
+    <updated>2004-11-17T09:15:22+01:00</updated>
+    <id>http://tgrall.github.io/blog/2004/11/17/oracle-toplink-happy-10th-anniversary</id>
+    <content type="html"><![CDATA[<p>In the context of the 10th anniversary of Oracle TopLink, <a href="http://theserverside.com/news/thread.tss?thread_id=30017" target="_tugSite">The Server Side published an interview of Mike Keith and Doug Clark</a>, architect and product manager of TopLink. They talk about persistence in J2EE using EJB 3.0, but also the differences between TopLink and other persistence solutions&hellip;</p>
+]]></content>
+  </entry>
+  
+</feed>

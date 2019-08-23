@@ -1,0 +1,1216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Nosql | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/nosql/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR-DB JSON REST API]]></title>
+    <link href="http://tgrall.github.io/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/"/>
+    <updated>2018-04-23T14:37:51+02:00</updated>
+    <id>http://tgrall.github.io/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>In this project you will learn how to use the MapR-DB JSON REST API to:</p>
+
+<p>Create and Delete tables
+Create, Read, Update and Delete documents (CRUD)
+MapR Extension Package 5.0 (MEP) introduced the MapR-DB JSON REST API that allow application to use REST to interact with MapR-DB JSON.</p>
+
+<p>You can find information about the MapR-DB JSON REST API in the documentation: <a href="https://maprdocs.mapr.com/home/MapR-DB/JSON_DB/UsingMapRDBJSONRESTAPI.html">Using the MapR-DB JSON REST API</a></p>
+
+<!-- more -->
+
+
+<h2>Prerequisites</h2>
+
+<p>You system should have the following components:</p>
+
+<ul>
+<li>A running MapR 6.0.1 &amp; MEP 5.0 cluster with the MapR-DB REST API service installed</li>
+<li><code>curl</code> or equivalent tool</li>
+</ul>
+
+
+<h2>Discover the MapR-DB JSON REST API</h2>
+
+<p>The easiest way to discover it, is to use curl command (or equivalent).</p>
+
+<p><strong>1 - Create a table</strong></p>
+
+<pre><code>curl -X PUT \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the MapR-DB REST Service (MapR Data Access Gateway) is running on the mapr-node host with the default port <code>8243</code> using HTTPS</li>
+<li>the HTTP verb <code>PUT</code> on <code>/api/v2/table/</code> endoint creates a new table</li>
+<li>the protocol is HTTP since HTTPS is not enabled on this cluster</li>
+<li>the new table will be created wit the path <code>/apps/emp</code> that is encoded to <code>%2Fapps%2Femp</code></li>
+<li>the user <code>root</code> with the password <code>mapr</code> is used for authentication, using basic authentication</li>
+<li>the <code>-k</code> parameter is used to indicate to turn off curl’s verification of the certificate.</li>
+</ul>
+
+
+<p>In this example, you use the basic authentication, it is also possible to use <a href="https://jwt.io/introduction/">JSON Web Token</a>. You will learn more about this when you will write an application in Go.</p>
+
+<p><strong>2 - Insert Documents</strong></p>
+
+<p>Insert one document</p>
+
+<pre><code>curl -X POST \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -H 'Content-Type: application/json' \
+  -d '{"_id":"user001","first_name":"John","last_name":"Doe", "age" : 28}' \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the <code>/api/v2/table/{path}</code> with the verb <code>GET</code> is used with a <code>condition</code> query parameter</li>
+<li>the OJAI JSON syntax is used to express the condition: <code>{"$eq":{"last_name":"Doe"}}</code></li>
+</ul>
+
+
+<p><strong>3 - Update a document</strong></p>
+
+<p>The following example will increment the age by 1 and update the last name.</p>
+
+<pre><code>curl -X POST \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -H 'Content-Type: application/json' \
+  -d '{"$set" : {"last_name" : "New Doe"}, "$increment" : {"age":1}}' \
+  -k
+</code></pre>
+
+<p>In this comamnd:</p>
+
+<ul>
+<li>the URL points to the document <code>_id</code> to update</li>
+<li>the HTTP verb <code>POST</code> is used to modify the resource</li>
+<li>the request body <code>-d</code> is the OJAI JSON Mutation that update the last name and increment the age.</li>
+</ul>
+
+
+<p>You can check that the document has been updated using the following command:</p>
+
+<pre><code>curl -X GET \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p><strong>4 - Delete a document</strong></p>
+
+<p>Delete the document with the <code>_id</code> user001.</p>
+
+<pre><code>curl -X DELETE \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the URI <code>/api/v2/table/{path}/document/{id}</code> with the HTTP verb <code>DELETE</code> is used to delete the document</li>
+</ul>
+
+
+<p><strong>5 - Delete the MapR-DB JSON table</strong></p>
+
+<p>The last step of this tutorial is to delete the table using the following command:</p>
+
+<pre><code>curl -X DELETE \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial you have learned how to use the MapR-DB JSON REST API to:</p>
+
+<ul>
+<li>Create a table</li>
+<li>Insert and query documents</li>
+<li>Update and delete documents</li>
+<li>Drop table</li>
+</ul>
+
+
+<p>You can now use the API to create MapR-DB JSON Application using your favorite language.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR-DB Table Replication]]></title>
+    <link href="http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication/"/>
+    <updated>2017-08-08T10:01:19+02:00</updated>
+    <id>http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>MapR-DB Table Replication allows data to be replicated to another table that could be on on the same cluster or in another cluster. This is different from the automatic and intra-cluster replication that copies the data into different physical nodes for high availability and prevent data loss.</p>
+
+<p>This tutorial focuses on the MapR-DB Table Replication that replicates data between tables on different clusters.</p>
+
+<p>Replicating data between different clusters allows you to:</p>
+
+<ul>
+<li>provide another level of disaster recovery that protects your data and applications against global data center failure,</li>
+<li>push data close to the applications and users,</li>
+<li>aggregate the data from mutliple datacenters.</li>
+</ul>
+
+
+<p><strong>Replication Topologies</strong></p>
+
+<p>MapR-DB Table Replication provides various topologies to adapt the replication to the business and technical requirements:</p>
+
+<ul>
+<li><em>Master-slave replication</em> : in this topology, you replicate one way from source tables to replicas. The replicas can be in a remote cluster or in the cluster where the source tables are located.</li>
+<li><em>Multi-Master replication</em> : in this replication topology, there are two master-slave relationships, with each table playing both the role of a master and a slave. Client applications update both tables and each table replicates updates to the other.</li>
+</ul>
+
+
+<p>In this example you will learn how to setup multi-master replication.</p>
+
+<!-- more -->
+
+
+<h3>Prerequisites</h3>
+
+<ul>
+<li>2 MapR Clusters 5.x with Enterprise Edition license
+
+<ul>
+<li>in this demonstration they are called <code>cluster1</code> and <code>cluster2</code></li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Setting Up Replication</h2>
+
+<p>In the next steps you will configure your clusters to enable mutip-master replication as follow:</p>
+
+<p><img src="http://tgrall.github.io/images/posts/maprdb-replication/replication.png" alt="Architecture" /></p>
+
+<h3>Configuring the clusters</h3>
+
+<p>Each node of the source cluster must communicate with the destination cluster&rsquo;s CLDB nodes. On each node of your source cluster edit the <code>mapr-clusters.conf</code> file and add the destination cluster information.</p>
+
+<p><em>Cluster 1 Configuration</em></p>
+
+<p>In all the nodes of <code>cluster1</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster2</code> configuration. The file should look like the following:</p>
+
+<pre><code>cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
+
+cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
+</code></pre>
+
+<p><em>Cluster 2 Configuration</em></p>
+
+<p>In all the nodes of <code>cluster2</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster1</code> configuration. The file should look like the following:</p>
+
+<pre><code>cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
+
+cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
+</code></pre>
+
+<p>You can find information about the <code>mapr-clusters.conf</code> format in <a href="http://maprdocs.mapr.com/home/ReferenceGuide/mapr-clusters.conf.html">the documentation</a>.</p>
+
+<p>Open a terminal window on one of the <code>cluster1</code> node using <code>mapr</code> user, and do the following:</p>
+
+<pre><code>$ ls /mapr/cluster1/
+apps   hbase  installer  opt  tmp  user  var
+
+$ ls /mapr/cluster2/
+apps   hbase  installer  opt  tmp  user  var
+</code></pre>
+
+<h3>Installing and Configuring the MapR Gateway</h3>
+
+<p>A MapR gateway mediates one-way communication between a source MapR cluster and a destination MapR cluster. In this example you will use mult-master replication, this means that data will be replicated from <code>cluster1</code> to <code>cluster2</code> and from <code>cluster2</code> to <code>cluster1</code>.</p>
+
+<p>The good practice is to install the MapR-Gateway to the destination cluster, so in our case let&rsquo;s install one gateway on one of the <code>cluster1</code> node, and one gateway on one of the <code>cluster2</code> node. Note that this configuration will not be highly available, and usually you will deploy more than 1 gateway by cluster.</p>
+
+<h4>Installing the MapR-Gateway</h4>
+
+<p>As root on one node of the <code>cluster1</code>, adapt the command to your linux environment, for example on the node <code>cluster1-node2</code></p>
+
+<pre><code>$ yum install mapr-gateway
+
+
+# Update MapR configuration
+$ /opt/mapr/server/configure.sh -N cluster1 -C cluster1-node1:7222,cluster1-node2:7222,cluster1-node3:7222 -R
+</code></pre>
+
+<p>Do the same on <code>cluster2</code>, for example on the node <code>cluster2-node2</code>:</p>
+
+<pre><code>$ yum install mapr-gateway
+
+
+# Update MapR configuration
+$ /opt/mapr/server/configure.sh -N cluster1 -C cluster2-node1:7222,cluster2-node2:7222,cluster2-node3:7222 -R
+</code></pre>
+
+<h4>Registering the Gateway to the Clusters</h4>
+
+<p>Now that we have a gateway running on each cluster, you have to <strong><em>register the gateway</em></strong> in each cluster.</p>
+
+<p>On <code>cluster1</code> run the following command to register the <code>cluster2</code> gateway as destination:</p>
+
+<pre><code>$ maprcli cluster gateway set -dstcluster cluster2 -gateways cluster2-node2
+
+# Check the configuration
+$ maprcli cluster gateway list
+</code></pre>
+
+<p>On <code>cluster2</code> run the following command to register the <code>cluster1</code> gateway as destination:</p>
+
+<pre><code>$ maprcli cluster gateway set -dstcluster cluster1 -gateways cluster1-node2
+
+# Check the configuration
+$ maprcli cluster gateway list
+</code></pre>
+
+<h3>Creating Table with Replication</h3>
+
+<p>In a terminal window, as <code>mapr</code> user on <code>cluster1</code>, create a table and insert documents:</p>
+
+<pre><code>$ maprcli table create -path /apps/user_profiles  -tabletype json
+</code></pre>
+
+<p>This create a new JSON table; it is also possible to use <code>/mapr/cluster1/apps/user_profiles</code>.</p>
+
+<p>Let&rsquo;s now add documents using MapR-DB Shell:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user001" , "first_name":"John", "last_name":"Doe"}'
+
+maprdb mapr:&gt; find /apps/user_profiles
+</code></pre>
+
+<h4>Adding Table Replication</h4>
+
+<p>Let&rsquo;s now enable replication between <code>user_profiles</code> on <code>cluster1</code> to a <code>user_profiles</code> table in <code>cluster2</code>.</p>
+
+<p>In <code>cluster1</code>, on a terminal window as <code>mapr</code> run the following command:</p>
+
+<pre><code>$ maprcli table replica autosetup -path /apps/user_profiles -replica /mapr/cluster2/apps/user_profiles -multimaster yes
+</code></pre>
+
+<p>You can get information about the replication configuration for the table using the following command:</p>
+
+<pre><code>$ maprcli table replica list -path /apps/user_profiles -json
+</code></pre>
+
+<h4>Testing Replication</h4>
+
+<p>Open another terminal in <code>cluster2</code> and use MapR-DB Shell to look at the replicated data:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; find /apps/user_profiles
+{"_id":"user001","first_name":"John","last_name":"Doe"}
+1 document(s) found.
+</code></pre>
+
+<p>You can also use the full path <code>/mapr/cluster2/apps/user_profiles</code></p>
+
+<p>In <code>cluster1</code> add a new document using MapR-DB Shell:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user002" , "first_name":"Simon", "last_name":"Dupont"}'
+
+maprdb mapr:&gt; find /apps/user_profiles
+</code></pre>
+
+<p>Do a find in <code>cluster2</code> table, and you will see that the data have been replicated.</p>
+
+<p>You can insert or delete a document in <code>cluster2</code> and do a find in <code>cluster1</code>, you will see that the new document is also replicated in the other direction.</p>
+
+<p>Note, for this demonstration, we use 2 terminals connected to each cluster you can do some test using the Global Namespace in a single MapR-DB Shell.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial you have learned how to setup the MapR-DB Multi-Master replication to have data automatically replicated between 2 clusters.</p>
+
+<p>MapR-DB Table Replication provides many options, not only in term of topology (master-slave/mult-master), but also some options and commands to:</p>
+
+<ul>
+<li>replicate some columns/attributes or column family</li>
+<li>configure replication in a secured cluster</li>
+<li>pause replication.</li>
+</ul>
+
+
+<p>You can find more information about the MapR-DB Table Replication, and MapR-Gateway in the documentation:</p>
+
+<ul>
+<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ReplicatingMapR-DBTables.html">Table Replication</a></li>
+<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ConfiguringMapRClustersForTR.html">Setting up Table Replication</a></li>
+<li><a href="http://maprdocs.mapr.com/home/Gateways/MapRGateways.html">Configuring and Managing MapR Gateways</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Introduction to MongoDB Security]]></title>
+    <link href="http://tgrall.github.io/blog/2015/02/04/introduction-to-mongodb-security/"/>
+    <updated>2015-02-04T18:55:30+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/02/04/introduction-to-mongodb-security</id>
+    <content type="html"><![CDATA[<p>Last week at the Paris MUG, I had a quick chat about security and MongoDB, and I have decided to create this post that explains how to configure out of the box security available in MongoDB.</p>
+
+<p>You can find all information about MongoDB Security in following documentation chapter:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/security/">http://docs.mongodb.org/manual/security/</a></li>
+</ul>
+
+
+<p><img class="center" src="/images/posts/intro-mongodb-security/password.jpg"></p>
+
+<p>In this post, <em>I won&rsquo;t go</em> into the detail about how to deploy your database in a secured environment (DMZ/Network/IP/Location/&hellip;)</p>
+
+<p>I will focus on <strong>Authentication</strong> and <strong>Authorization</strong>, and provide you the steps to secure the access to your database and data.</p>
+
+<p>I have to mention that by default, when you install and start MongoDB, security is not enabled. Just to make it easier to work with.</p>
+
+<p>The first part of the security is the <strong>Authentication</strong>, you have multiple choices documented <a href="http://docs.mongodb.org/manual/core/authentication/">here</a>. Let&rsquo;s focus on &ldquo;MONGODB-CR&rdquo; mechanism.</p>
+
+<p>The second part is <strong>Authorization</strong> to select what a user can do or not once he is connected to the database. The documentation about authorization is available <a href="http://docs.mongodb.org/manual/core/authorization/">here</a>.</p>
+
+<p>Let&rsquo;s now document how-to:</p>
+
+<ol>
+<li>Create an Administrator User</li>
+<li>Create Application Users</li>
+</ol>
+
+
+<p>For each type of users I will show how to grant specific permissions.</p>
+
+<!-- more -->
+
+
+<h2>1. Start MongoDB</h2>
+
+<p>As I said before, by default security is not enabled when you start MongoDB; so the first think to do is to enable it using the <code>--auth</code> parameter.</p>
+
+<pre><code>&gt; mkdir /data/db
+
+&gt; mongod --auth
+
+....
+....
+2015-02-04T06:56:37.875+0100 [conn1] note: no users configured in admin.system.users, allowing localhost access
+...
+</code></pre>
+
+<p>MongoDB is starting, and until you have created a user you can connect from localhost to create some users (especially the administrator one). This is what is called the <em>localhost exception</em>.</p>
+
+<p>Note: I am here documenting security in simple configuration, I invite you to look to the documentation when deploying a <a href="http://docs.mongodb.org/v2.2/administration/sharded-clusters/#sharded-cluster-security-considerations">Sharded cluster</a>.</p>
+
+<p>Now that we have started MongoDB, we can create users.</p>
+
+<h2>2. Create Admin User</h2>
+
+<p>The first thing is to create an admin user, that can also create users, So we have to:</p>
+
+<ol>
+<li>go to the mongo shell</li>
+<li>connect to the `admin&#8217; database</li>
+<li>create a user and assign him the role <a href="http://docs.mongodb.org/manual/reference/built-in-roles/#userAdminAnyDatabase"><strong>userAdminAnyDatabase</strong></a></li>
+</ol>
+
+
+<pre><code>use admin
+
+var user = {
+    "user" : "admin",
+    "pwd" : "manager",
+    roles : [
+        {
+            "role" : "userAdminAnyDatabase",
+            "db" : "admin"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>Now that you have created a user, in a MongoDB running with <code>--auth</code>, anonymous connections won&rsquo;t be able to do do anything with the database.</p>
+
+<p>You can test for example to execute <code>show dbs</code> or <code>db.coll.insert({'x':0})</code> commands, you&rsquo;ll see authorization errors.</p>
+
+<h3>Connect with the Admnistrator user</h3>
+
+<p>Now that we have an admin user you can connect to the database with this user:</p>
+
+<pre><code>
+&gt; mongo admin -u admin -p
+</code></pre>
+
+<p>Our admin user, has the role <strong>userAdminAnyDatabase</strong>. With this role you can manage user; but this role cannot read/write data from application datatabases/collections.</p>
+
+<p>So we need now to create a new user for our &ldquo;eCommerce&rdquo; application.</p>
+
+<h2>3. Create Application User</h2>
+
+<p>Now we will create a new user <em>website</em> that is responsible of the ecommerce database.</p>
+
+<pre><code>&gt; mongo admin -u admin -p
+
+use ecommerce
+
+var user = {
+    "user" : "website",
+    "pwd" : "abc123",
+    roles : [
+        {
+            "role" : "readWrite",
+            "db" : "ecommerce"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>This user will be able to read/write on the <em>ecommerce</em> database</p>
+
+<h3>Connect with the application user</h3>
+
+<p>Using the mongo shell you can now connect and create/query data</p>
+
+<pre><code>&gt; mongo ecommerce -u website -p
+
+db.products.insert({ "title" : "MongoDB in Action"  });
+
+db.products.findOne();
+
+db.products.update({}, {"$set" : { "type" : "book" } })
+</code></pre>
+
+<p>As you can see this user has the perfect profile for your application.</p>
+
+<p>Note, that if you try to query or modify another database with this user you will receive authorization exceptions.</p>
+
+<h2>Create a reporting user (Read Only)</h2>
+
+<p>You may need in your application, user that can only read data, let&rsquo;s say in all databases. For this you just need to assign the role <strong>readAnyDatabase</strong>.</p>
+
+<pre><code>
+&gt; mongo admin -u admin -p
+
+var user = {
+    "user" : "reporting",
+    "pwd" : "abc123",
+    roles : [
+        {
+            "role" : "readAnyDatabase",
+            "db" : "admin"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>This user will be able to query all the databases and collections, including <code>show dbs</code> command.</p>
+
+<p>Let&rsquo;s connect with the reporting user:</p>
+
+<pre><code>&gt; mongo admin -u reporting -p
+
+show dbs
+
+use ecommerce
+
+db.products.find();
+</code></pre>
+
+<p>If you try to inser/update/delete document you will receive an exception.</p>
+
+<h2>Add new role to a user</h2>
+
+<p>Let&rsquo;s now see how to add a new role to a user. For example I want to let the admin the power of read and write any database. For this I just need to add the role <strong>readWriteAnyDatabase</strong> to the admin user.</p>
+
+<pre><code>&gt; mongo admin -u admin -p
+
+db.grantRolesToUser(
+    "admin",
+    [{ "role" : "readWriteAnyDatabase", "db" : "admin" }]
+)
+
+db.getUser("admin");
+</code></pre>
+
+<p>Using the <code>db.grantRolesToUser</code> command I have added the role to the admin user, and using the <code>db.getUser</code> I can look at the user profile.</p>
+
+<p>Now, admin user should be able to create new databases, collections and documents, let&rsquo;s try:</p>
+
+<pre><code>use hr
+
+db.employees.insert({ "name":"John Doe", "hire_date" : new Date() });
+
+db.organization.insert({ "name" : "Development" });
+
+db.employees.findOne();
+</code></pre>
+
+<h2>Create and use custom roles</h2>
+
+<p>Another feature that is used a lot around security is related to the roles. In some case you want to provide multiple roles to a user, for example:</p>
+
+<ul>
+<li>all permission on database <em>ecommerce</em></li>
+<li>read the collection <em>employees</em> in database <em>hr</em></li>
+</ul>
+
+
+<p>For this you can create a role that provide all the permissions and assign it to users. Let&rsquo;s do that using admin user.</p>
+
+<pre><code>use admin
+
+var role = {
+    "role"  : "webSiteManagerRole",
+    privileges : [
+        {
+            "resource": {"db" : "hr", "collection" : "employees"},
+            "actions": ["find"]
+        }
+    ],
+    "roles" : [
+        {
+            "role" : "readWrite",
+            "db" : "ecommerce"
+        }
+    ]
+}
+
+db.createRole( role );
+
+var user = {
+    "user" : "master",
+    "pwd" : "abc123",
+    roles : [
+        {
+            "role" : "webSiteManagerRole",
+            "db" : "admin"
+        }
+    ]
+}
+
+db.createUser(user);
+
+exit
+</code></pre>
+
+<p>If you connect now with the user &ldquo;master&rdquo;, you will see that, the user:</p>
+
+<ul>
+<li>can do anything you want in the ecommerce database</li>
+<li>can read the &ldquo;hr.employees&rdquo; collection, on only this</li>
+<li>cannot do anything else.</li>
+</ul>
+
+
+<h2>Roles and Privileges</h2>
+
+<p>As you have seen in the previous section, you can create roles, and assign privileges to these roles. This is very powerful and you can really control each action on the database.</p>
+
+<p>I am inviting you to look in detail to the built-in roles and privileges, this will help you a lot to select the proper ones for your application:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/reference/built-in-roles/">Built-in Roles</a></li>
+<li><a href="http://docs.mongodb.org/manual/reference/privilege-actions/">Privileges</a></li>
+</ul>
+
+
+<h2>Conclusion</h2>
+
+<p>In this blog post I quickly explained, how to:</p>
+
+<ul>
+<li>Use MongoDB Authentication</li>
+<li>Create Users</li>
+<li>Assign Roles and Privileges for Users.</li>
+</ul>
+
+
+<p>It is interesting to know that everything that I have showed you in the shell could be done from a user interface in <a href="http://mms.mongodb.com">MMS</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Moving My Beers From Couchbase to MongoDB]]></title>
+    <link href="http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/"/>
+    <updated>2015-02-01T15:37:46+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb</id>
+    <content type="html"><![CDATA[<p>Few days ago I have posted a <em>joke</em> on Twitter</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>Moving my Java from Couchbase to MongoDB <a href="http://t.co/Wnn3pXfMGi">pic.twitter.com/Wnn3pXfMGi</a></p>&mdash; Tugdual Grall (@tgrall) <a href="https://twitter.com/tgrall/status/559664540041117696">January 26, 2015</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>So I decided to move it from a simple picture to a <em>real</em> project. Let&rsquo;s look at the two phases of this so called project:</p>
+
+<ul>
+<li>Moving the data from Couchbase to MongoDB</li>
+<li>Updating the application code to use MongoDB</li>
+</ul>
+
+
+<p>Look at this screencast to see it in action:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/Fpl74Z0HbC0?color=white&theme=light"></iframe></p>
+
+<!-- more -->
+
+
+<h2>Moving the data</h2>
+
+<p>I have created a replication server, that uses the Couchbase XDCR protocol to get the document out and insert them into MongoDB. This server use the Couchbase CAPI Server project available <a href="https://github.com/couchbaselabs/couchbase-capi-server">here</a>.</p>
+
+<p>This server will receive all the mutations made in the Couchbase:</p>
+
+<ul>
+<li>When a document is inserted or updated the full document is sent</li>
+<li>When a document is deleted, only the medata are sent</li>
+<li>The <code>replication server</code>, save the data into MongoDB (inserts and/or updates - no delete), and then return the list to Couchbase as part of the XDCR Protocol.</li>
+</ul>
+
+
+<p>One of the challenges is the fact Couchbase does not have the notion of &ldquo;types&rdquo; or &ldquo;collections&rdquo;. You put everything in a <em>bucket</em> and the application code knows how to deal with the data. Not necessary a problem, just a choice of implementation, but make it sometime harder than expected when you want to write tools. So here the logic that I apply in my replication server, to organize the data in multiple collections when it makes sense <em>(and when it is possible)</em>:</p>
+
+<ul>
+<li>If the JSON document does not contains a <em>type field</em>, all the documents will be saved in a single collection</li>
+<li>If the JSON document contains a <em>type field</em> then a collection will be created for each type and documents will be inserted/updated in these collections</li>
+<li>MongoDB does not allow attributes key to have . and $ signs, so it is necessary to change the name with alternative characters. This is done automatically during the copy of the data.</li>
+</ul>
+
+
+<p>All this, and more is configurable in the tool.</p>
+
+<p>As you can see in the screencast this is straightforward.<em>(note that I have only tested very simple use cases and deployment)</em></p>
+
+<p>You can download the tool and the source code here:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/mongodb-cb-replicator">https://github.com/tgrall/mongodb-cb-replicator</a></li>
+<li>Download the <a href="http://goo.gl/WkuHBk">MongoCBReplicator.jar</a> file.</li>
+</ul>
+
+
+<h2>Updating the application code</h2>
+
+<p>The next step is to use these data in an application. For this I simply use the Beer Sample Java application available on <a href="https://github.com/couchbaselabs/beersample-java">Couchbase repository</a>.</p>
+
+<p>I just recreated the project and modified few things, to get the application up and running:</p>
+
+<ul>
+<li>Change the connection string</li>
+<li>Remove the code that generate views</li>
+<li>Replace set/get by MongoDB operations</li>
+<li>Replace call to the views by simple queries</li>
+</ul>
+
+
+<p>The code of the MongoDBeer application is available here:</p>
+
+<ul>
+<li>[<a href="https://github.com/tgrall/mongodbeer">https://github.com/tgrall/mongodbeer</a>]</li>
+</ul>
+
+
+<p>I did not change any business logic, or added features, or even replaced the way navigation and page rendition is made. I just focused on the database access, for example :</p>
+
+<pre><code class="java">
+// Couchbase Query
+View view = client.getView("beer", "by_name");
+    Query query = new Query();
+    query.setIncludeDocs(true).setLimit(20);
+    ViewResponse result = client.query(view, query);
+
+    ArrayList&lt;HashMap&lt;String, String&gt;&gt; beers =
+      new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+    for(ViewRow row : result) {
+      HashMap&lt;String, String&gt; parsedDoc = gson.fromJson(
+        (String)row.getDocument(), HashMap.class);
+
+      HashMap&lt;String, String&gt; beer = new HashMap&lt;String, String&gt;();
+      beer.put("id", row.getId());
+      beer.put("name", parsedDoc.get("name"));
+      beer.put("brewery", parsedDoc.get("brewery_id"));
+      beers.add(beer);
+    }
+    request.setAttribute("beers", beers);
+
+
+// MongoDB Query
+DBCursor cursor = db.getCollection("beer").find()
+                                                   .sort( BasicDBObjectBuilder.start("name",1).get() )
+                                                   .limit(20);
+     ArrayList&lt;HashMap&lt;String, String&gt;&gt; beers =
+             new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+     while (cursor.hasNext()) {
+         DBObject row = cursor.next();
+         HashMap&lt;String, String&gt; beer = new HashMap&lt;String, String&gt;();
+         beer.put("id", (String)row.get("_id"));
+         beer.put("name", (String)row.get("name"));
+         beer.put("brewery", (String)row.get("brewery_id"));
+         beers.add(beer);
+     }
+
+
+
+// Couchbase update
+client.set(beerId, 0, gson.toJson(beer));
+
+// MongoDB update
+db.getCollection("beer").save(new BasicDBObject(beer));
+</code></pre>
+
+<p>I did not attend to optimize the MongoDB code,  but just to replace as few lines of code as possible.</p>
+
+<p>Note: I have not created any index during the process. Obviously if your application have more and more data and you do intense work with it you must analyze your application/queries to see which indexes must be created.</p>
+
+<h2>Adding new features</h2>
+
+<p>Once you have the data into MongoDB you can do a lot more without anything more than MongoDB:</p>
+
+<h4>Full Text Search</h4>
+
+<p>You can create a Text index on various fields in the collection to provide advanced search capabilities to your users.</p>
+
+<pre><code class="json">db.brewery.ensureIndex(
+  {
+    "name" : "text",
+    "description" : "text"
+  },
+  {
+    "weights" :
+    {
+      "name" : 10,
+      "description" : 5
+    },
+    "name" : "TextIndex"
+  }
+
+);
+</code></pre>
+
+<p>Then you can query the database using the <code>$text</code> operation, for example all breweries with <em>Belgium</em> and without <em>Ale</em></p>
+
+<pre><code class="json">db.brewery.find( { "$text" : { "$search" : "belgium -ale" }   }  , { "name" : 1  } );
+{ "_id" : "daas", "name" : "Daas" }
+{ "_id" : "chimay_abbaye_notre_dame_de_scourmont", "name" : "Chimay (Abbaye Notre Dame de Scourmont)" }
+{ "_id" : "brasserie_de_cazeau", "name" : "Brasserie de Cazeau" }
+{ "_id" : "inbev", "name" : "InBev" }
+{ "_id" : "new_belgium_brewing", "name" : "New Belgium Brewing" }
+{ "_id" : "palm_breweries", "name" : "Palm Breweries" }
+</code></pre>
+
+<h4>Some analytics</h4>
+
+<p>Not sure these queries really make sense, but it is just to show that now you can leverage your documents without the need of any 3rd party tool.</p>
+
+<p>Number of beer by category, from the most common to the less one:</p>
+
+<pre><code class="json">db.beer.aggregate([
+  {"$group" : { "_id" : "$category","count" : {"$sum" : 1 } } },
+  {"$sort" : { "count" : -1 } },
+  {"$project" : {   "category" : "$_id", "count" : 1, "_id" : 0 } }
+]);
+
+{ "count" : 1996, "category" : "North American Ale" }
+{ "count" : 1468, "category" : null }
+{ "count" : 564, "category" : "North American Lager" }
+{ "count" : 441, "category" : "German Lager" }
+...
+...
+</code></pre>
+
+<p>Number of beer of a specific ABV by brewery, for example: top 3 breweries with the most beer with an abv greather or equals to a value, let&rsquo;s say 5:</p>
+
+<pre><code class="json">db.beer.aggregate([
+... { "$match" : { "abv" : { "$gte" : 5 }  } },
+... { "$group" : { "_id" : "$brewery_id", "count" : { "$sum" : 1} }},
+... { "$sort" : { "count" : -1 } },
+... { "$limit" : 3 }
+... ])
+
+{ "_id" : "midnight_sun_brewing_co", "count" : 53 }
+{ "_id" : "troegs_brewing", "count" : 33 }
+{ "_id" : "rogue_ales", "count" : 31 }
+</code></pre>
+
+<h4>Geospatial queries</h4>
+
+<p>The first thing to do with the data is to change the data structure to save the various data into a GeoJSON format, for this we can simply use a script into the MongoDB Shell:</p>
+
+<pre><code class="json">&gt;mongo
+
+use beers
+
+db.brewery.find().forEach(
+  function( doc ) {
+    var loc = { type : "Point" };
+    if (doc.geo &amp;&amp; doc.geo.lat &amp;&amp; doc.geo.lon) {
+      loc.coordinates = [ doc.geo.lon , doc.geo.lat  ];
+      db.brewery.update( { _id : doc._id } , {$set : { loc : loc } }  );
+    }
+  }
+);
+
+db.brewery.ensureIndex( { "loc" : "2dsphere" } );
+</code></pre>
+
+<p>This call take all the breweries and add a new attribute, name <code>loc</code> as a GeoJSON point. I could also chose to remove the old geo information using a &lsquo;$unset&rsquo;, but I did not; let&rsquo;s imagine that some API/applications are using it. This is a good example of flexible schema.</p>
+
+<p>Now I can search for all the brewery that are at less than 30km from the Golden Gate in San Francisco: [-122.478255,37.819929]</p>
+
+<pre><code class="json">db.brewery.find(
+  { "loc" :
+    { "$near" :
+      { "$geometry" :
+        {
+          "type" : "Point",
+          "coordinates" : [-122.478255,37.819929]
+        },
+        "$maxDistance" : 20000
+
+      }
+    }
+  }
+  , { name : 1 }  
+)
+</code></pre>
+
+<p>You can also use Geospatial indexes and operators in the aggregation queries used above</p>
+
+<h2>Conclusion</h2>
+
+<p>As as said in the introduction, this week end project started as a joke on Twitter, and finished with a small blog post and Gitub repositories.</p>
+
+<p>My goal here is not to compare the two solutions -I made my choice few months back-  but simply show how you can move from one to the other with almost no effort, not only the data but also the application code.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Introduction to MongoDB Geospatial Feature]]></title>
+    <link href="http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/"/>
+    <updated>2014-08-21T15:30:02+02:00</updated>
+    <id>http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature</id>
+    <content type="html"><![CDATA[<p>This post is a quick and simple introduction to Geospatial feature of MongoDB 2.6 using simple dataset and queries.</p>
+
+<h3>Storing Geospatial Informations</h3>
+
+<p>As you know you can store any type of data, but if you want to query them you need to use some coordinates, and create index on them. MongoDB supports three types of indexes for GeoSpatial queries:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/core/2d/">2d Index</a> : uses simple coordinate (longitude, latitude). As stated in the documentation: <em>The 2d index is intended for legacy coordinate pairs used in MongoDB 2.2 and earlier</em>. For this reason, I won&rsquo;t detail anything about this in this post. Just for the record 2d Index are used to query data stored as points on a two-dimensional plane</li>
+<li><a href="http://docs.mongodb.org/manual/core/2dsphere/">2d Sphere Index</a> : support queries of any geometries on an-earth-like sphere, the data can be stored as GeoJSON and legacy coordinate pairs (longitude, latitude). For the rest of the article I will use this type of index and focusing on GeoJSON.</li>
+<li><a href="http://docs.mongodb.org/manual/core/geohaystack/">Geo Haystack</a> : that are used to query on very small area. It is today less used by applications and I will not describe it in this post.
+So this article will focus now on the 2d Sphere index with GeoJSON format to store and query documents.</li>
+</ul>
+
+
+<p><em>So what is GeoJSON?</em></p>
+
+<p>You can look at the <a href="http://geojson.org/">http://geojson.org/</a> site, let&rsquo;s do a very short explanation. GeoJSON is a format for encoding, in JSON, a variety of geographic data structures, and support the following types:  Point , LineString , Polygon , MultiPoint , MultiLineString , MultiPolygon and Geometry.</p>
+
+<p>The GeoJSON format  is quite straightforward based, for the simple geometries, on two attributes: type and coordinates. Let&rsquo;s take some examples:</p>
+
+<p>The city where I spend all my childhood, Pleneuf Val-André, France, has the following coordinates (from Wikipedia)</p>
+
+<p><code>48° 35′ 30.12″ N, 2° 32′ 48.84″ W</code></p>
+
+<p>This notation is a point, based on a latitude &amp; longitude using the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Degrees, Minutes, Seconds) system. Not very easy to use by application/code, this is why it is also possible to represent the exact same point using the following values for latitude &amp; longitude:</p>
+
+<p><code>48.5917, -2.5469</code></p>
+
+<p>This one uses the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Decimal Degrees) system. This is the coordinates you see use in most of the application/API you are using as developer (eg: Google Maps/Earth for example)</p>
+
+<p>By default GeoJSON, and MongoDB use these values but <strong>the coordinates must be stored in the longitude, latitude order</strong>, so this point in GeoJSON will look like:</p>
+
+<pre><code class="json">{
+  "type": "Point",
+  "coordinates": [
+  -2.5469,  
+  48.5917
+  ]
+}
+</code></pre>
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png">http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png</a>&#8221;></p>
+
+<p>This is a simple &ldquo;Point&rdquo;, let&rsquo;s now for example look at a line, a very nice walk on the beach :</p>
+
+<pre><code class="json">{
+  "type": "LineString",
+  "coordinates": [
+    [-2.551082,48.5955632],
+    [-2.551229,48.594312],
+    [-2.551550,48.593312],
+    [-2.552400,48.592312],
+    [-2.553677, 48.590898]
+  ]
+  }
+</code></pre>
+
+<p><img class="<a" src="href="http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png">http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png</a>&#8221;></p>
+
+<p>So using the same approach you will be able to create MultiPoint, MultiLineString, Polygon, MultiPolygon. It is also possible to mix all these in a single document using a GeometryCollection. The following example is a Geometry Collection of MultiLineString and Polygon over Central Park:</p>
+
+<pre><code class="json">{
+  "type" : "GeometryCollection",
+  "geometries" : [
+    {
+      "type" : "Polygon",
+      "coordinates" : [
+[
+  [ -73.9580, 40.8003 ],
+  [ -73.9498, 40.7968 ],
+  [ -73.9737, 40.7648 ],
+  [ -73.9814, 40.7681 ],
+  [ -73.9580, 40.8003  ]
+]
+      ]
+    },
+    {
+      "type" : "MultiLineString",
+      "coordinates" : [
+[ [ -73.96943, 40.78519 ], [ -73.96082, 40.78095 ] ],
+[ [ -73.96415, 40.79229 ], [ -73.95544, 40.78854 ] ],
+[ [ -73.97162, 40.78205 ], [ -73.96374, 40.77715 ] ],
+[ [ -73.97880, 40.77247 ], [ -73.97036, 40.76811 ] ]
+      ]
+    }
+  ]
+}
+</code></pre>
+
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png">http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png</a>&#8221;></p>
+
+<p>Note: You can if you want test/visualize these JSON documents using the <a href="http://geojsonlint.com/">http://geojsonlint.com/</a> service.</p>
+
+<h5>Now what? Let&rsquo;s store data!</h5>
+
+<p>Once you have a GeoJSON document you just need to store it into your document. For example if you want to store a document about JFK Airport with its location you can run the following command:</p>
+
+<pre><code class="js">db.airports.insert(
+{
+  "name" : "John F Kennedy Intl",
+  "type" : "International",
+  "code" : "JFK",
+  "loc" : {
+    "type" : "Point",
+    "coordinates" : [ -73.778889, 40.639722 ]
+  }
+}
+</code></pre>
+
+<p>Yes this is that simple! You just save the GeoJSON as one of the attribute of the document, <code>loc</code> in this example)</p>
+
+<h3>Querying Geospatial Informations</h3>
+
+<p>Now that we have the data stored in MongoDB, it is now possible to use the geospatial information to do some interesting queries.</p>
+
+<p>For this we need a sample dataset. I have created one using some open data found in various places. This dataset contains the following informations:</p>
+
+<ul>
+<li>airports collection with the list of US airport (Point)</li>
+<li>states collection with the list of US states (MultiPolygon)</li>
+</ul>
+
+
+<p>I have created this dataset from various OpenData sources ( <a href="http://geocommons.com/">http://geocommons.com/</a> , <a href="http://catalog.data.gov/dataset">http://catalog.data.gov/dataset</a> ) and use <a href="https://github.com/mapbox/togeojson">toGeoJSON</a> to convert them into the proper format.</p>
+
+<p>Let&rsquo;s install the dataset:</p>
+
+<ol>
+<li>Download it from <a href="https://www.dropbox.com/s/yui7shcud2xbxt7/geo.zip">here</a></li>
+<li>Unzip geo.zip file</li>
+<li>Restore the data into your mongoDB instance, using the following command</li>
+</ol>
+
+
+<pre><code>mongorestore geo.zip
+</code></pre>
+
+<p>MongoDB allows applications to do the following types of query on geospatial data:</p>
+
+<ul>
+<li>inclusion</li>
+<li>intersection</li>
+<li>proximity</li>
+</ul>
+
+
+<p>Obviously, you will be able to use all the other operator in addition to the geospatial ones. Let&rsquo;s now look at some concrete examples.</p>
+
+<h4>Inclusion</h4>
+
+<p>Find all the airports in California. For this you need to get the California location (Polygon) and use the command $geoWithin in the query. From the shell it will look like :</p>
+
+<pre><code class="js">use geo
+var cal = db.states.findOne(  {code : "CA"}  );
+
+db.airports.find(
+{
+  loc : { $geoWithin : { $geometry : cal.loc } }
+},
+{ name : 1 , type : 1, code : 1, _id: 0 }
+);
+</code></pre>
+
+<p>Result:</p>
+
+<pre><code class="json">{ "name" : "Modesto City - County", "type" : "", "code" : "MOD" }
+...
+{ "name" : "San Francisco Intl", "type" : "International", "code" : "SFO" }
+{ "name" : "San Jose International", "type" : "International", "code" : "SJC" }
+...
+</code></pre>
+
+<p>So the query is using the &ldquo;California MultiPolygon&rdquo; and looks in the airports collection to find all the airports that are in these polygons. This looks like the following image on a map:</p>
+
+<p><img class="<a" src="href="http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png">http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png</a>&#8221;></p>
+
+<p>You can use any other query features or criteria, for example you can limit the query to international airport only sorted by name :</p>
+
+<pre><code class="js">db.airports.find(
+{
+  loc : { $geoWithin : { $geometry : cal.loc } },
+  type : "International"
+},
+{ name : 1 , type : 1, code : 1, _id: 0 }
+).sort({ name : 1 });
+</code></pre>
+
+<p>Result:</p>
+
+<pre><code class="json">{ "name" : "Los Angeles Intl", "type" : "International", "code" : "LAX" }
+{ "name" : "Metropolitan Oakland Intl", "type" : "International", "code" : "OAK" }
+{ "name" : "Ontario Intl", "type" : "International", "code" : "ONT" }
+{ "name" : "San Diego Intl", "type" : "International", "code" : "SAN" }
+{ "name" : "San Francisco Intl", "type" : "International", "code" : "SFO" }
+{ "name" : "San Jose International", "type" : "International", "code" : "SJC" }
+{ "name" : "Southern California International", "type" : "International", "code" : "VCV" }
+</code></pre>
+
+<p>I do not know if you have looked in detail, but we are querying these documents with no index. You can run a query with the <code>explain()</code> to see what&rsquo;s going on. The <code>$geoWithin</code> operator does not need index but your queries will be more efficient with one so let&rsquo;s create the index:</p>
+
+<pre><code class="js">db.airports.ensureIndex( { "loc" : "2dsphere" } );
+</code></pre>
+
+<p>Run the explain and you will se the difference.</p>
+
+<h4>Intersection</h4>
+
+<p>Suppose you want to know what are all the adjacent states to California, for this we just need to search for all the states that have coordinates that &ldquo;intersects&rdquo; with California. This is done with the following query:</p>
+
+<pre><code class="js">var cal = db.states.findOne(  {code : "CA"}  );
+db.states.find(
+{
+  loc : { $geoIntersects : { $geometry : cal.loc  }  } ,
+  code : { $ne : "CA"  }  
+},
+{ name : 1, code : 1 , _id : 0 }
+);
+</code></pre>
+
+<p>Result:</p>
+
+<pre><code class="json">{ "name" : "Oregon", "code" : "OR" }
+{ "name" : "Nevada", "code" : "NV" }
+{ "name" : "Arizona", "code" : "AZ" }
+</code></pre>
+
+<p><img class="<a" src="href="http://3.bp.blogspot.com/--Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png">http://3.bp.blogspot.com/&#8211;Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png</a>&#8221;></p>
+
+<p>Same as before <code>$geoIntersect</code> operator does not need an index to work, but it will be more efficient with the following index:</p>
+
+<pre><code class="js">db.states.ensureIndex( { loc : "2dsphere" } );
+</code></pre>
+
+<h4>Proximity</h4>
+
+<p>The last feature that I want to highlight in this post is related to query with proximity criteria. Let&rsquo;s find all the international airports that are located at less than 20km from the reservoir in NYC Central Park. For this you will be using the <code>$near</code> operator.</p>
+
+<pre><code class="js">db.airports.find(
+{
+  loc : {
+    $near : {
+      $geometry : {
+        type : "Point" ,
+        coordinates : [-73.965355,40.782865]  
+      },
+      $maxDistance : 20000
+    }
+  },
+  type : "International"
+},
+{
+  name : 1,
+  code : 1,
+  _id : 0
+}
+);
+</code></pre>
+
+<p>Results:</p>
+
+<pre><code class="json">{ "name" : "La Guardia", "code" : "LGA" }
+{ "name" : "Newark Intl", "code" : "EWR"}
+</code></pre>
+
+<p>So this query returns 2 airports, the closest being La Guardia, since the <code>$near</code> operator sorts the results by distance. Also it is important to raise here that the <code>$near</code> operator requires an index.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this first post about geospatial feature you have learned:</p>
+
+<ul>
+<li>the basic of GeoJSON</li>
+<li>how to query documents with inclusion, intersection and proximity criteria.</li>
+</ul>
+
+
+<p>You can now play more with this for example integrate this into an application that expose data into some UI, or see how you can use the geospatial operators into a aggregation pipeline.</p>
+]]></content>
+  </entry>
+  
+</feed>

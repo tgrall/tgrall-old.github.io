@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Drill | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/drill/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using Apache Drill REST API to Build ASCII Dashboard With Node]]></title>
+    <link href="http://tgrall.github.io/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node/"/>
+    <updated>2015-12-10T11:30:44+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node</id>
+    <content type="html"><![CDATA[<p><a href="http://drill.apache.org">Apache Drill</a> has a hidden gem: an easy to use REST interface. This API can be used to Query, Profile and Configure Drill engine.</p>
+
+<p>In this blog post I will explain how to use Drill REST API to create ascii dashboards using <a href="https://www.npmjs.com/package/blessed-contrib">Blessed Contrib</a>.</p>
+
+<p>The ASCII Dashboard looks like</p>
+
+<p><img class="center" src="/images/posts/drill_dashboard/dashboard_demo.gif" title="Dashboard" ></p>
+
+<!-- more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Node.js</li>
+<li>Apache Drill 1.2</li>
+<li>For this post, you will use the SFO Passengers CSV file available <a href="http://www.flysfo.com/media/facts-statistics/air-traffic-statistics">here</a>.
+
+<ul>
+<li>Download this locally, unzip the files and put the CSV into a folder that will be access uzing the following path in Drill : <code>dfs.data.`/airport/*.csv`</code></li>
+</ul>
+</li>
+</ul>
+
+
+<p><em>Note: I am still using Apache 1.2 to allow this example to be executed in context of a MapR cluster.</em></p>
+
+<h2>The Query and View</h2>
+
+<p>In Drill 1.2, CSV headers are not automatically parsed. (This is one of the new features of 1.3: look for <code>extractHeader</code> in the <a href="https://drill.apache.org/docs/text-files-csv-tsv-psv/">documentation</a>).</p>
+
+<p>For simplicity, remove the first line of the CSV.</p>
+
+<p>The basic query will look like:</p>
+
+<pre><code>SELECT
+CAST(SUBSTR(columns[0],1,4) AS INT)  `YEAR`,
+CAST(SUBSTR(columns[0],5,2) AS INT) `MONTH`,
+columns[1] as `AIRLINE`,
+columns[2] as `IATA_CODE`,
+columns[3] as `AIRLINE_2`,
+columns[4] as `IATA_CODE_2`,
+columns[5] as `GEO_SUMMARY`,
+columns[6] as `GEO_REGION`,
+columns[7] as `ACTIVITY_CODE`,
+columns[8] as `PRICE_CODE`,
+columns[9] as `TERMINAL`,
+columns[10] as `BOARDING_AREA`,
+CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+FROM dfs.data.`/airport/*.csv`
+LIMIT 10
+</code></pre>
+
+<p>Let&rsquo;s now create a view with these columns: <em>(do not put any limit !)</em></p>
+
+<pre><code>CREATE OR REPLACE VIEW dfs.tmp.`airport_data_view` AS
+SELECT
+CAST(SUBSTR(columns[0],1,4) AS INT)  `YEAR`,
+CAST(SUBSTR(columns[0],5,2) AS INT) `MONTH`,
+columns[1] as `AIRLINE`,
+columns[2] as `IATA_CODE`,
+columns[3] as `AIRLINE_2`,
+columns[4] as `IATA_CODE_2`,
+columns[5] as `GEO_SUMMARY`,
+columns[6] as `GEO_REGION`,
+columns[7] as `ACTIVITY_CODE`,
+columns[8] as `PRICE_CODE`,
+columns[9] as `TERMINAL`,
+columns[10] as `BOARDING_AREA`,
+CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+FROM dfs.data.`/airport/*.csv`
+</code></pre>
+
+<p>So you can now use the view in your query:</p>
+
+<pre><code>select * from dfs.tmp.`airport_data_view` limit 5;
+</code></pre>
+
+<h2>Use the REST API</h2>
+
+<p>Now that you have the query you can use the REST API to retrieve the data as JSON document over HTTP. Open a terminal and run this curl command:</p>
+
+<pre><code>curl  \
+  --header "Content-type: application/json" \
+  --request POST \
+  --data '{
+    "queryType" : "SQL",
+    "query" : "select * from dfs.tmp.`airport_data_view` limit 5 " }' \
+  http://localhost:8047/query.json
+</code></pre>
+
+<p>The returned JSON document looks like:</p>
+
+<pre><code>{
+  "columns" : [ "YEAR", "MONTH", ... , "PASSENGER_COUNT" ],
+  "rows" : [ {
+    "GEO_REGION" : "US",
+    "IATA_CODE_2" : "TZ",
+        ...
+        ...
+    "AIRLINE" : "ATA Airlines",
+    "MONTH" : "7",
+    "ACTIVITY_CODE" : "Deplaned"
+  }, {
+    "GEO_REGION" : "US",
+    "IATA_CODE_2" : "TZ",
+    "GEO_SUMMARY" : "Domestic",
+    ...
+  }
+  ]
+}
+</code></pre>
+
+<p>As you can see it is quite simple:</p>
+
+<ul>
+<li>a first JSON attribute that list the columns</li>
+<li>the list of rows, as JSON documents in an array.</li>
+</ul>
+
+
+<h2>Create a Graph using Node.js &amp; Blessed Contrib</h2>
+
+<p>Let&rsquo;s create a node application.</p>
+
+<p>First you have to include:</p>
+
+<ul>
+<li><code>request</code> : to call the REST API</li>
+<li><code>blessed</code> : to get a rich Terminal API</li>
+<li><code>blessed-contrib</code> : for the dashboard</li>
+</ul>
+
+
+<p>and then create a <code>screen</code> and a <code>bar</code> chard from Contrib.</p>
+
+<p>So the <em>header</em> of your Javascript file looks like:</p>
+
+<pre><code class="javascript ">var blessed = require('blessed')
+  , contrib = require('blessed-contrib')
+  , request = require('request')
+  , screen = blessed.screen()
+  , bar = contrib.bar(
+       { label: 'Bar Chart'
+       , barWidth: 20
+       , barSpacing: 20
+       , maxHeight: 9
+       , height: "100%"
+       , width: "100%"})
+</code></pre>
+
+<p>So here we have defined a bar char, that will be populated with the columns and rows. For this we need a query, let&rsquo;s use the number of passengers per year, as follow:</p>
+
+<pre><code>SELECT `YEAR`, SUM(`PASSENGER_COUNT`) FROM dfs.tmp.`airport_data_view` GROUP BY `YEAR`
+</code></pre>
+
+<p>The complete Bar Chat application looks like:</p>
+
+<p><div><script src='https://gist.github.com/00c5d83b85f59d80ad95.js?file=app001.js'></script>
+<noscript><pre><code>var blessed = require(&#39;blessed&#39;)
+  , contrib = require(&#39;blessed-contrib&#39;)
+  , request = require(&#39;request&#39;)
+  , screen = blessed.screen()
+  , bar = contrib.bar(
+       { label: &#39;Bar Chart&#39;
+       , barWidth: 12
+       , barSpacing: 5
+       , maxHeight: 9
+       , height: &quot;100%&quot;
+       , width: &quot;100%&quot;})
+
+screen.append(bar);
+
+var query =  {
+	&quot;queryType&quot; : &quot;SQL&quot;,
+	&quot;query&quot; : &quot;select `YEAR`, SUM(`PASSENGER_COUNT`) from dfs.tmp.`airport_data_view` GROUP BY `YEAR`&quot;
+};
+
+request(
+	{
+   		url: &#39;http://localhost:8047/query.json&#39;, //URL to hit
+		method: &#39;POST&#39;,
+		json: query
+	}, 
+	function(error, response, body){
+     	var columns = body.columns;
+		var data = {
+			titles : [],
+			data : []
+		};
+		for(var entry of body.rows){
+			data.titles.push(entry[columns[0]]);
+			data.data.push(entry[columns[1]]);
+		}
+		bar.setData(data);
+		screen.render()
+	});
+
+
+screen.key([&#39;escape&#39;, &#39;q&#39;, &#39;C-c&#39;], function(ch, key) {
+	  return process.exit(0);
+});
+</code></pre></noscript></div>
+</p>
+
+<ul>
+<li>The lines 15-17 contain the query object used by the Drill REST API</li>
+<li>The lines 26-38 contain the callback from the HTTP call, and the results values are store in the data object (lines 33-34), and then set in the bar chart (line 36)</li>
+</ul>
+
+
+<h3>Run the &ldquo;Dashboard&rdquo;</h3>
+
+<pre><code>npm install request blessed blessed-contrib
+
+node app001.js
+</code></pre>
+
+<p>This application shows a simple bar chart, in your terminal. Let&rsquo;s now create a richer dashboard.</p>
+
+<h2>Complete Dashboard</h2>
+
+<p>The Bless-Contrib node package allows developer to create rich dashboards that aggregate multiple graphs and could be refresh automatically, as seen in the screencast at the top of this post.</p>
+
+<p>You can find a simple dashboard in this <a href="https://github.com/tgrall/drill-node-dashboard.git">Github repository</a>, once you have cloned it, you just need to run: (be sure that your view is called &lsquo;dfs.tmp.<code>airport_data_view</code>&rsquo;</p>
+
+<pre><code>git clone https://github.com/tgrall/drill-node-dashboard.git
+
+cd drill-node-dashboard
+
+npm install
+
+node dashboard.js http://localhost:8047
+</code></pre>
+
+<p>You can even change the CSV file, for example adding new months, and the line chart on the right will be refreshed automatically.</p>
+
+<p><em>Note: this dashboard sample is very basic and just a quick example explaning how to use Drill REST API in a node.js application</em></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Convert a CSV File to Apache Parquet With Drill]]></title>
+    <link href="http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/"/>
+    <updated>2015-08-17T14:07:00+02:00</updated>
+    <id>http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill</id>
+    <content type="html"><![CDATA[<p>A very common use case when working with Hadoop is to store and query simple files (CSV, TSV, &hellip;); then to get better performance and efficient storage convert these files into more efficient format, for example <a href="https://parquet.apache.org/">Apache Parquet</a>.</p>
+
+<p><a href="https://parquet.apache.org/">Apache Parquet</a> is a <a href="https://en.wikipedia.org/wiki/Column-oriented_DBMS">columnar storage format</a> available to any project in the Hadoop ecosystem. Apache Parquet has the following characteristics:</p>
+
+<ul>
+<li>Self-describing</li>
+<li>Columnar format</li>
+<li>Language-independent</li>
+</ul>
+
+
+<p>Let&rsquo;s take a concrete example, you can find many interesting Open Data sources that distribute data as CSV files- or equivalent format-. So you can store them into your distributed file system and use them in your applications/jobs/analytics queries. This is not the most efficient way especially when we know that these data won&rsquo;t move that often. So instead of simply storing the CSV let&rsquo;s copy this information into Parquet.</p>
+
+<h3>How to convert CSV files into Parquet files?</h3>
+
+<p>You can use code to achieve this, as you can see in the <a href="https://github.com/Parquet/parquet-compatibility/blob/master/parquet-compat/src/test/java/parquet/compat/test/ConvertUtils.java">ConvertUtils</a> sample/test class. You can use a simpler way with Apache Drill. Drill allows you save the result of a query as Parquet files.</p>
+
+<p>The following steps will show you how to do convert a simple CSV into a Parquet file using Drill.</p>
+
+<!-- more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Apache Drill : Standalone <a href="https://drill.apache.org/">Apache Drill</a> or using <a href="https://www.mapr.com/products/mapr-sandbox-hadoop/download-sandbox-drill">Apache Drill Sandbox from MapR</a></li>
+<li>Some CSV Files: for example <a href="http://www.flysfo.com/media/facts-statistics/air-traffic-statistics">Passenger Dataset from SFO Air Traffic Statistics</a></li>
+</ul>
+
+
+<h4>Querying the CSV file</h4>
+
+<p>Let&rsquo;s execute a basic query:</p>
+
+<pre><code class="sql">SELECT *
+FROM dfs.`/opendata/Passenger/SFO_Passenger_Data/MonthlyPassengerData_200507_to_201503.csv`
+LIMIT 5;
+
+["200507","ATA Airlines","TZ","ATA Airlines","TZ","Domestic","US","Deplaned","Low Fare","Terminal 1","B","27271\r"]
+...
+...
+</code></pre>
+
+<p>As you can see, by default Drill processes each line as an array of columns, all values being simple String. So if you need to do some operations with these values (projection or where clause) you must use the column index, and cast the value to the proper type. You can see a simple example below:</p>
+
+<pre><code>SELECT
+columns[0] as `DATE`,
+columns[1] as `AIRLINE`,
+CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+FROM dfs.`/opendata/Passenger/SFO_Passenger_Data/*.csv`
+WHERE CAST(columns[11] AS DOUBLE) &lt; 5
+;
+
++---------+-----------------------------------+------------------+
+|  DATE   |              AIRLINE              | PASSENGER_COUNT  |
++---------+-----------------------------------+------------------+
+| 200610  | United Airlines - Pre 07/01/2013  | 2.0              |
+...
+...
+</code></pre>
+
+<p>We are now ready to create our Parquet files using the &ldquo;Create Table As Select&rdquo; (aka <a href="http://drill.apache.org/docs/create-table-as-ctas-command/">CTAS</a>)</p>
+
+<pre><code class="sql">alter session set `store.format`='parquet';
+
+
+CREATE TABLE dfs.tmp.`/stats/airport_data/` AS
+SELECT
+CAST(SUBSTR(columns[0],1,4) AS INT)  `YEAR`,
+CAST(SUBSTR(columns[0],5,2) AS INT) `MONTH`,
+columns[1] as `AIRLINE`,
+columns[2] as `IATA_CODE`,
+columns[3] as `AIRLINE_2`,
+columns[4] as `IATA_CODE_2`,
+columns[5] as `GEO_SUMMARY`,
+columns[6] as `GEO_REGION`,
+columns[7] as `ACTIVITY_CODE`,
+columns[8] as `PRICE_CODE`,
+columns[9] as `TERMINAL`,
+columns[10] as `BOARDING_AREA`,
+CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+FROM dfs.`/opendata/Passenger/SFO_Passenger_Data/*.csv`
+</code></pre>
+
+<p>That&rsquo;s it! You have now a Parquet file, a single file in our case since our dataset is really small. Apache Drill will create multiples files for the tables depending of the size and configuration your environment.</p>
+
+<p>I invite you to read this Chapter in the Apache Drill documentation to learn more about <a href="https://drill.apache.org/docs/parquet-format/">Drill and Parquet</a>.</p>
+
+<h3>Query Parquet Files</h3>
+
+<p>Now that you have created your Parquet files you can use them in any of your Hadoop processes, but you can also use them in Drill, as follow:</p>
+
+<pre><code>
+SELECT *
+FROM dfs.tmp.`/stats/airport_data/*`
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to convert a CSV file using an Apache Drill query.</p>
+
+<p>You can do that with any source supported by Drill, for example from JSON to Parquet, or even a complex join query between multiple data sources. You can also chose a different output format for example JSON, or a CSV.</p>
+]]></content>
+  </entry>
+  
+</feed>

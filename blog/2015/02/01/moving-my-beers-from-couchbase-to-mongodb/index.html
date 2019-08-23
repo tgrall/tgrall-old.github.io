@@ -1,0 +1,677 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Moving My Beers From Couchbase to MongoDB - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Few days ago I have posted a joke on Twitter Moving my Java from Couchbase to MongoDB pic.twitter.com/Wnn3pXfMGi&mdash; Tugdual Grall (@tgrall) &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Moving My Beers From Couchbase to MongoDB</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-02-01T15:37:46+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>3:37 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Few days ago I have posted a <em>joke</em> on Twitter</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>Moving my Java from Couchbase to MongoDB <a href="http://t.co/Wnn3pXfMGi">pic.twitter.com/Wnn3pXfMGi</a></p>&mdash; Tugdual Grall (@tgrall) <a href="https://twitter.com/tgrall/status/559664540041117696">January 26, 2015</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>So I decided to move it from a simple picture to a <em>real</em> project. Let&rsquo;s look at the two phases of this so called project:</p>
+
+<ul>
+<li>Moving the data from Couchbase to MongoDB</li>
+<li>Updating the application code to use MongoDB</li>
+</ul>
+
+
+<p>Look at this screencast to see it in action:</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/Fpl74Z0HbC0?color=white&theme=light"></iframe>
+
+
+
+
+<!-- more -->
+
+
+<h2>Moving the data</h2>
+
+<p>I have created a replication server, that uses the Couchbase XDCR protocol to get the document out and insert them into MongoDB. This server use the Couchbase CAPI Server project available <a href="https://github.com/couchbaselabs/couchbase-capi-server">here</a>.</p>
+
+<p>This server will receive all the mutations made in the Couchbase:</p>
+
+<ul>
+<li>When a document is inserted or updated the full document is sent</li>
+<li>When a document is deleted, only the medata are sent</li>
+<li>The <code>replication server</code>, save the data into MongoDB (inserts and/or updates - no delete), and then return the list to Couchbase as part of the XDCR Protocol.</li>
+</ul>
+
+
+<p>One of the challenges is the fact Couchbase does not have the notion of &ldquo;types&rdquo; or &ldquo;collections&rdquo;. You put everything in a <em>bucket</em> and the application code knows how to deal with the data. Not necessary a problem, just a choice of implementation, but make it sometime harder than expected when you want to write tools. So here the logic that I apply in my replication server, to organize the data in multiple collections when it makes sense <em>(and when it is possible)</em>:</p>
+
+<ul>
+<li>If the JSON document does not contains a <em>type field</em>, all the documents will be saved in a single collection</li>
+<li>If the JSON document contains a <em>type field</em> then a collection will be created for each type and documents will be inserted/updated in these collections</li>
+<li>MongoDB does not allow attributes key to have . and $ signs, so it is necessary to change the name with alternative characters. This is done automatically during the copy of the data.</li>
+</ul>
+
+
+<p>All this, and more is configurable in the tool.</p>
+
+<p>As you can see in the screencast this is straightforward.<em>(note that I have only tested very simple use cases and deployment)</em></p>
+
+<p>You can download the tool and the source code here:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/mongodb-cb-replicator">https://github.com/tgrall/mongodb-cb-replicator</a></li>
+<li>Download the <a href="http://goo.gl/WkuHBk">MongoCBReplicator.jar</a> file.</li>
+</ul>
+
+
+<h2>Updating the application code</h2>
+
+<p>The next step is to use these data in an application. For this I simply use the Beer Sample Java application available on <a href="https://github.com/couchbaselabs/beersample-java">Couchbase repository</a>.</p>
+
+<p>I just recreated the project and modified few things, to get the application up and running:</p>
+
+<ul>
+<li>Change the connection string</li>
+<li>Remove the code that generate views</li>
+<li>Replace set/get by MongoDB operations</li>
+<li>Replace call to the views by simple queries</li>
+</ul>
+
+
+<p>The code of the MongoDBeer application is available here:</p>
+
+<ul>
+<li>[<a href="https://github.com/tgrall/mongodbeer">https://github.com/tgrall/mongodbeer</a>]</li>
+</ul>
+
+
+<p>I did not change any business logic, or added features, or even replaced the way navigation and page rendition is made. I just focused on the database access, for example :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Couchbase Query</span>
+</span><span class='line'><span class="n">View</span> <span class="n">view</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">getView</span><span class="o">(</span><span class="s">&quot;beer&quot;</span><span class="o">,</span> <span class="s">&quot;by_name&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Query</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">query</span><span class="o">.</span><span class="na">setIncludeDocs</span><span class="o">(</span><span class="kc">true</span><span class="o">).</span><span class="na">setLimit</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">ViewResponse</span> <span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">view</span><span class="o">,</span> <span class="n">query</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">beers</span> <span class="o">=</span>
+</span><span class='line'>      <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;();</span>
+</span><span class='line'>    <span class="k">for</span><span class="o">(</span><span class="n">ViewRow</span> <span class="n">row</span> <span class="o">:</span> <span class="n">result</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">parsedDoc</span> <span class="o">=</span> <span class="n">gson</span><span class="o">.</span><span class="na">fromJson</span><span class="o">(</span>
+</span><span class='line'>        <span class="o">(</span><span class="n">String</span><span class="o">)</span><span class="n">row</span><span class="o">.</span><span class="na">getDocument</span><span class="o">(),</span> <span class="n">HashMap</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">beer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;();</span>
+</span><span class='line'>      <span class="n">beer</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="n">row</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">beer</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="n">parsedDoc</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">));</span>
+</span><span class='line'>      <span class="n">beer</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;brewery&quot;</span><span class="o">,</span> <span class="n">parsedDoc</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;brewery_id&quot;</span><span class="o">));</span>
+</span><span class='line'>      <span class="n">beers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">beer</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">request</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">&quot;beers&quot;</span><span class="o">,</span> <span class="n">beers</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// MongoDB Query</span>
+</span><span class='line'><span class="n">DBCursor</span> <span class="n">cursor</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="na">getCollection</span><span class="o">(</span><span class="s">&quot;beer&quot;</span><span class="o">).</span><span class="na">find</span><span class="o">()</span>
+</span><span class='line'>                                                   <span class="o">.</span><span class="na">sort</span><span class="o">(</span> <span class="n">BasicDBObjectBuilder</span><span class="o">.</span><span class="na">start</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span><span class="mi">1</span><span class="o">).</span><span class="na">get</span><span class="o">()</span> <span class="o">)</span>
+</span><span class='line'>                                                   <span class="o">.</span><span class="na">limit</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span>
+</span><span class='line'>     <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">beers</span> <span class="o">=</span>
+</span><span class='line'>             <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;();</span>
+</span><span class='line'>     <span class="k">while</span> <span class="o">(</span><span class="n">cursor</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>         <span class="n">DBObject</span> <span class="n">row</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class='line'>         <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">beer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;();</span>
+</span><span class='line'>         <span class="n">beer</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span><span class="n">row</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;_id&quot;</span><span class="o">));</span>
+</span><span class='line'>         <span class="n">beer</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">,</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span><span class="n">row</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;name&quot;</span><span class="o">));</span>
+</span><span class='line'>         <span class="n">beer</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;brewery&quot;</span><span class="o">,</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span><span class="n">row</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;brewery_id&quot;</span><span class="o">));</span>
+</span><span class='line'>         <span class="n">beers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">beer</span><span class="o">);</span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Couchbase update</span>
+</span><span class='line'><span class="n">client</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">beerId</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">gson</span><span class="o">.</span><span class="na">toJson</span><span class="o">(</span><span class="n">beer</span><span class="o">));</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// MongoDB update</span>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="na">getCollection</span><span class="o">(</span><span class="s">&quot;beer&quot;</span><span class="o">).</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nf">BasicDBObject</span><span class="o">(</span><span class="n">beer</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I did not attend to optimize the MongoDB code,  but just to replace as few lines of code as possible.</p>
+
+<p>Note: I have not created any index during the process. Obviously if your application have more and more data and you do intense work with it you must analyze your application/queries to see which indexes must be created.</p>
+
+<h2>Adding new features</h2>
+
+<p>Once you have the data into MongoDB you can do a lot more without anything more than MongoDB:</p>
+
+<h4>Full Text Search</h4>
+
+<p>You can create a Text index on various fields in the collection to provide advanced search capabilities to your users.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.brewery.ensureIndex(</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;description&quot;</span> <span class="p">:</span> <span class="s2">&quot;text&quot;</span>
+</span><span class='line'>  <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;weights&quot;</span> <span class="p">:</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;description&quot;</span> <span class="p">:</span> <span class="mi">5</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;TextIndex&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then you can query the database using the <code>$text</code> operation, for example all breweries with <em>Belgium</em> and without <em>Ale</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.brewery.find(</span> <span class="p">{</span> <span class="nt">&quot;$text&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;$search&quot;</span> <span class="p">:</span> <span class="s2">&quot;belgium -ale&quot;</span> <span class="p">}</span>   <span class="p">}</span>  <span class="err">,</span> <span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="mi">1</span>  <span class="p">}</span> <span class="err">);</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;daas&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Daas&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;chimay_abbaye_notre_dame_de_scourmont&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Chimay (Abbaye Notre Dame de Scourmont)&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;brasserie_de_cazeau&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Brasserie de Cazeau&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;inbev&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;InBev&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;new_belgium_brewing&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;New Belgium Brewing&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;palm_breweries&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Palm Breweries&quot;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Some analytics</h4>
+
+<p>Not sure these queries really make sense, but it is just to show that now you can leverage your documents without the need of any 3rd party tool.</p>
+
+<p>Number of beer by category, from the most common to the less one:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.beer.aggregate(</span><span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;$group&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;$category&quot;</span><span class="p">,</span><span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="nt">&quot;$sum&quot;</span> <span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;$sort&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">-1</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;$project&quot;</span> <span class="p">:</span> <span class="p">{</span>  <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;$_id&quot;</span><span class="p">,</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class='line'><span class="p">]</span><span class="err">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">1996</span><span class="p">,</span> <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;North American Ale&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">1468</span><span class="p">,</span> <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="kc">null</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">564</span><span class="p">,</span> <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;North American Lager&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">441</span><span class="p">,</span> <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;German Lager&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="err">...</span>
+</span><span class='line'><span class="err">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Number of beer of a specific ABV by brewery, for example: top 3 breweries with the most beer with an abv greather or equals to a value, let&rsquo;s say 5:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.beer.aggregate(</span><span class="p">[</span>
+</span><span class='line'><span class="err">...</span> <span class="p">{</span> <span class="nt">&quot;$match&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;abv&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;$gte&quot;</span> <span class="p">:</span> <span class="mi">5</span> <span class="p">}</span>  <span class="p">}</span> <span class="p">},</span>
+</span><span class='line'><span class="err">...</span> <span class="p">{</span> <span class="nt">&quot;$group&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;$brewery_id&quot;</span><span class="p">,</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;$sum&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="p">}},</span>
+</span><span class='line'><span class="err">...</span> <span class="p">{</span> <span class="nt">&quot;$sort&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">-1</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class='line'><span class="err">...</span> <span class="p">{</span> <span class="nt">&quot;$limit&quot;</span> <span class="p">:</span> <span class="mi">3</span> <span class="p">}</span>
+</span><span class='line'><span class="err">...</span> <span class="p">]</span><span class="err">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;midnight_sun_brewing_co&quot;</span><span class="p">,</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">53</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;troegs_brewing&quot;</span><span class="p">,</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">33</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;rogue_ales&quot;</span><span class="p">,</span> <span class="nt">&quot;count&quot;</span> <span class="p">:</span> <span class="mi">31</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Geospatial queries</h4>
+
+<p>The first thing to do with the data is to change the data structure to save the various data into a GeoJSON format, for this we can simply use a script into the MongoDB Shell:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">&gt;mongo</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">use</span> <span class="err">beers</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">db.brewery.find().forEach(</span>
+</span><span class='line'>  <span class="err">function(</span> <span class="err">doc</span> <span class="err">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="err">var</span> <span class="err">loc</span> <span class="err">=</span> <span class="err">{</span> <span class="err">type</span> <span class="err">:</span> <span class="nt">&quot;Point&quot;</span> <span class="p">}</span><span class="err">;</span>
+</span><span class='line'>    <span class="err">if</span> <span class="err">(doc.geo</span> <span class="err">&amp;&amp;</span> <span class="err">doc.geo.lat</span> <span class="err">&amp;&amp;</span> <span class="err">doc.geo.lon)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="err">loc.coordinates</span> <span class="err">=</span> <span class="err">[</span> <span class="err">doc.geo.lon</span> <span class="err">,</span> <span class="err">doc.geo.lat</span>  <span class="err">];</span>
+</span><span class='line'>      <span class="err">db.brewery.update(</span> <span class="err">{</span> <span class="err">_id</span> <span class="err">:</span> <span class="err">doc._id</span> <span class="p">}</span> <span class="err">,</span> <span class="p">{</span><span class="err">$set</span> <span class="err">:</span> <span class="err">{</span> <span class="err">loc</span> <span class="err">:</span> <span class="err">loc</span> <span class="p">}</span> <span class="err">}</span>  <span class="err">);</span>
+</span><span class='line'>    <span class="err">}</span>
+</span><span class='line'>  <span class="err">}</span>
+</span><span class='line'><span class="err">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">db.brewery.ensureIndex(</span> <span class="p">{</span> <span class="nt">&quot;loc&quot;</span> <span class="p">:</span> <span class="s2">&quot;2dsphere&quot;</span> <span class="p">}</span> <span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This call take all the breweries and add a new attribute, name <code>loc</code> as a GeoJSON point. I could also chose to remove the old geo information using a &lsquo;$unset&rsquo;, but I did not; let&rsquo;s imagine that some API/applications are using it. This is a good example of flexible schema.</p>
+
+<p>Now I can search for all the brewery that are at less than 30km from the Golden Gate in San Francisco: [-122.478255,37.819929]</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.brewery.find(</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;loc&quot;</span> <span class="p">:</span>
+</span><span class='line'>    <span class="p">{</span> <span class="nt">&quot;$near&quot;</span> <span class="p">:</span>
+</span><span class='line'>      <span class="p">{</span> <span class="nt">&quot;$geometry&quot;</span> <span class="p">:</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>          <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+</span><span class='line'>          <span class="nt">&quot;coordinates&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mf">-122.478255</span><span class="p">,</span><span class="mf">37.819929</span><span class="p">]</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nt">&quot;$maxDistance&quot;</span> <span class="p">:</span> <span class="mi">20000</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="err">,</span> <span class="p">{</span> <span class="err">name</span> <span class="err">:</span> <span class="err">1</span> <span class="p">}</span>
+</span><span class='line'><span class="err">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can also use Geospatial indexes and operators in the aggregation queries used above</p>
+
+<h2>Conclusion</h2>
+
+<p>As as said in the introduction, this week end project started as a joke on Twitter, and finished with a small blog post and Gitub repositories.</p>
+
+<p>My goal here is not to compare the two solutions -I made my choice few months back-  but simply show how you can move from one to the other with almost no effort, not only the data but also the application code.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-02-01T15:37:46+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>3:37 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/couchbase/'>couchbase</a>, <a class='category' href='/blog/categories/java/'>java</a>, <a class='category' href='/blog/categories/mongodb/'>mongodb</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/01/23/everybody-says-hackathon/" title="Previous Post: Everybody says “Hackathon”!">&laquo; Everybody says “Hackathon”!</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/02/04/introduction-to-mongodb-security/" title="Next Post: Introduction to MongoDB Security">Introduction to MongoDB Security &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/';
+        var disqus_url = 'http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

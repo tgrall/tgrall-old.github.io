@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Memcached | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/memcached/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Installing Memcached on Mac OS X and Using It in Java]]></title>
+    <link href="http://tgrall.github.io/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/"/>
+    <updated>2011-11-20T07:12:21+01:00</updated>
+    <id>http://tgrall.github.io/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java</id>
+    <content type="html"><![CDATA[<h3>Introduction</h3>
+
+<p>In this article I will explain how you can:</p>
+
+<ol>
+<li>Install and Configure Memcached on Mac OS X</li>
+<li>Use Memcached in your Java Application</li>
+</ol>
+
+
+<p>I won&rsquo;t go in too much detail about the benefits of using a distributed cache in your applications, but let&rsquo;s at least provide some use cases for applications that are running in the context of an enterprise portal, eXo Platform in my case - <em>surprising isn&rsquo;t?</em> And I will show this in another post.</p>
+
+<p>We have many reasons to use a cache (distributed or not), in the context of enterprise portal, let&rsquo;s take a look to some of these reasons:</p>
+
+<ul>
+<li>A portal is used to aggregate data in a single page. These data could come from different sources : Web Services, Database, ERP, &hellip;.. and accessing the data in real time could be costly. So it will be quite interesting to cache the result of the call when possible.</li>
+<li>If the portal is used to aggregate many data from many sources, it is sometime necessary to jump into another application to continue some operation. A distributed and shared cache could be used to manage some context between different applications running in different processes (JVM or even technologies)
+These are two example where a shared cache could be interesting for your portal based applications, we can find many other reason.</li>
+</ul>
+
+
+<p>Note that the Portlet API (JSR-286) contains already a cache mechanism that cache the HTML fragment, and that eXo Platform also provide a <a href="http://docs.jboss.org/exojcr/1.14.0-CR4/developer/en-US/html/ch-cache.html">low level cache</a>, based on <a href="http://www.jboss.org/jbosscache">JBoss Cache</a>.</p>
+
+<!-- more -->
+
+
+<h3>Installation and Configuration</h3>
+
+<p><strong>Installing Memcached from sources</strong></p>
+
+<p>You can find some information about Memcached installation on the Memcached <a href="http://code.google.com/p/memcached/wiki/NewStart">Wiki</a>. The following steps are the steps that I have used on my environment.</p>
+
+<p>As far as I know, Memached is not available as package for Mac OS X. I am still on Snow Leopard (10.6.8), and I have installed XCode and all development tools. I have use the article &ldquo;Installing memcached 1.4.1 on Mac OS X 10.6 Snow Leopard&rdquo; from <a href="https://wincent.com/wiki/Installing_memcached_1.4.1_on_Mac_OS_X_10.6_Snow_Leopard">wincent.com</a>. For simplicity reason I have duplicate the content and updated to the latest releases.</p>
+
+<p>1- Create a working directory :</p>
+
+<pre><code class="sh">$ mkdir memcachedbuild
+$ cd memcachebuild
+</code></pre>
+
+<p>2- Install <a href="http://libevent.org/">libevent</a> that is mandatory for memcached</p>
+
+<pre><code class="sh">$ curl -O http://www.monkey.org/~provos/libevent-1.4.14-stable.tar.gz
+$ tar xzvf libevent-1.4.14-stable.tar.gz
+$ cd libevent-1.4.14-stable
+$ ./configure
+$ make
+$ make verify
+$ sudo make install&amp;nbsp;
+</code></pre>
+
+<p>3- Install memcached</p>
+
+<p>Go back to your install directory (<em>memcachedbuild</em>)</p>
+
+<pre><code class="sh">$ curl -O http://memcached.googlecode.com/files/memcached-1.4.10.tar.gz
+$ tar xzvf memcached-1.4.10.tar.gz
+$ cd memcached-1.4.10
+$ ./configure
+$ make
+$ make test
+$ sudo make install
+</code></pre>
+
+<p>You are now ready to use memcached that is available at <code>/usr/local/bin/memcached</code>.</p>
+
+<p>This allows you to avoid changing to the pre-installed memcached located in /usr/bin, if you want to replace it instead of having you own install, just run the configure command with the following parameter: <code>./configure --prefix=/usr</code></p>
+
+<p><strong>Starting and testing Memcached</strong></p>
+
+<p>Start the memcached server, using the following command line:</p>
+
+<pre><code class="sh">$ /usr/local/bin/memcached -d -p 11211
+</code></pre>
+
+<p>This command starts the memcached server as demon (-d parameter), on the TCP port 11211 (this is the default value). You can find more about the memcached command using <code>man memcached</code>.</p>
+
+<p>It is possible to connect and test your server using a telnet connection. Once connected you can set and get object in the cache, take a look to the following paragraph.</p>
+
+<pre><code class="sh">$ telnet 127.0.0.1 11211
+Trying 127.0.0.1...
+Connected to tgrall-server.
+Escape character is '^]'.
+set KEY 0 600 16
+This is my value
+STORED
+get KEY
+VALUE KEY 0 16
+This is my value
+END
+</code></pre>
+
+<p>The <code>set</code> command allows you to put a new value in the cache using the following syntax:</p>
+
+<pre><code class="sh">set &lt;key&gt;  &lt;flags&gt; &lt;expiration_time&gt;  &lt;number_of_bytes&gt; [noreply] \n\n
+
+&lt;value&gt;
+</code></pre>
+
+<ul>
+<li>key : the key used to store the data in the cache</li>
+<li>flags : a 32 bits unsigned integer that memcached stored with the data</li>
+<li>expiration_time : expiration time in seconds, if you put 0 this means no delay</li>
+<li>number_if_bytes : number of bytes in the data block</li>
+<li>noreply : option to tell the server to not return any value</li>
+<li>value : the value to store and associate to the key.</li>
+</ul>
+
+
+<p>This is a short view of the documentation located in your source directory <code>/memcachedbuild/memcached-1.4.10/doc/protocol.txt</code>.</p>
+
+<p>The <code>get</code> command allows you to access the value that is associated with the key.</p>
+
+<p>You can check the version of memcahed you are running by calling the <code>stats</code> command in your telnet session.</p>
+
+<p>Your memcached server is up and running, you can now start to use it inside your applications.</p>
+
+<h3>Simple Java Application with Memcached</h3>
+
+<p>The easiest way to use memcached from your Java applications is to use a client library. You can find many <a href="http://code.google.com/p/memcached/wiki/Clients#Java">client libraries</a>. In this example I am using <a href="http://code.google.com/p/spymemcached/">spymemcached</a> developped by the people from <a href="http://www.couchbase.com/">Couchbase</a>.</p>
+
+<p>1- Adding SpyMemcached to your Maven project</p>
+
+<p>Add the repository to you pom.xml (or you setting.xml)</p>
+
+<pre><code class="xml">&lt;repository&gt;
+  &lt;id&gt;spy&lt;/id&gt;
+  &lt;name&gt;Spy Repository&lt;/name&gt;
+  &lt;layout&gt;default&lt;/layout&gt;
+  &lt;url&gt;http://files.couchbase.com/maven2/&lt;/url&gt;
+&lt;/repository&gt;
+</code></pre>
+
+<p>then the dependency to your pom.xml</p>
+
+<pre><code class="xml">&lt;dependency&gt;
+  &lt;groupid&gt;spy&lt;/groupid&gt;
+  &lt;artifactid&gt;spymemcached&lt;/artifactid&gt;
+  &lt;version&gt;2.7.3&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>2- Use SpyMemcache client in your application</p>
+
+<p>The following code is a simple Java class that allows you to enter the key and the value and set it in the cache.</p>
+
+<pre><code class="java">package com.grallandco.blog;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Console;
+import java.io.InputStreamReader;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.spy.memcached.AddrUtil;
+import net.spy.memcached.MemcachedClient;
+
+public class Test {
+
+  public static void main(String[] args) {
+    try {
+
+      System.out.print("Enter the new key : ");
+      BufferedReader reader = new BufferedReader( new InputStreamReader(System.in));
+      String key = null;
+      key = reader.readLine();
+
+      System.out.print("Enter the new value : ");
+      String value = null;
+      value = reader.readLine();
+
+      MemcachedClient cache = new MemcachedClient(AddrUtil.getAddresses("127.0.0.1:11211"));
+
+      // read the object from memory
+      System.out.println("Get Object before set :"+ cache.get(key)  );
+
+      // set a new object
+      cache.set(key, 0, value );
+
+      System.out.println("Get Object after set :"+ cache.get(key)  );
+
+
+    } catch (IOException ex) {
+      Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+      System.exit(0);
+    }
+
+
+    System.exit(0);
+
+  }
+}
+</code></pre>
+
+<p>So when executing the application you will see something like :</p>
+
+<pre><code class="sh">Enter the new key : CITY
+Enter the new value : Paris, France
+2011-11-16 15:22:09.928 INFO net.spy.memcached.MemcachedConnection:  Added {QA sa=/127.0.0.1:11211, #Rops=0, #Wops=0, #iq=0, topRop=null, topWop=null, toWrite=0, interested=0} to connect queue
+2011-11-16 15:22:09.932 INFO net.spy.memcached.MemcachedConnection:  Connection state changed for sun.nio.ch.SelectionKeyImpl@5b40c281
+Get Object before set :null
+Get Object after set :Paris, France
+</code></pre>
+
+<p>You can also access the object from a Telnet session:</p>
+
+<pre><code class="sh">get CITY
+VALUE CITY 0 13
+Paris, France
+END
+</code></pre>
+
+<p>You can use any Java class in your application, the only thing to do is to make this class serializable.</p>
+
+<p>This is it for the first post about memcached and Java,&nbsp; I am currently working on a small example integrating Web Services call, Portlets and memcached.</p>
+]]></content>
+  </entry>
+  
+</feed>

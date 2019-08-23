@@ -1,0 +1,624 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Using Apache Drill REST API to Build ASCII Dashboard With Node - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Apache Drill has a hidden gem: an easy to use REST interface. This API can be used to Query, Profile and Configure Drill engine. In this blog post I &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Using Apache Drill REST API to Build ASCII Dashboard With Node</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-12-10T11:30:44+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:30 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="http://drill.apache.org">Apache Drill</a> has a hidden gem: an easy to use REST interface. This API can be used to Query, Profile and Configure Drill engine.</p>
+
+<p>In this blog post I will explain how to use Drill REST API to create ascii dashboards using <a href="https://www.npmjs.com/package/blessed-contrib">Blessed Contrib</a>.</p>
+
+<p>The ASCII Dashboard looks like</p>
+
+<p><img class="center" src="/images/posts/drill_dashboard/dashboard_demo.gif" title="Dashboard" ></p>
+
+<!-- more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Node.js</li>
+<li>Apache Drill 1.2</li>
+<li>For this post, you will use the SFO Passengers CSV file available <a href="http://www.flysfo.com/media/facts-statistics/air-traffic-statistics">here</a>.
+
+<ul>
+<li>Download this locally, unzip the files and put the CSV into a folder that will be access uzing the following path in Drill : <code>dfs.data.`/airport/*.csv`</code></li>
+</ul>
+</li>
+</ul>
+
+
+<p><em>Note: I am still using Apache 1.2 to allow this example to be executed in context of a MapR cluster.</em></p>
+
+<h2>The Query and View</h2>
+
+<p>In Drill 1.2, CSV headers are not automatically parsed. (This is one of the new features of 1.3: look for <code>extractHeader</code> in the <a href="https://drill.apache.org/docs/text-files-csv-tsv-psv/">documentation</a>).</p>
+
+<p>For simplicity, remove the first line of the CSV.</p>
+
+<p>The basic query will look like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SELECT
+</span><span class='line'>CAST(SUBSTR(columns[0],1,4) AS INT)  `YEAR`,
+</span><span class='line'>CAST(SUBSTR(columns[0],5,2) AS INT) `MONTH`,
+</span><span class='line'>columns[1] as `AIRLINE`,
+</span><span class='line'>columns[2] as `IATA_CODE`,
+</span><span class='line'>columns[3] as `AIRLINE_2`,
+</span><span class='line'>columns[4] as `IATA_CODE_2`,
+</span><span class='line'>columns[5] as `GEO_SUMMARY`,
+</span><span class='line'>columns[6] as `GEO_REGION`,
+</span><span class='line'>columns[7] as `ACTIVITY_CODE`,
+</span><span class='line'>columns[8] as `PRICE_CODE`,
+</span><span class='line'>columns[9] as `TERMINAL`,
+</span><span class='line'>columns[10] as `BOARDING_AREA`,
+</span><span class='line'>CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+</span><span class='line'>FROM dfs.data.`/airport/*.csv`
+</span><span class='line'>LIMIT 10</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s now create a view with these columns: <em>(do not put any limit !)</em></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>CREATE OR REPLACE VIEW dfs.tmp.`airport_data_view` AS
+</span><span class='line'>SELECT
+</span><span class='line'>CAST(SUBSTR(columns[0],1,4) AS INT)  `YEAR`,
+</span><span class='line'>CAST(SUBSTR(columns[0],5,2) AS INT) `MONTH`,
+</span><span class='line'>columns[1] as `AIRLINE`,
+</span><span class='line'>columns[2] as `IATA_CODE`,
+</span><span class='line'>columns[3] as `AIRLINE_2`,
+</span><span class='line'>columns[4] as `IATA_CODE_2`,
+</span><span class='line'>columns[5] as `GEO_SUMMARY`,
+</span><span class='line'>columns[6] as `GEO_REGION`,
+</span><span class='line'>columns[7] as `ACTIVITY_CODE`,
+</span><span class='line'>columns[8] as `PRICE_CODE`,
+</span><span class='line'>columns[9] as `TERMINAL`,
+</span><span class='line'>columns[10] as `BOARDING_AREA`,
+</span><span class='line'>CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+</span><span class='line'>FROM dfs.data.`/airport/*.csv`</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So you can now use the view in your query:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>select * from dfs.tmp.`airport_data_view` limit 5;</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Use the REST API</h2>
+
+<p>Now that you have the query you can use the REST API to retrieve the data as JSON document over HTTP. Open a terminal and run this curl command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>curl  \
+</span><span class='line'>  --header "Content-type: application/json" \
+</span><span class='line'>  --request POST \
+</span><span class='line'>  --data '{
+</span><span class='line'>    "queryType" : "SQL",
+</span><span class='line'>    "query" : "select * from dfs.tmp.`airport_data_view` limit 5 " }' \
+</span><span class='line'>  http://localhost:8047/query.json</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The returned JSON document looks like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{
+</span><span class='line'>  "columns" : [ "YEAR", "MONTH", ... , "PASSENGER_COUNT" ],
+</span><span class='line'>  "rows" : [ {
+</span><span class='line'>    "GEO_REGION" : "US",
+</span><span class='line'>    "IATA_CODE_2" : "TZ",
+</span><span class='line'>      ...
+</span><span class='line'>      ...
+</span><span class='line'>    "AIRLINE" : "ATA Airlines",
+</span><span class='line'>    "MONTH" : "7",
+</span><span class='line'>    "ACTIVITY_CODE" : "Deplaned"
+</span><span class='line'>  }, {
+</span><span class='line'>    "GEO_REGION" : "US",
+</span><span class='line'>    "IATA_CODE_2" : "TZ",
+</span><span class='line'>    "GEO_SUMMARY" : "Domestic",
+</span><span class='line'>    ...
+</span><span class='line'>  }
+</span><span class='line'>  ]
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see it is quite simple:</p>
+
+<ul>
+<li>a first JSON attribute that list the columns</li>
+<li>the list of rows, as JSON documents in an array.</li>
+</ul>
+
+
+<h2>Create a Graph using Node.js &amp; Blessed Contrib</h2>
+
+<p>Let&rsquo;s create a node application.</p>
+
+<p>First you have to include:</p>
+
+<ul>
+<li><code>request</code> : to call the REST API</li>
+<li><code>blessed</code> : to get a rich Terminal API</li>
+<li><code>blessed-contrib</code> : for the dashboard</li>
+</ul>
+
+
+<p>and then create a <code>screen</code> and a <code>bar</code> chard from Contrib.</p>
+
+<p>So the <em>header</em> of your Javascript file looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">blessed</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;blessed&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">,</span> <span class="nx">contrib</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;blessed-contrib&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">,</span> <span class="nx">request</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">,</span> <span class="nx">screen</span> <span class="o">=</span> <span class="nx">blessed</span><span class="p">.</span><span class="nx">screen</span><span class="p">()</span>
+</span><span class='line'>  <span class="p">,</span> <span class="nx">bar</span> <span class="o">=</span> <span class="nx">contrib</span><span class="p">.</span><span class="nx">bar</span><span class="p">(</span>
+</span><span class='line'>       <span class="p">{</span> <span class="nx">label</span><span class="o">:</span> <span class="s1">&#39;Bar Chart&#39;</span>
+</span><span class='line'>       <span class="p">,</span> <span class="nx">barWidth</span><span class="o">:</span> <span class="mi">20</span>
+</span><span class='line'>       <span class="p">,</span> <span class="nx">barSpacing</span><span class="o">:</span> <span class="mi">20</span>
+</span><span class='line'>       <span class="p">,</span> <span class="nx">maxHeight</span><span class="o">:</span> <span class="mi">9</span>
+</span><span class='line'>       <span class="p">,</span> <span class="nx">height</span><span class="o">:</span> <span class="s2">&quot;100%&quot;</span>
+</span><span class='line'>       <span class="p">,</span> <span class="nx">width</span><span class="o">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So here we have defined a bar char, that will be populated with the columns and rows. For this we need a query, let&rsquo;s use the number of passengers per year, as follow:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">SELECT</span> <span class="err">`</span><span class="nx">YEAR</span><span class="err">`</span><span class="p">,</span> <span class="nx">SUM</span><span class="p">(</span><span class="err">`</span><span class="nx">PASSENGER_COUNT</span><span class="err">`</span><span class="p">)</span> <span class="nx">FROM</span> <span class="nx">dfs</span><span class="p">.</span><span class="nx">tmp</span><span class="p">.</span><span class="err">`</span><span class="nx">airport_data_view</span><span class="err">`</span> <span class="nx">GROUP</span> <span class="nx">BY</span> <span class="err">`</span><span class="nx">YEAR</span><span class="err">`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The complete Bar Chat application looks like:</p>
+
+<div><script src='https://gist.github.com/00c5d83b85f59d80ad95.js?file=app001.js'></script>
+<noscript><pre><code>var blessed = require(&#39;blessed&#39;)
+  , contrib = require(&#39;blessed-contrib&#39;)
+  , request = require(&#39;request&#39;)
+  , screen = blessed.screen()
+  , bar = contrib.bar(
+       { label: &#39;Bar Chart&#39;
+       , barWidth: 12
+       , barSpacing: 5
+       , maxHeight: 9
+       , height: &quot;100%&quot;
+       , width: &quot;100%&quot;})
+
+screen.append(bar);
+
+var query =  {
+    &quot;queryType&quot; : &quot;SQL&quot;,
+    &quot;query&quot; : &quot;select `YEAR`, SUM(`PASSENGER_COUNT`) from dfs.tmp.`airport_data_view` GROUP BY `YEAR`&quot;
+};
+
+request(
+    {
+        url: &#39;http://localhost:8047/query.json&#39;, //URL to hit
+        method: &#39;POST&#39;,
+        json: query
+    }, 
+    function(error, response, body){
+        var columns = body.columns;
+        var data = {
+            titles : [],
+            data : []
+        };
+        for(var entry of body.rows){
+            data.titles.push(entry[columns[0]]);
+            data.data.push(entry[columns[1]]);
+        }
+        bar.setData(data);
+        screen.render()
+    });
+
+
+screen.key([&#39;escape&#39;, &#39;q&#39;, &#39;C-c&#39;], function(ch, key) {
+      return process.exit(0);
+});
+</code></pre></noscript></div>
+
+
+<ul>
+<li>The lines 15-17 contain the query object used by the Drill REST API</li>
+<li>The lines 26-38 contain the callback from the HTTP call, and the results values are store in the data object (lines 33-34), and then set in the bar chart (line 36)</li>
+</ul>
+
+
+<h3>Run the &ldquo;Dashboard&rdquo;</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">npm</span> <span class="nx">install</span> <span class="nx">request</span> <span class="nx">blessed</span> <span class="nx">blessed</span><span class="o">-</span><span class="nx">contrib</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">node</span> <span class="nx">app001</span><span class="p">.</span><span class="nx">js</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This application shows a simple bar chart, in your terminal. Let&rsquo;s now create a richer dashboard.</p>
+
+<h2>Complete Dashboard</h2>
+
+<p>The Bless-Contrib node package allows developer to create rich dashboards that aggregate multiple graphs and could be refresh automatically, as seen in the screencast at the top of this post.</p>
+
+<p>You can find a simple dashboard in this <a href="https://github.com/tgrall/drill-node-dashboard.git">Github repository</a>, once you have cloned it, you just need to run: (be sure that your view is called &lsquo;dfs.tmp.<code>airport_data_view</code>&rsquo;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">git</span> <span class="nx">clone</span> <span class="nx">https</span><span class="o">:</span><span class="c1">//github.com/tgrall/drill-node-dashboard.git</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">cd</span> <span class="nx">drill</span><span class="o">-</span><span class="nx">node</span><span class="o">-</span><span class="nx">dashboard</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">npm</span> <span class="nx">install</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">node</span> <span class="nx">dashboard</span><span class="p">.</span><span class="nx">js</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//localhost:8047</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can even change the CSV file, for example adding new months, and the line chart on the right will be refreshed automatically.</p>
+
+<p><em>Note: this dashboard sample is very basic and just a quick example explaning how to use Drill REST API in a node.js application</em></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-12-10T11:30:44+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:30 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/dataviz/'>dataviz</a>, <a class='category' href='/blog/categories/drill/'>drill</a>, <a class='category' href='/blog/categories/node-dot-js/'>node.js</a>, <a class='category' href='/blog/categories/sql/'>sql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/" title="Previous Post: Convert a CSV File to Apache Parquet with Drill">&laquo; Convert a CSV File to Apache Parquet with Drill</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2016/02/10/getting-started-with-sample-programs-for-apache-kafka-0-dot-9/" title="Next Post: Getting Started with Sample Programs for Apache Kafka 0.9">Getting Started with Sample Programs for Apache Kafka 0.9 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node/';
+        var disqus_url = 'http://tgrall.github.io/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

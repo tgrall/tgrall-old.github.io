@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Webservices | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/webservices/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Good Bye JAX-RPC, Weclome to JAX-WS]]></title>
+    <link href="http://tgrall.github.io/blog/2005/05/29/good-bye-jax-rpc-weclome-to-jax-ws/"/>
+    <updated>2005-05-29T20:52:02+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/05/29/good-bye-jax-rpc-weclome-to-jax-ws</id>
+    <content type="html"><![CDATA[<p>Finally the Java specification about Web Service will  have a name that makes sense&hellip; moving away from JAX-RPC to JAX-WS (JAX Web Services)&hellip;</p>
+
+<blockquote><p>The JAX-RPC name, which stands for Java API for XML-based RPC, is misleading because developers assume it is only about RPC, according to Doug Kohlert, a Sun staff engineer, in his blog this week. “By renaming JAX-RPC to JAX-WS, we can eliminate this confusion,” Kohlert wrote. JAX-WS stands for Java API for XML Web Services.</p></blockquote>
+
+<p><a href="http://www.infoworld.com/article/05/05/25/HNjaxrpc_1.html">This infoworld article will give you more details</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

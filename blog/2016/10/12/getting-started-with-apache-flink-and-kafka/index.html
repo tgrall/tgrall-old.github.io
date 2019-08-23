@@ -1,0 +1,622 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Getting Started With Apache Flink and Kafka - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Introduction Apache Flink is an open source platform for distributed stream and batch data processing. Flink is a streaming data flow engine with &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Getting Started With Apache Flink and Kafka</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-10-12T04:54:17+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>4:54 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Introduction</h2>
+
+<p><a href="https://flink.apache.org/">Apache Flink</a> is an open source platform for distributed stream and batch data processing. Flink is a streaming data flow engine with several APIs to create data streams oriented application.</p>
+
+<p>It is very common for Flink applications to use <a href="http://kafka.apache.org/">Apache Kafka</a> for data input and output. This article will guide you into  the steps to use Apache Flink with Kafka.</p>
+
+<p><img class="center" src="/images/posts/flink-kafka/flink-kafka.png" title="Flink-Kafka" ></p>
+
+<!-- more -->
+
+
+<h3>Prerequisites</h3>
+
+<ul>
+<li>Apache Kafka 0.9.x</li>
+<li>Git</li>
+<li>Maven 3.x or later</li>
+</ul>
+
+
+<h2>Create your Flink Streaming Project</h2>
+
+<p>The first step is to create an Java application, the easiest is to use the flink-quickstart-java archetype, that contains the core dependencies and packaging tasks. This article is similar with the <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.1/quickstart/run_example_quickstart.html">Apache Flink Quick Start Example</a>, with a clear focus on data input and output with MapR Streams.</p>
+
+<p>In this application we will create two jobs:</p>
+
+<ul>
+<li><code>WriteToKafka</code> : that generates random string and post them to a MapR Streams Topic using the Kafka Flink Connector and its Producer API.</li>
+<li><code>ReadFromKafka</code> : that reads the same topic and print the messages in the standard output using the Kafka Flink Connector and its Consumer. API.</li>
+</ul>
+
+
+<p>The full project is available on GitHub:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/kafka-flink-101">Flink and Kakfa Application</a></li>
+</ul>
+
+
+<p>Let’s create the project using Apache Maven:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>mvn archetype:generate <span class="se">\</span>
+</span><span class='line'>      -DarchetypeGroupId<span class="o">=</span>org.apache.flink<span class="se">\</span>
+</span><span class='line'>      -DarchetypeArtifactId<span class="o">=</span>flink-quickstart-java <span class="se">\</span>
+</span><span class='line'>      -DarchetypeVersion<span class="o">=</span>1.1.2 <span class="se">\</span>
+</span><span class='line'>      -DgroupId<span class="o">=</span>com.grallandco.demos <span class="se">\</span>
+</span><span class='line'>      -DartifactId<span class="o">=</span>kafka-flink-101 <span class="se">\</span>
+</span><span class='line'>      -Dversion<span class="o">=</span>1.0-SNAPSHOT <span class="se">\</span>
+</span><span class='line'>      -DinteractiveMode<span class="o">=</span><span class="nb">false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Maven will create the following structure:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tree kafka-flink-101/
+</span><span class='line'>kafka-flink-101/
+</span><span class='line'>├── pom.xml
+</span><span class='line'>└── src
+</span><span class='line'>    └── main
+</span><span class='line'>        ├── java
+</span><span class='line'>        │   └── com
+</span><span class='line'>        │       └── grallandco
+</span><span class='line'>        │           └── demos
+</span><span class='line'>        │               ├── BatchJob.java
+</span><span class='line'>        │               ├── SocketTextStreamWordCount.java
+</span><span class='line'>        │               ├── StreamingJob.java
+</span><span class='line'>        │               └── WordCount.java
+</span><span class='line'>        └── resources
+</span><span class='line'>            └── log4j.properties
+</span><span class='line'>
+</span><span class='line'><span class="m">7</span> directories, <span class="m">6</span> files
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>This project is configured to create a Jar file that contains your flink project code and also includes all dependencies needed to run it.</p>
+
+<p>The project contains some other sample jobs, we do not need them for this article, you can either keep them to educational purposes or simply remove them from the project.</p>
+
+<h2>Add Kafka Connector</h2>
+
+<p>Open the <code>pom.xml</code> and add the following dependencies to your project:</p>
+
+<p>As a first step, we have to add the Flink Kafka connector as a dependency so that we can use the Kafka sink. Add this to the pom.xml file in the dependencies section:</p>
+
+<p>You must add now the Flink Kafka Connector dependency to use the Kafka sink. Add the following entry in the <code>&lt;dependencies&gt;</code> element:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> &lt;dependency&gt;
+</span><span class='line'>      &lt;groupId&gt;org.apache.flink&lt;/groupId&gt;
+</span><span class='line'>      &lt;artifactId&gt;flink-connector-kafka-0.9_2.10&lt;/artifactId&gt;
+</span><span class='line'>      &lt;version&gt;<span class="k">${</span><span class="nv">flink</span><span class="p">.version</span><span class="k">}</span>&lt;/version&gt;
+</span><span class='line'> &lt;/dependency&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The Flink project is now ready to use the DataStream using the Kafka Connector so you can send and receive messages from Apache Kafka.</p>
+
+<h2>Install and Start Kafka</h2>
+
+<p>Download Kafka, enter the following commands in your terminal:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>curl -O http://www.us.apache.org/dist/kafka/0.9.0.0/kafka_2.11-0.9.0.0.tgz
+</span><span class='line'>tar -xzf kafka_2.11-0.9.0.0.tgz
+</span><span class='line'><span class="nb">cd </span>kafka_2.11-0.9.0.0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Kafka uses ZooKeeper, if you do not have Zookeeper running, you can start it using the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>./bin/zookeeper-server-start.sh config/zookeeper.properties
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Start a Kafka broker by running the following command in a new terminal:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>./bin/kafka-server-start.sh config/server.properties
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In another terminal, run the following command to create a Kafka topic called <code>flink-demo</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor <span class="m">1</span> --partitions <span class="m">1</span> --topic flink-demo
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Use the Kafka tools to post and consume messages to the <code>flink-demo</code> topic.</p>
+
+<p>Producer</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic flink-demo
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Consumer</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>./bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic flink-demo --from-beginning
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the producer window, you can post some messages and see them in the consumer windows. We will use these tools to follow the interactions between Kafka and Flink.</p>
+
+<h2>Write your Flink application</h2>
+
+<p>Let’s now use the Flink Kafka Connector to send messages to Kafka and consume them.</p>
+
+<h3>Producer</h3>
+
+<p>The producer generates messages using the <code>SimpleStringGenerator()</code> class and send the string to the <code>flink-demo</code> topic.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>  public static void main<span class="o">(</span>String<span class="o">[]</span> args<span class="o">)</span> throws Exception <span class="o">{</span>
+</span><span class='line'>    StreamExecutionEnvironment <span class="nv">env</span> <span class="o">=</span> StreamExecutionEnvironment.getExecutionEnvironment<span class="o">()</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    Properties <span class="nv">properties</span> <span class="o">=</span> new Properties<span class="o">()</span><span class="p">;</span>
+</span><span class='line'>    properties.setProperty<span class="o">(</span><span class="s2">&quot;bootstrap.servers&quot;</span>, “localhost:9092<span class="s2">&quot;); </span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">    DataStream&lt;String&gt; stream = env.addSource(new SimpleStringGenerator());</span>
+</span><span class='line'><span class="s2">    stream.addSink(new FlinkKafkaProducer09&lt;&gt;(&quot;</span>flink-demo<span class="err">&quot;</span>, new SimpleStringSchema<span class="o">()</span>, properties<span class="o">))</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    env.execute<span class="o">()</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>SimpleStringGenerator()</code> method code is available <a href="https://github.com/tgrall/kafka-flink-101/blob/master/src/main/java/com/grallandco/demos/WriteToKafka.java#L45-L60">here</a>.</p>
+
+<p>The main steps are:</p>
+
+<ul>
+<li>create a new <code>StreamExecutionEnvironment</code> the basis of any Flink application</li>
+<li>create a new <code>DataStream</code> in the application environment, the <code>SimpleStringGenerator</code> class implements the <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.1/api/java/">SourceFunction</a> the base interface for all streams data sources in Flink.</li>
+<li>add the <code>FlinkKafkaProducer09</code> sink to the topic.</li>
+</ul>
+
+
+<h3>Consumer</h3>
+
+<p>The consumer simply reads the messages from the <code>flink-demo</code> topic, and print them into the console.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>  public static void main<span class="o">(</span>String<span class="o">[]</span> args<span class="o">)</span> throws Exception <span class="o">{</span>
+</span><span class='line'>    // create execution environment
+</span><span class='line'>    StreamExecutionEnvironment <span class="nv">env</span> <span class="o">=</span> StreamExecutionEnvironment.getExecutionEnvironment<span class="o">()</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    Properties <span class="nv">properties</span> <span class="o">=</span> new Properties<span class="o">()</span><span class="p">;</span>
+</span><span class='line'>    properties.setProperty<span class="o">(</span><span class="s2">&quot;bootstrap.servers&quot;</span>, “localhost:9092<span class="s2">&quot;);</span>
+</span><span class='line'><span class="s2">    properties.setProperty(&quot;</span>group.id<span class="s2">&quot;, &quot;</span>flink_consumer<span class="s2">&quot;);</span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">    DataStream&lt;String&gt; stream = env.addSource(new FlinkKafkaConsumer09&lt;&gt;(</span>
+</span><span class='line'><span class="s2">     &quot;</span>flink-demo<span class="s2">&quot;, new SimpleStringSchema(), properties) );</span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">    stream.map(new MapFunction&lt;String, String&gt;() {</span>
+</span><span class='line'><span class="s2">      private static final long serialVersionUID = -6867736771747690202L;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">      @Override</span>
+</span><span class='line'><span class="s2">      public String map(String value) throws Exception {</span>
+</span><span class='line'><span class="s2">        return &quot;</span>Stream Value: <span class="err">&quot;</span> + value<span class="p">;</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">})</span>.print<span class="o">()</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    env.execute<span class="o">()</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The main steps are:</p>
+
+<ul>
+<li>create a new <code>StreamExecutionEnvironment</code> the basis of any Flink application</li>
+<li>create a set of properties with the consumer information, in this application we can only set the consumer <code>group.id</code>.</li>
+<li>use the <code>FlinkKafkaConsumer09</code> to get the message from the topic <code>flink-demo</code></li>
+</ul>
+
+
+<h2>Build and Run the application</h2>
+
+<p>Let’s run the application directly from Maven (or from your favorite IDE).</p>
+
+<p>1- Build the project:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mvn clean package
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2- Run the Flink Producer Job</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mvn <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span>com.mapr.demos.WriteToKafka
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3- Run the Flink Consumer Job</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mvn <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span>com.mapr.demos.ReadFromKafka
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the terminal, you should see the messages generated from the producer</p>
+
+<p>You can now deploy and execute this job on your Flink cluster.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to use Flink with kafka to write and read data streams.</p>
+
+<p>Learn about what Apache Flink can do and how it maintains consistency and provides flexibility in the &ldquo;<a href="https://www.mapr.com/introduction-to-apache-flink">Introduction to Apache Flink</a>&rdquo; ebook.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-10-12T04:54:17+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>4:54 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/flink/'>flink</a>, <a class='category' href='/blog/categories/how-to/'>how-to</a>, <a class='category' href='/blog/categories/kafka/'>kafka</a>, <a class='category' href='/blog/categories/streaming/'>streaming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/09/26/streaming-analytics-in-a-digitally-industrialized-world/" title="Previous Post: Streaming Analytics in a Digitally Industrialized World">&laquo; Streaming Analytics in a Digitally Industrialized World</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/" title="Next Post: Getting started with Apache Flink and Mapr Streams">Getting started with Apache Flink and Mapr Streams &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/';
+        var disqus_url = 'http://tgrall.github.io/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,729 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Getting Started With Kafka REST Proxy for MapR Streams - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Introduction MapR Ecosystem Package 2.0 (MEP) is coming with some new features related to MapR Streams: Kafka REST Proxy for MapR Streams provides a &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Getting Started With Kafka REST Proxy for MapR Streams</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-01-20T10:31:22+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:31 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Introduction</h2>
+
+<p>MapR Ecosystem Package 2.0 (MEP) is coming with some new features related to MapR Streams:</p>
+
+<ul>
+<li><a href="http://maprdocs.mapr.com/home/Kafka/kafkaREST.html">Kafka REST Proxy for MapR Streams</a> provides a RESTful interface to MapR Streams and Kafka clusters to consume and product messages and to perform administrative operations.</li>
+<li><a href="http://maprdocs.mapr.com/home/Kafka/kafkaConnect.html">Kafka Connect for MapR Streams</a> is a utility for streaming data between MapR Streams and Apache Kafka and other storage systems.</li>
+</ul>
+
+
+<p>MapR Ecosystem Packs (MEPs) are a way to deliver ecosystem upgrades decoupled from core upgrades - allowing you to upgrade your tooling independently of your Converged Data Platform. You can lean more about MEP 2.0 in <a href="https://www.mapr.com/blog/announcing-mapr-ecosystem-pack-mep-20">this article</a>.</p>
+
+<p>In this blog we describe how to use the REST Proxy to publish and consume messages to/from MapR Streams. The REST Proxy is a great addition to the MapR Converged Data Platform allowing any programming language to use MapR Streams.</p>
+
+<p>The Kafka REST Proxy provided with the MapR Streams tools, can be used with MapR Streams (default), but also used in a hybrid mode with Apache Kafka. In this article we will focus on MapR Streams.</p>
+
+<!-- more -->
+
+
+<h2>Prerequisites</h2>
+
+<ul>
+<li>MapR Converged Data Platform 5.2 with MEP 2.0
+
+<ul>
+<li>with MapR Streams Tools</li>
+</ul>
+</li>
+<li>curl, wget or any HTTP/REST Client tool</li>
+</ul>
+
+
+<h2>Create the MapR Streams and Topic</h2>
+
+<p>A stream is a collection of topics that you can manage as a group by:</p>
+
+<ol>
+<li>Setting security policies that apply to all topics in that stream</li>
+<li>Setting a default number of partitions for each new topic that is created in the stream</li>
+<li>Set a time-to-live for messages in every topic in the stream</li>
+</ol>
+
+
+<p>You can find more information about MapR Streams concepts in the <a href="http://maprdocs.mapr.com/home/MapR_Streams/mapr_streams.html">documentation</a>.</p>
+
+<p>On your Mapr Cluster or Sandbox, run the following commands:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ maprcli stream create -path /apps/iot-stream -produceperm p -consumeperm p -topicperm p
+</span><span class='line'>
+</span><span class='line'>$ maprcli stream topic create -path /apps/iot-stream -topic sensor-json -partitions 3
+</span><span class='line'>
+</span><span class='line'>$ maprcli stream topic create -path /apps/iot-stream -topic sensor-binary -partitions 3</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Start Kafka Console Producers and Consumers</h2>
+
+<p>Open two terminal windows and run the consumer Kafka utilities using the following commands:</p>
+
+<h4>Consumer</h4>
+
+<ul>
+<li>Topic sensor-json</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ /opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-consumer.sh --new-consumer --bootstrap-server this.will.be.ignored:9092 --topic /apps/iot-stream:sensor-json</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Topic sensor-binary</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ /opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-consumer.sh --new-consumer --bootstrap-server this.will.be.ignored:9092 --topic /apps/iot-stream:sensor-binary</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This two terminal windows will allow you to see the messages posted on the different topics</p>
+
+<h2>Using Kafka REST Proxy</h2>
+
+<h3>Inspect Topic Metadata</h3>
+
+<p>The endpoint <code>/topics/[topic_name]</code> allows you to get some informations about the topic. In MapR Streams, topics are part of a <em>stream</em> identified by a path;
+to use the topic using the REST API you have to use the full path, and encode it in the URL; for example:</p>
+
+<ul>
+<li><code>/apps/iot-stream:sensor-json</code> will be encoded with <code>%2Fapps%2Fiot-stream%3Asensor-json</code></li>
+</ul>
+
+
+<p>Run the following command, to get information about the <code>sensor-json</code> topic</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ curl -X GET  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note: For simplicity reason I am running the command from the node where the Kafka REST proxy is running, so it is possible to use <code>localhost</code>.</p>
+
+<p>You can print JSON in a pretty way, by adding a Python command such as :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ curl -X GET  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json | python -m json.tool</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Default Stream</strong></p>
+
+<p>As mentioned above, the Stream path is part of the topic name you have to use in the command;
+however it is possible to configure the MapR Kafka REST Proxy to use a default stream.
+For this you should add the following property in the <code>/opt/mapr/kafka-rest/kafka-rest-2.0.1/config/kafka-rest.properties</code> file:</p>
+
+<ul>
+<li><code>streams.default.stream=/apps/iot-stream</code></li>
+</ul>
+
+
+<p> When you change the Kafka REST proxy configuration, you must restart the service using maprcli or MCS.</p>
+
+<p> The main reason to use the <code>streams.default.stream</code> properties is to simplify the URLs used by the application for example
+ * with <code>streams.default.stream</code> you can use <code>curl -X GET  http://localhost:8082/topics/</code>
+ * without this configuration, or if you want to use a specific stream you must specify it in the URL <code>http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json</code></p>
+
+<p> In this article, all the URLs contains the encoded stream name, like that you can start using the Kafka REST proxy without changind the configuration and also use it with different streams.</p>
+
+<h3>Publishing Messages</h3>
+
+<p>The Kafka REST Proxy for MapR Streams allows application to publish messages to MapR Streams. Messages could be send as JSON or Binary content (base64 encoding).</p>
+
+<h4>To send a JSON Message:</h4>
+
+<ul>
+<li>the query should be a HTTP <code>POST</code></li>
+<li>the Content-Type should be : <code>application/vnd.kafka.json.v1+json</code></li>
+<li>the Body:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;records&quot;</span><span class="p">:</span>
+</span><span class='line'>  <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;value&quot;</span><span class="p">:</span>
+</span><span class='line'>      <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;temp&quot;</span> <span class="p">:</span> <span class="mi">10</span> <span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;speed&quot;</span> <span class="p">:</span> <span class="mi">40</span> <span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;direction&quot;</span> <span class="p">:</span> <span class="s2">&quot;NW&quot;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The complete request is:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">POST</span> <span class="err">-H</span> <span class="s2">&quot;Content-Type: application/vnd.kafka.json.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">--data</span> <span class="err">&#39;</span><span class="p">{</span><span class="nt">&quot;records&quot;</span><span class="p">:[{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;temp&quot;</span> <span class="p">:</span> <span class="mi">10</span> <span class="p">,</span> <span class="nt">&quot;speed&quot;</span> <span class="p">:</span> <span class="mi">40</span> <span class="p">,</span> <span class="nt">&quot;direction&quot;</span> <span class="p">:</span> <span class="s2">&quot;NW&quot;</span><span class="p">}</span>  <span class="p">}]}</span><span class="err">&#39;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/topics/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-json</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should see the message printed in the terminal window where the <code>/apps/iot-stream:sensor-json</code> consumer is running.</p>
+
+<h4>To send a binary Message:</h4>
+
+<ul>
+<li>the query should be a HTTP <code>POST</code></li>
+<li>the Content-Type should be : <code>application/vnd.kafka.binary.v1+json</code></li>
+<li>the Body:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;records&quot;</span><span class="p">:</span>
+</span><span class='line'>  <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;SGVsbG8gV29ybGQ=&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that <code>SGVsbG8gV29ybGQ=</code> is the string &ldquo;Hello World&rdquo; encoded in Base64.</p>
+
+<p>The complete request is:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">POST</span> <span class="err">-H</span> <span class="s2">&quot;Content-Type: application/vnd.kafka.binary.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">--data</span> <span class="err">&#39;</span><span class="p">{</span><span class="nt">&quot;records&quot;</span><span class="p">:[{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;SGVsbG8gV29ybGQ=&quot;</span><span class="p">}]}</span><span class="err">&#39;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/topics/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-binary</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should see the message printed in the terminal window where the <code>/apps/iot-stream:sensor-binary</code> consumer is running.</p>
+
+<h4>Sending multiple messages</h4>
+
+<p>The <code>records</code> field of the HTTP Body allows you to send multiple messages for example you can send:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">POST</span> <span class="err">-H</span> <span class="s2">&quot;Content-Type: application/vnd.kafka.json.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">--data</span> <span class="err">&#39;</span><span class="p">{</span><span class="nt">&quot;records&quot;</span><span class="p">:[{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;temp&quot;</span> <span class="p">:</span> <span class="mi">12</span> <span class="p">,</span> <span class="nt">&quot;speed&quot;</span> <span class="p">:</span> <span class="mi">42</span> <span class="p">,</span> <span class="nt">&quot;direction&quot;</span> <span class="p">:</span> <span class="s2">&quot;NW&quot;</span><span class="p">}</span>  <span class="p">},</span> <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;temp&quot;</span> <span class="p">:</span> <span class="mi">10</span> <span class="p">,</span> <span class="nt">&quot;speed&quot;</span> <span class="p">:</span> <span class="mi">37</span> <span class="p">,</span> <span class="nt">&quot;direction&quot;</span> <span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">}</span>  <span class="p">}</span> <span class="p">]}</span><span class="err">&#39;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/topics/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-json</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This command will send 2 messages, and increment the offset by 2. You can do the same
+with binary content, just add new element in the JSON array; for example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">POST</span> <span class="err">-H</span> <span class="s2">&quot;Content-Type: application/vnd.kafka.binary.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">--data</span> <span class="err">&#39;</span><span class="p">{</span><span class="nt">&quot;records&quot;</span><span class="p">:[{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;SGVsbG8gV29ybGQ=&quot;</span><span class="p">},</span> <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;Qm9uam91cg==&quot;</span><span class="p">}]}</span><span class="err">&#39;</span> <span class="err">\</span>
+</span><span class='line'>  <span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/topics/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-binary</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you probably know, it is possible to set a key to a message to be sure that all the messages
+with the same key will arrive in the same partition. For this, add the <code>key</code> attribute to the message as follow:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;records&quot;</span><span class="p">:</span>
+</span><span class='line'>  <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;K001&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;value&quot;</span><span class="p">:</span>
+</span><span class='line'>      <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;temp&quot;</span> <span class="p">:</span> <span class="mi">10</span> <span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;speed&quot;</span> <span class="p">:</span> <span class="mi">40</span> <span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;direction&quot;</span> <span class="p">:</span> <span class="s2">&quot;NW&quot;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that you know how to post messages to MapR Stream topics usinf the REST Proxy, let&rsquo;s see how to consume the messages.</p>
+
+<h3>Consuming Messages</h3>
+
+<p>The REST proxy can also be used to consume messages from topics; for this you need to:</p>
+
+<ol>
+<li>Create a consumer instance.</li>
+<li>Use this URL returned by the first call to read message.</li>
+<li>Delete the consumer instanced if needed.</li>
+</ol>
+
+
+<h4>Creating the consumer instance</h4>
+
+<p>The following request creates the consumer instance:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">POST</span> <span class="err">-H</span> <span class="s2">&quot;Content-Type: application/vnd.kafka.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'>      <span class="err">--data</span> <span class="err">&#39;</span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;iot_json_consumer&quot;</span><span class="p">,</span> <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="nt">&quot;auto.offset.reset&quot;</span><span class="p">:</span> <span class="s2">&quot;earliest&quot;</span><span class="p">}</span><span class="err">&#39;</span> <span class="err">\</span>
+</span><span class='line'>      <span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/consumers/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-json</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The response from the server looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;instance_id&quot;</span><span class="p">:</span><span class="s2">&quot;iot_json_consumer&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;base_uri&quot;</span><span class="p">:</span><span class="s2">&quot;http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-json/instances/iot_json_consumer&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that we have used the <code>/consumers/[topic_name]</code> to create the consumer.</p>
+
+<p>The <code>base_uri</code> will be used by the subsequent requests to get the messages from the topic. Like any MapR Streams/Kafka consumer the <code>auto.offset.reset</code> defines its behavior. In this example the value is set to <code>earliest</code>, this means that the consumer will read the messages from the beginning. You can find more information about the consumer configuration in the <a href="http://maprdocs.mapr.com/home/MapR_Streams/configuration_parameters_for_consumers.html">MapR Streams documentation</a>.</p>
+
+<h4>Consuming the messages</h4>
+
+<p>To consume the messages, just add the Mapr Streams topic to the URL of the consumer isntance.</p>
+
+<p>The following request consumes the messages from the topic:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">GET</span> <span class="err">-H</span> <span class="s2">&quot;Accept: application/vnd.kafka.json.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'><span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/consumers/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-json/instances/iot_json_consumer/topics/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-json</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This call returns the messages in a JSON document:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:{</span><span class="nt">&quot;temp&quot;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span><span class="nt">&quot;direction&quot;</span><span class="p">:</span><span class="s2">&quot;NW&quot;</span><span class="p">},</span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="s2">&quot;/apps/iot-stream:sensor-json&quot;</span><span class="p">,</span><span class="nt">&quot;partition&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:{</span><span class="nt">&quot;temp&quot;</span><span class="p">:</span><span class="mi">12</span><span class="p">,</span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="mi">42</span><span class="p">,</span><span class="nt">&quot;direction&quot;</span><span class="p">:</span><span class="s2">&quot;NW&quot;</span><span class="p">},</span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="s2">&quot;/apps/iot-stream:sensor-json&quot;</span><span class="p">,</span><span class="nt">&quot;partition&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:{</span><span class="nt">&quot;temp&quot;</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="mi">37</span><span class="p">,</span><span class="nt">&quot;direction&quot;</span><span class="p">:</span><span class="s2">&quot;N&quot;</span><span class="p">},</span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="s2">&quot;/apps/iot-stream:sensor-json&quot;</span><span class="p">,</span><span class="nt">&quot;partition&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="mi">3</span><span class="p">}</span>
+</span><span class='line'><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each call to the API returns the new messages published, based on the offset of the last call.</p>
+
+<p>Note that the Consumer will be destroyed:</p>
+
+<ul>
+<li>after some idle time set by the <code>consumer.instance.timeout.ms</code> (default value set to 300000ms / 5 minutes)</li>
+<li>where it is destroyed using a REST API call (see below).</li>
+</ul>
+
+
+<h3>Consuming binary format messages</h3>
+
+<p>The approach is the same if you need to consume binary messages, you need to change the format and accept header.</p>
+
+<p>Call this URL to create a consumer instance for the binary topic:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">POST</span> <span class="err">-H</span> <span class="s2">&quot;Content-Type: application/vnd.kafka.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'>      <span class="err">--data</span> <span class="err">&#39;</span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;iot_binary_consumer&quot;</span><span class="p">,</span> <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="nt">&quot;auto.offset.reset&quot;</span><span class="p">:</span> <span class="s2">&quot;earliest&quot;</span><span class="p">}</span><span class="err">&#39;</span> <span class="err">\</span>
+</span><span class='line'>      <span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/consumers/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-binary</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then consume messages, the accept header is set to <code>application/vnd.kafka.binary.v1+json</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">GET</span> <span class="err">-H</span> <span class="s2">&quot;Accept: application/vnd.kafka.binary.v1+json&quot;</span> <span class="err">\</span>
+</span><span class='line'><span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/consumers/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-binary/instances/iot_binary_consumer/topics/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-binary</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This call returns the messages in a JSON document, and the value is encoded in Base64</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;SGVsbG8gV29ybGQ=&quot;</span><span class="p">,</span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="s2">&quot;/apps/iot-stream:sensor-binary&quot;</span><span class="p">,</span><span class="nt">&quot;partition&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;Qm9uam91cg==&quot;</span><span class="p">,</span><span class="nt">&quot;topic&quot;</span><span class="p">:</span><span class="s2">&quot;/apps/iot-stream:sensor-binary&quot;</span><span class="p">,</span><span class="nt">&quot;partition&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">&quot;offset&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+</span><span class='line'><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Delete consumer instances</h3>
+
+<p>As mentioned before the consumer will be destroyed automatically based on the <code>consumer.instance.timeout.ms</code> configuration of the REST Proxy;
+it is also possible to destroyed the instance using the consumer instance URI and an HTTP DELETE call, as follow:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">curl</span> <span class="err">-X</span> <span class="err">DELETE</span> <span class="err">http://localhost:</span><span class="mi">8082</span><span class="err">/consumers/%</span><span class="mi">2</span><span class="err">Fapps%</span><span class="mi">2</span><span class="err">Fiot-stream%</span><span class="mi">3</span><span class="err">Asensor-binary/instances/iot_binary_consumer</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to use the Kafka REST Proxy for MapR Streams that allow any application to
+use messages published in the MapR Converged Data Platform.</p>
+
+<p>You can find more information about the Kafka REST Proxy in the <a href="http://maprdocs.mapr.com/home/Kafka/REST-proxy.html">MapR documentation</a> and the following resources:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">Getting Started with MapR Streams</a></li>
+<li><a href="https://www.mapr.com/streaming-architecture-using-apache-kafka-mapr-streams">&ldquo;Streaming Architecture: New Designs Using Apache Kafka and MapR Streams&rdquo; ebook by Ted Dunning and Ellen Friedman</a></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2017-01-20T10:31:22+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:31 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/kafka/'>kafka</a>, <a class='category' href='/blog/categories/mapr/'>mapr</a>, <a class='category' href='/blog/categories/rest/'>rest</a>, <a class='category' href='/blog/categories/streaming/'>streaming</a>, <a class='category' href='/blog/categories/streams/'>streams</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2017/01/02/getting-started-with-mqtt/" title="Previous Post: Getting Started with MQTT and Java">&laquo; Getting Started with MQTT and Java</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/" title="Next Post: Getting started with MapR-DB Table Replication">Getting started with MapR-DB Table Replication &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/';
+        var disqus_url = 'http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

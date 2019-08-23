@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Conference | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/conference/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[SAP Cloud Inside : Build and Run Applications in the Cloud]]></title>
+    <link href="http://tgrall.github.io/blog/2012/02/19/sap-cloud-inside-build-and-run-applications-in-the-cloud/"/>
+    <updated>2012-02-19T23:56:56+01:00</updated>
+    <id>http://tgrall.github.io/blog/2012/02/19/sap-cloud-inside-build-and-run-applications-in-the-cloud</id>
+    <content type="html"><![CDATA[<p>Last week I was invited to present eXo Cloud IDE during the SAP Cloud Inside. This SAP Community event was a great opportunity to discuss about the cloud with an interesting point of view: the impact of the cloud for SAP customers (especially administrators and developers).</p>
+
+<p>During this presentation I have introduced the <a href="http://www.cloud-ide.com/">eXo Cloud IDE</a>, and I did a demonstration in which O have built and deployed applications : Open Social Gadgets, Ruby on Rails and Java/Spring, and explain how it could be extended to SAP business services.</p>
+
+<p>Here the slides that I have used during this presentation:</p>
+
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/95672 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
+
+<p><strong><a href="http://www.slideshare.net/tgrall/sap-cloud-inside-develop-and-deploy-on-the-cloud" title="SAP Cloud Inside : Develop and Run on the Cloud">SAP Cloud Inside : Develop and Run on the Cloud</a></strong></p>
+
+<p>Remember that you can register yourself to the <a href="http://www.cloud-ide.com/">eXo Cloud IDE</a> Service and start develop application from your browser.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[NantesJUG: Next Meeting Friday November 13th About 'Google Technologies']]></title>
+    <link href="http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/"/>
+    <updated>2009-11-08T22:27:15+01:00</updated>
+    <id>http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2">http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2</a>&#8221;></p>
+
+<p>This Friday , the Nantes JUG is pleased to organize a conference about &ldquo;Google Technologies&rdquo;. Didier Girard, <a href="http://twitter.com/dgirard">http://twitter.com/dgirard</a> , will be presenting and demoing cool stuff from Google:</p>
+
+<ul>
+<li>GWT 2</li>
+<li>Android</li>
+<li>Wave</li>
+<li>App Engine</li>
+</ul>
+
+
+<p>Want to come? Register for free <a href="http://jugevents.jugpadova.it/jugevents/event/registration.form?event.id=20744">here</a></p>
+
+<p>The event will occur at the &ldquo;<a href="http://maps.google.com/maps?f=q&amp;amp;source=s_q&amp;amp;hl=en&amp;amp;geocode=&amp;amp;q=ecole+des+mines+de+nantes&amp;amp;sll=47.176415,-1.340556&amp;amp;sspn=0.078063,0.181103&amp;amp;ie=UTF8&amp;amp;hq=%C3%89cole+des+mines+de+Nantes&amp;amp;hnear=%C3%89cole+des+mines+de+Nantes,+France&amp;amp;ll=47.283363,-1.520834&amp;amp;spn=0.019476,0.045276&amp;amp;t=h&amp;amp;z=15&amp;amp;iwloc=near">Ecole des Mines de Nantes</a>&rdquo; one of our sponsor from 7 to 9 pm.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[USI2009: The Geek and Boss French Conference]]></title>
+    <link href="http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/"/>
+    <updated>2009-07-08T08:53:57+02:00</updated>
+    <id>http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference</id>
+    <content type="html"><![CDATA[<p>This year I was lucky enough to have a presentation at the second edition of the &ldquo;<a href="http://www.universite-du-si.com/">Université du SI</a>&rdquo;, organized by <a href="http://octo.com/">Octo Technologies</a>. I have to say that this conference is one of the best that I have attended, for sure it is the best in France. Unfortunately I was only able to attend the first day of the conference, but even in one day, I was very happy with the content of the presentations, keynotes, and networking opportunities.</p>
+
+<p>I won&rsquo;t go in details in all the presentations that I have seen, Google for the Enterprise, Application Server Future, Usability concerns, and keynotes. If you want to have a good feedback about this conference I invite you to read, in French, the reports from <a href="http://www.touilleur-express.fr/tag/usi/">Le Touilleur Express</a>.</p>
+
+<p>Let me just share the presentation that I gave with <a href="http://massol.net/">Vincent Massol</a> from <a href="http://www.xwiki.com/">XWiki</a>, about CMS vs Wiki.</p>
+
+<p><strong>Wiki vs CMS duel</strong></p>
+
+<p>First of all, the room was packed, so it looks like it is an interesting subject for many of you, so do not hesitate to post comments or question on this entry. Vincent and I will be pleased to update our presentation for a new event.</p>
+
+<p>The main message of the talk was:</p>
+
+<ul>
+<li><strong>For collaboration on content</strong> the wiki is king</li>
+<li><strong>For publication of content</strong> the CMS is king</li>
+</ul>
+
+
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1678352 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> 
+<a href="http://www.slideshare.net/tgrall/wiki-vs-cms-1678352" title="Wiki vs CMS ">Wiki vs CMS </a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Conference Season for eXo Platform in Paris]]></title>
+    <link href="http://tgrall.github.io/blog/2009/03/30/conference-season-for-exo-platform-in-paris/"/>
+    <updated>2009-03-30T01:03:00+01:00</updated>
+    <id>http://tgrall.github.io/blog/2009/03/30/conference-season-for-exo-platform-in-paris</id>
+    <content type="html"><![CDATA[<p>eXo Platform, and I, will be present in conferences in the upcoming weeks:</p>
+
+<ul>
+<li><a href="http://www.solutionslinux.fr/">Linux Solutions</a>, March 31st - April 2nd : In addition to the demonstration pod where you can meet eXo people, I am inviting you to joing us during the <a href="http://www.ow2.org/view/Events2009AnnualConference/">OW2 Annual Conference</a> presentations:
+
+<ul>
+<li>Next generation Portals: how OpenSocial standard adds social to the mix (April 2, 01:30 - 02:00)</li>
+<li>Which Portlet Bridge is made for you? (April 2, 02:00 - 02:30)</li>
+</ul>
+</li>
+</ul>
+
+
+<p>You can find the <a href="http://www.ow2.org/view/Events2009AnnualConference/Sessions">full program here</a>.</p>
+
+<ul>
+<li><a href="http://www.salon-intranet.com/">Salon Intranet</a>, May 12th,13th : Once again, eXo will be present with a demonstration pod, but also come to meet eXo CEO, Benjamin Mestrallet and myself during the &ldquo;eXo Platform, the Open Source solution for your Intranet&rdquo; on May 12th from 3pm-4pm.</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaOne 2008: Groovy and Grails Presentations and Code]]></title>
+    <link href="http://tgrall.github.io/blog/2008/05/16/javaone-2008-groovy-and-grails-presentations-and-code/"/>
+    <updated>2008-05-16T12:47:00+02:00</updated>
+    <id>http://tgrall.github.io/blog/2008/05/16/javaone-2008-groovy-and-grails-presentations-and-code</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a>&#8220;>Andres and Guillaume have posted on the Groovy Users list the pointers to many (if not all) the Groovy and Grails sessions of JavaOne 2008&hellip; You want to learn more, this is a great opportunity to do it so:</p>
+
+<ul>
+<li><a href="http://permalink.gmane.org/gmane.comp.lang.groovy.user/32891">JavaOne 2008: Groovy and Grails presentations and code</a></li>
+</ul>
+
+
+<p>Thanks to all of the authors&hellip; I would love to be there watching these session live&hellip; This post is the opportunity also to point you to this video from InfoQ of <a href="http://www.infoq.com/presentations/rudolph-grails-intro">Jason Rudolph doing a very nice introduction to Grails</a> during last year QCon conference&hellip;</p>
+]]></content>
+  </entry>
+  
+</feed>

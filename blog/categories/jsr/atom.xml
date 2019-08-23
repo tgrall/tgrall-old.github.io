@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Jsr | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/jsr/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[JSR 223: Public Review of the Specification]]></title>
+    <link href="http://tgrall.github.io/blog/2005/02/08/jsr-223-public-review-of-the-specification/"/>
+    <updated>2005-02-08T19:34:27+01:00</updated>
+    <id>http://tgrall.github.io/blog/2005/02/08/jsr-223-public-review-of-the-specification</id>
+    <content type="html"><![CDATA[<p>The JSR 223: Scripting for the Java Platform is now open for public review until March 28th.</p>
+
+<p>If you are not familiar with it, the JSR 223 main goal is to define how the Java platform should integrate with scripting languages. It defines a standard API similar to <a href="http://jakarta.apache.org/bsf/">Bean Scripting Framework</a>.</p>
+
+<p>You can dowlnoad the spec from the <a href="http://jcp.org/en/jsr/detail?id=223">JCP Web Site</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

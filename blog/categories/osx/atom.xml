@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Osx | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/osx/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Installing Memcached on Mac OS X and Using It in Java]]></title>
+    <link href="http://tgrall.github.io/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/"/>
+    <updated>2011-11-20T07:12:21+01:00</updated>
+    <id>http://tgrall.github.io/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java</id>
+    <content type="html"><![CDATA[<h3>Introduction</h3>
+
+<p>In this article I will explain how you can:</p>
+
+<ol>
+<li>Install and Configure Memcached on Mac OS X</li>
+<li>Use Memcached in your Java Application</li>
+</ol>
+
+
+<p>I won&rsquo;t go in too much detail about the benefits of using a distributed cache in your applications, but let&rsquo;s at least provide some use cases for applications that are running in the context of an enterprise portal, eXo Platform in my case - <em>surprising isn&rsquo;t?</em> And I will show this in another post.</p>
+
+<p>We have many reasons to use a cache (distributed or not), in the context of enterprise portal, let&rsquo;s take a look to some of these reasons:</p>
+
+<ul>
+<li>A portal is used to aggregate data in a single page. These data could come from different sources : Web Services, Database, ERP, &hellip;.. and accessing the data in real time could be costly. So it will be quite interesting to cache the result of the call when possible.</li>
+<li>If the portal is used to aggregate many data from many sources, it is sometime necessary to jump into another application to continue some operation. A distributed and shared cache could be used to manage some context between different applications running in different processes (JVM or even technologies)
+These are two example where a shared cache could be interesting for your portal based applications, we can find many other reason.</li>
+</ul>
+
+
+<p>Note that the Portlet API (JSR-286) contains already a cache mechanism that cache the HTML fragment, and that eXo Platform also provide a <a href="http://docs.jboss.org/exojcr/1.14.0-CR4/developer/en-US/html/ch-cache.html">low level cache</a>, based on <a href="http://www.jboss.org/jbosscache">JBoss Cache</a>.</p>
+
+<!-- more -->
+
+
+<h3>Installation and Configuration</h3>
+
+<p><strong>Installing Memcached from sources</strong></p>
+
+<p>You can find some information about Memcached installation on the Memcached <a href="http://code.google.com/p/memcached/wiki/NewStart">Wiki</a>. The following steps are the steps that I have used on my environment.</p>
+
+<p>As far as I know, Memached is not available as package for Mac OS X. I am still on Snow Leopard (10.6.8), and I have installed XCode and all development tools. I have use the article &ldquo;Installing memcached 1.4.1 on Mac OS X 10.6 Snow Leopard&rdquo; from <a href="https://wincent.com/wiki/Installing_memcached_1.4.1_on_Mac_OS_X_10.6_Snow_Leopard">wincent.com</a>. For simplicity reason I have duplicate the content and updated to the latest releases.</p>
+
+<p>1- Create a working directory :</p>
+
+<pre><code class="sh">$ mkdir memcachedbuild
+$ cd memcachebuild
+</code></pre>
+
+<p>2- Install <a href="http://libevent.org/">libevent</a> that is mandatory for memcached</p>
+
+<pre><code class="sh">$ curl -O http://www.monkey.org/~provos/libevent-1.4.14-stable.tar.gz
+$ tar xzvf libevent-1.4.14-stable.tar.gz
+$ cd libevent-1.4.14-stable
+$ ./configure
+$ make
+$ make verify
+$ sudo make install&amp;nbsp;
+</code></pre>
+
+<p>3- Install memcached</p>
+
+<p>Go back to your install directory (<em>memcachedbuild</em>)</p>
+
+<pre><code class="sh">$ curl -O http://memcached.googlecode.com/files/memcached-1.4.10.tar.gz
+$ tar xzvf memcached-1.4.10.tar.gz
+$ cd memcached-1.4.10
+$ ./configure
+$ make
+$ make test
+$ sudo make install
+</code></pre>
+
+<p>You are now ready to use memcached that is available at <code>/usr/local/bin/memcached</code>.</p>
+
+<p>This allows you to avoid changing to the pre-installed memcached located in /usr/bin, if you want to replace it instead of having you own install, just run the configure command with the following parameter: <code>./configure --prefix=/usr</code></p>
+
+<p><strong>Starting and testing Memcached</strong></p>
+
+<p>Start the memcached server, using the following command line:</p>
+
+<pre><code class="sh">$ /usr/local/bin/memcached -d -p 11211
+</code></pre>
+
+<p>This command starts the memcached server as demon (-d parameter), on the TCP port 11211 (this is the default value). You can find more about the memcached command using <code>man memcached</code>.</p>
+
+<p>It is possible to connect and test your server using a telnet connection. Once connected you can set and get object in the cache, take a look to the following paragraph.</p>
+
+<pre><code class="sh">$ telnet 127.0.0.1 11211
+Trying 127.0.0.1...
+Connected to tgrall-server.
+Escape character is '^]'.
+set KEY 0 600 16
+This is my value
+STORED
+get KEY
+VALUE KEY 0 16
+This is my value
+END
+</code></pre>
+
+<p>The <code>set</code> command allows you to put a new value in the cache using the following syntax:</p>
+
+<pre><code class="sh">set &lt;key&gt;  &lt;flags&gt; &lt;expiration_time&gt;  &lt;number_of_bytes&gt; [noreply] \n\n
+
+&lt;value&gt;
+</code></pre>
+
+<ul>
+<li>key : the key used to store the data in the cache</li>
+<li>flags : a 32 bits unsigned integer that memcached stored with the data</li>
+<li>expiration_time : expiration time in seconds, if you put 0 this means no delay</li>
+<li>number_if_bytes : number of bytes in the data block</li>
+<li>noreply : option to tell the server to not return any value</li>
+<li>value : the value to store and associate to the key.</li>
+</ul>
+
+
+<p>This is a short view of the documentation located in your source directory <code>/memcachedbuild/memcached-1.4.10/doc/protocol.txt</code>.</p>
+
+<p>The <code>get</code> command allows you to access the value that is associated with the key.</p>
+
+<p>You can check the version of memcahed you are running by calling the <code>stats</code> command in your telnet session.</p>
+
+<p>Your memcached server is up and running, you can now start to use it inside your applications.</p>
+
+<h3>Simple Java Application with Memcached</h3>
+
+<p>The easiest way to use memcached from your Java applications is to use a client library. You can find many <a href="http://code.google.com/p/memcached/wiki/Clients#Java">client libraries</a>. In this example I am using <a href="http://code.google.com/p/spymemcached/">spymemcached</a> developped by the people from <a href="http://www.couchbase.com/">Couchbase</a>.</p>
+
+<p>1- Adding SpyMemcached to your Maven project</p>
+
+<p>Add the repository to you pom.xml (or you setting.xml)</p>
+
+<pre><code class="xml">&lt;repository&gt;
+  &lt;id&gt;spy&lt;/id&gt;
+  &lt;name&gt;Spy Repository&lt;/name&gt;
+  &lt;layout&gt;default&lt;/layout&gt;
+  &lt;url&gt;http://files.couchbase.com/maven2/&lt;/url&gt;
+&lt;/repository&gt;
+</code></pre>
+
+<p>then the dependency to your pom.xml</p>
+
+<pre><code class="xml">&lt;dependency&gt;
+  &lt;groupid&gt;spy&lt;/groupid&gt;
+  &lt;artifactid&gt;spymemcached&lt;/artifactid&gt;
+  &lt;version&gt;2.7.3&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>2- Use SpyMemcache client in your application</p>
+
+<p>The following code is a simple Java class that allows you to enter the key and the value and set it in the cache.</p>
+
+<pre><code class="java">package com.grallandco.blog;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Console;
+import java.io.InputStreamReader;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.spy.memcached.AddrUtil;
+import net.spy.memcached.MemcachedClient;
+
+public class Test {
+
+  public static void main(String[] args) {
+    try {
+
+      System.out.print("Enter the new key : ");
+      BufferedReader reader = new BufferedReader( new InputStreamReader(System.in));
+      String key = null;
+      key = reader.readLine();
+
+      System.out.print("Enter the new value : ");
+      String value = null;
+      value = reader.readLine();
+
+      MemcachedClient cache = new MemcachedClient(AddrUtil.getAddresses("127.0.0.1:11211"));
+
+      // read the object from memory
+      System.out.println("Get Object before set :"+ cache.get(key)  );
+
+      // set a new object
+      cache.set(key, 0, value );
+
+      System.out.println("Get Object after set :"+ cache.get(key)  );
+
+
+    } catch (IOException ex) {
+      Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+      System.exit(0);
+    }
+
+
+    System.exit(0);
+
+  }
+}
+</code></pre>
+
+<p>So when executing the application you will see something like :</p>
+
+<pre><code class="sh">Enter the new key : CITY
+Enter the new value : Paris, France
+2011-11-16 15:22:09.928 INFO net.spy.memcached.MemcachedConnection:  Added {QA sa=/127.0.0.1:11211, #Rops=0, #Wops=0, #iq=0, topRop=null, topWop=null, toWrite=0, interested=0} to connect queue
+2011-11-16 15:22:09.932 INFO net.spy.memcached.MemcachedConnection:  Connection state changed for sun.nio.ch.SelectionKeyImpl@5b40c281
+Get Object before set :null
+Get Object after set :Paris, France
+</code></pre>
+
+<p>You can also access the object from a Telnet session:</p>
+
+<pre><code class="sh">get CITY
+VALUE CITY 0 13
+Paris, France
+END
+</code></pre>
+
+<p>You can use any Java class in your application, the only thing to do is to make this class serializable.</p>
+
+<p>This is it for the first post about memcached and Java,&nbsp; I am currently working on a small example integrating Web Services call, Portlets and memcached.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[What Apple’s Announcement Really Means to Java Developers]]></title>
+    <link href="http://tgrall.github.io/blog/2010/10/29/what-apples-announcement-really-means-to-java-developers/"/>
+    <updated>2010-10-29T09:29:53+02:00</updated>
+    <id>http://tgrall.github.io/blog/2010/10/29/what-apples-announcement-really-means-to-java-developers</id>
+    <content type="html"><![CDATA[<p>Hey Steve, keep the bean in the Apple!</p>
+
+<p>The <a href="http://www.infoq.com/news/2010/10/apple-deprecates-java">news from last week</a> that grabbed the attention of many Java developers was Apple’s announcement of <a href="http://developer.apple.com/library/mac/#releasenotes/Java/JavaSnowLeopardUpdate3LeopardUpdate8RN/Introduction/Introduction.html">its intentions to deprecate Java in the latest OS X 10.6 update</a>. One sentence stood out in particular, “Developers should not rely on the Apple-supplied Java runtime being present in future versions of Mac OS X,” and raised the question: should Java developers (many of whom, like me, develop on Macs) freak out?</p>
+
+<p>I don’t think so. (Though it prompted additional speculation and <a href="http://gigaom.com/2010/10/26/java-is-under-siege-will-oracle-let-it-burn/">follow-on news stories</a>.)</p>
+
+<p>Let’s be realistic. Most applications run on the server side, on Unix/Linux and/or Windows Server – which has nothing to do with Apple or Mac OS X. And more and more applications are running on the cloud, where the language isn’t necessarily irrelevant, but certainly less important than the services that the application exposes. And I’m sure Java will have a big role in ‘development in the cloud,’ as we can already see with Google AppEngine and the VMWare/SpringSource effort.</p>
+
+<p>I think the more interesting question to ask is “Why did Apple do this?”</p>
+
+<p>I believe this is related Apple’s other big news last week: the new “Mac App Store,” which looks like an effort to have one single technology and language to develop “official” applications for Mac. In fact, for all Apple platforms running OS X and iOS, developers should use X Code and Objective C. That’s fine with me, as I enjoy developing small apps for my iPhone and iPad in my spare time, using these tools. But at eXo, many of our developers are using Java, often on Macs, to build our software.</p>
+
+<p>We’re not talking about the same kind of applications. If, in the future, Java does not exist on Macs, it will not cause enterprise developers to abandon Java, but simply force them to move away from their Macs. Personally, I don’t want that to happen. I switched to Mac in 2001, and I’ve been a big fan of all Apple products ever since (most of my extended family are now also on Macs, and they couldn’t care less about Java).</p>
+
+<p>As a Java developer, do I switch back to PC now? Unlikely. I am very confident (overconfident?) that Java will still be present on OS X. The difference is that Apple will simply stop caring about it &ndash; the same way that Microsoft doesn’t care now. I cannot believe that Apple will stop/block Java on their platform. So the future of Java in general, and now on Mac, is fully under the control of the Java community, driven by Oracle and OpenJDK.  I am sure we will find many skilled “MacAddicts” to maintain and improve Java on OS X, to at least allow Java developers to run their favorite IDE and test their applications before deploying them on the servers &ndash; keeping the “Write Once, Run Anywhere” a reality (almost&hellip;). The only “bad” part is the fact that “Java Desktop” will not borrow any of the cool features of Apple Mac OS X. Not a big deal, since Java Desktop has never been that successful anyway.</p>
+
+<p>So my advice to fellow Java developers is this: if you care, be vocal.  Let’s make sure Apple lets the community drive the future of Java on Mac, since the future of the Java platform is still very exciting for many of us.</p>
+
+<p>Original Post on&nbsp;<a href="http://blog.exoplatform.org/2010/10/29/what-apples-announcement-really-means-to-java-developers/">eXo Blog</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Your Built-In iSight With Parallels (and VMWare)]]></title>
+    <link href="http://tgrall.github.io/blog/2007/06/05/using-your-built-in-isight-with-parallels-and-vmware/"/>
+    <updated>2007-06-05T00:24:27+02:00</updated>
+    <id>http://tgrall.github.io/blog/2007/06/05/using-your-built-in-isight-with-parallels-and-vmware</id>
+    <content type="html"><![CDATA[<p>It is probably an old tipe, but I have just configured my Windows XP Parallels VMs
+to use my MacBook buit-in iSight Web Cam using the driver that you can find here:
+- <a href="http://www.maconlysource.com/?p=885">Download iSight Driver for XP</a></p>
+
+<p>The site states that it does not work with Parallels, but I am using the release Build 3170 RC3 and I do not have any issue.</p>
+
+<ol>
+<li>Start your VM</li>
+<li><p>Download the Driver &amp; Unip zip</p></li>
+<li><p>Grab the Built-In iSight using the Devices > USB  menu</p></li>
+<li><p>Point the Windows Devices Manager Installer to the location of the Unzipped folder</p></li>
+<li>and you are done&hellip;</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Apple Released Beta Version of Dashcode]]></title>
+    <link href="http://tgrall.github.io/blog/2007/01/22/apple-released-beta-version-of-dashcode/"/>
+    <updated>2007-01-22T15:02:46+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/01/22/apple-released-beta-version-of-dashcode</id>
+    <content type="html"><![CDATA[<p>Dashcode is a new application for developing Dashboard widgets coming in Mac OS X 10.5 (Leopard).  This tools is already available as developer preview on Tiger.</p>
+
+<p>I have installed it and it is really great, easy to use, helping you to create good looking widgets. As usual, like all the Apple development tools it is really intuitive. More than a long blog entry on this I am just pointing you to the DashCode page on the Apple site:</p>
+
+<ul>
+<li><a href="http://developer.apple.com/tools/dashcode/">Dashcode</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Oracle Data Integrator on Mac OS X]]></title>
+    <link href="http://tgrall.github.io/blog/2007/01/18/using-oracle-data-integrator-on-mac-os-x/"/>
+    <updated>2007-01-18T20:58:13+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/01/18/using-oracle-data-integrator-on-mac-os-x</id>
+    <content type="html"><![CDATA[<p>Oracle just released on OTN a new product &ldquo;<a href="http://www.oracle.com/technology/products/oracle-data-integrator/index.html">Oracle Data Integrator</a>&rdquo; (ODI), I wanted
+to quickly take a look to the product, so I have downloaded it and
+installed it on my Mac. This product is a 100% Java based solution that
+you can quickly installed on mac following these steps:</p>
+
+<p>1- Download and unzip ODI from <a href="http://www.oracle.com/technology/software/products/ias/htdocs/101310.html">OTN download page</a> (bottom).</p>
+
+<p>2- Open a terminal Window and go to the folder where you have unzipped
+ODI, you should have the following content:</p>
+
+<pre><code>- external
+- index.htm
+- oracledi
+- oracledilwd
+- oracledimn
+- setup
+</code></pre>
+
+<p>Open the index.html and select the Getting Started Guide, this will
+help you to learn more about ODI using a comprehensive scenario.</p>
+
+<p>3- Setup the environment variables:</p>
+
+<pre><code>export ODI_JAVA_HOME=/Library/Java/Home/   (need to be Java 5)
+
+export ODI_HOME=&lt;path to ODI installation folder&gt;/odi/oracled
+</code></pre>
+
+<p>4- Go to the <code>$ODI_HOME/bin</code></p>
+
+<pre><code>cd $ODI_HOME/bin
+</code></pre>
+
+<p>5- Start the HSQL databases that contain the sample application and data:</p>
+
+<pre><code>./startdemo.sh &amp;
+</code></pre>
+
+<p>This command starts 3 different instances: repo (metadata repository), src (source db), trg (target db) that are used in the Getting Started guide. To stop the DB run the script <code>./stopdemo.sh</code>.</p>
+
+<p>6- You can now start the designer too using the command:</p>
+
+<pre><code>./designer.sh &amp;
+</code></pre>
+
+<p>Select the Getting Started project and when you are in the designer switch to the Mac OS X look and feel ;-), using the Menu &ldquo;Look And Feel &gt; Standard &gt; Mac OS X&rdquo;.</p>
+
+<p><img class="<a" src="href="http://farm1.static.flickr.com/139/361446290_8481172875_o.png">http://farm1.static.flickr.com/139/361446290_8481172875_o.png</a>&#8221;></p>
+
+<p>These are the first steps to start with Oracle Data Integrator, you can now follow the Getting Started Guide, to learm more about the product, and since your environment is set you can run any of the command documented in this guide.</p>
+]]></content>
+  </entry>
+  
+</feed>

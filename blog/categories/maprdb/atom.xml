@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Maprdb | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/maprdb/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR-DB JSON REST API]]></title>
+    <link href="http://tgrall.github.io/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/"/>
+    <updated>2018-04-23T14:37:51+02:00</updated>
+    <id>http://tgrall.github.io/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>In this project you will learn how to use the MapR-DB JSON REST API to:</p>
+
+<p>Create and Delete tables
+Create, Read, Update and Delete documents (CRUD)
+MapR Extension Package 5.0 (MEP) introduced the MapR-DB JSON REST API that allow application to use REST to interact with MapR-DB JSON.</p>
+
+<p>You can find information about the MapR-DB JSON REST API in the documentation: <a href="https://maprdocs.mapr.com/home/MapR-DB/JSON_DB/UsingMapRDBJSONRESTAPI.html">Using the MapR-DB JSON REST API</a></p>
+
+<!-- more -->
+
+
+<h2>Prerequisites</h2>
+
+<p>You system should have the following components:</p>
+
+<ul>
+<li>A running MapR 6.0.1 &amp; MEP 5.0 cluster with the MapR-DB REST API service installed</li>
+<li><code>curl</code> or equivalent tool</li>
+</ul>
+
+
+<h2>Discover the MapR-DB JSON REST API</h2>
+
+<p>The easiest way to discover it, is to use curl command (or equivalent).</p>
+
+<p><strong>1 - Create a table</strong></p>
+
+<pre><code>curl -X PUT \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the MapR-DB REST Service (MapR Data Access Gateway) is running on the mapr-node host with the default port <code>8243</code> using HTTPS</li>
+<li>the HTTP verb <code>PUT</code> on <code>/api/v2/table/</code> endoint creates a new table</li>
+<li>the protocol is HTTP since HTTPS is not enabled on this cluster</li>
+<li>the new table will be created wit the path <code>/apps/emp</code> that is encoded to <code>%2Fapps%2Femp</code></li>
+<li>the user <code>root</code> with the password <code>mapr</code> is used for authentication, using basic authentication</li>
+<li>the <code>-k</code> parameter is used to indicate to turn off curl’s verification of the certificate.</li>
+</ul>
+
+
+<p>In this example, you use the basic authentication, it is also possible to use <a href="https://jwt.io/introduction/">JSON Web Token</a>. You will learn more about this when you will write an application in Go.</p>
+
+<p><strong>2 - Insert Documents</strong></p>
+
+<p>Insert one document</p>
+
+<pre><code>curl -X POST \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -H 'Content-Type: application/json' \
+  -d '{"_id":"user001","first_name":"John","last_name":"Doe", "age" : 28}' \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the <code>/api/v2/table/{path}</code> with the verb <code>GET</code> is used with a <code>condition</code> query parameter</li>
+<li>the OJAI JSON syntax is used to express the condition: <code>{"$eq":{"last_name":"Doe"}}</code></li>
+</ul>
+
+
+<p><strong>3 - Update a document</strong></p>
+
+<p>The following example will increment the age by 1 and update the last name.</p>
+
+<pre><code>curl -X POST \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -H 'Content-Type: application/json' \
+  -d '{"$set" : {"last_name" : "New Doe"}, "$increment" : {"age":1}}' \
+  -k
+</code></pre>
+
+<p>In this comamnd:</p>
+
+<ul>
+<li>the URL points to the document <code>_id</code> to update</li>
+<li>the HTTP verb <code>POST</code> is used to modify the resource</li>
+<li>the request body <code>-d</code> is the OJAI JSON Mutation that update the last name and increment the age.</li>
+</ul>
+
+
+<p>You can check that the document has been updated using the following command:</p>
+
+<pre><code>curl -X GET \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p><strong>4 - Delete a document</strong></p>
+
+<p>Delete the document with the <code>_id</code> user001.</p>
+
+<pre><code>curl -X DELETE \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp%2F/document/user001' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<p>In this command:</p>
+
+<ul>
+<li>the URI <code>/api/v2/table/{path}/document/{id}</code> with the HTTP verb <code>DELETE</code> is used to delete the document</li>
+</ul>
+
+
+<p><strong>5 - Delete the MapR-DB JSON table</strong></p>
+
+<p>The last step of this tutorial is to delete the table using the following command:</p>
+
+<pre><code>curl -X DELETE \
+  'https://mapr-node:8243/api/v2/table/%2Fapps%2Femp' \
+  -u root:mapr \
+  -k
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial you have learned how to use the MapR-DB JSON REST API to:</p>
+
+<ul>
+<li>Create a table</li>
+<li>Insert and query documents</li>
+<li>Update and delete documents</li>
+<li>Drop table</li>
+</ul>
+
+
+<p>You can now use the API to create MapR-DB JSON Application using your favorite language.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR-DB Table Replication]]></title>
+    <link href="http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication/"/>
+    <updated>2017-08-08T10:01:19+02:00</updated>
+    <id>http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>MapR-DB Table Replication allows data to be replicated to another table that could be on on the same cluster or in another cluster. This is different from the automatic and intra-cluster replication that copies the data into different physical nodes for high availability and prevent data loss.</p>
+
+<p>This tutorial focuses on the MapR-DB Table Replication that replicates data between tables on different clusters.</p>
+
+<p>Replicating data between different clusters allows you to:</p>
+
+<ul>
+<li>provide another level of disaster recovery that protects your data and applications against global data center failure,</li>
+<li>push data close to the applications and users,</li>
+<li>aggregate the data from mutliple datacenters.</li>
+</ul>
+
+
+<p><strong>Replication Topologies</strong></p>
+
+<p>MapR-DB Table Replication provides various topologies to adapt the replication to the business and technical requirements:</p>
+
+<ul>
+<li><em>Master-slave replication</em> : in this topology, you replicate one way from source tables to replicas. The replicas can be in a remote cluster or in the cluster where the source tables are located.</li>
+<li><em>Multi-Master replication</em> : in this replication topology, there are two master-slave relationships, with each table playing both the role of a master and a slave. Client applications update both tables and each table replicates updates to the other.</li>
+</ul>
+
+
+<p>In this example you will learn how to setup multi-master replication.</p>
+
+<!-- more -->
+
+
+<h3>Prerequisites</h3>
+
+<ul>
+<li>2 MapR Clusters 5.x with Enterprise Edition license
+
+<ul>
+<li>in this demonstration they are called <code>cluster1</code> and <code>cluster2</code></li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Setting Up Replication</h2>
+
+<p>In the next steps you will configure your clusters to enable mutip-master replication as follow:</p>
+
+<p><img src="http://tgrall.github.io/images/posts/maprdb-replication/replication.png" alt="Architecture" /></p>
+
+<h3>Configuring the clusters</h3>
+
+<p>Each node of the source cluster must communicate with the destination cluster&rsquo;s CLDB nodes. On each node of your source cluster edit the <code>mapr-clusters.conf</code> file and add the destination cluster information.</p>
+
+<p><em>Cluster 1 Configuration</em></p>
+
+<p>In all the nodes of <code>cluster1</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster2</code> configuration. The file should look like the following:</p>
+
+<pre><code>cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
+
+cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
+</code></pre>
+
+<p><em>Cluster 2 Configuration</em></p>
+
+<p>In all the nodes of <code>cluster2</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster1</code> configuration. The file should look like the following:</p>
+
+<pre><code>cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
+
+cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
+</code></pre>
+
+<p>You can find information about the <code>mapr-clusters.conf</code> format in <a href="http://maprdocs.mapr.com/home/ReferenceGuide/mapr-clusters.conf.html">the documentation</a>.</p>
+
+<p>Open a terminal window on one of the <code>cluster1</code> node using <code>mapr</code> user, and do the following:</p>
+
+<pre><code>$ ls /mapr/cluster1/
+apps   hbase  installer  opt  tmp  user  var
+
+$ ls /mapr/cluster2/
+apps   hbase  installer  opt  tmp  user  var
+</code></pre>
+
+<h3>Installing and Configuring the MapR Gateway</h3>
+
+<p>A MapR gateway mediates one-way communication between a source MapR cluster and a destination MapR cluster. In this example you will use mult-master replication, this means that data will be replicated from <code>cluster1</code> to <code>cluster2</code> and from <code>cluster2</code> to <code>cluster1</code>.</p>
+
+<p>The good practice is to install the MapR-Gateway to the destination cluster, so in our case let&rsquo;s install one gateway on one of the <code>cluster1</code> node, and one gateway on one of the <code>cluster2</code> node. Note that this configuration will not be highly available, and usually you will deploy more than 1 gateway by cluster.</p>
+
+<h4>Installing the MapR-Gateway</h4>
+
+<p>As root on one node of the <code>cluster1</code>, adapt the command to your linux environment, for example on the node <code>cluster1-node2</code></p>
+
+<pre><code>$ yum install mapr-gateway
+
+
+# Update MapR configuration
+$ /opt/mapr/server/configure.sh -N cluster1 -C cluster1-node1:7222,cluster1-node2:7222,cluster1-node3:7222 -R
+</code></pre>
+
+<p>Do the same on <code>cluster2</code>, for example on the node <code>cluster2-node2</code>:</p>
+
+<pre><code>$ yum install mapr-gateway
+
+
+# Update MapR configuration
+$ /opt/mapr/server/configure.sh -N cluster1 -C cluster2-node1:7222,cluster2-node2:7222,cluster2-node3:7222 -R
+</code></pre>
+
+<h4>Registering the Gateway to the Clusters</h4>
+
+<p>Now that we have a gateway running on each cluster, you have to <strong><em>register the gateway</em></strong> in each cluster.</p>
+
+<p>On <code>cluster1</code> run the following command to register the <code>cluster2</code> gateway as destination:</p>
+
+<pre><code>$ maprcli cluster gateway set -dstcluster cluster2 -gateways cluster2-node2
+
+# Check the configuration
+$ maprcli cluster gateway list
+</code></pre>
+
+<p>On <code>cluster2</code> run the following command to register the <code>cluster1</code> gateway as destination:</p>
+
+<pre><code>$ maprcli cluster gateway set -dstcluster cluster1 -gateways cluster1-node2
+
+# Check the configuration
+$ maprcli cluster gateway list
+</code></pre>
+
+<h3>Creating Table with Replication</h3>
+
+<p>In a terminal window, as <code>mapr</code> user on <code>cluster1</code>, create a table and insert documents:</p>
+
+<pre><code>$ maprcli table create -path /apps/user_profiles  -tabletype json
+</code></pre>
+
+<p>This create a new JSON table; it is also possible to use <code>/mapr/cluster1/apps/user_profiles</code>.</p>
+
+<p>Let&rsquo;s now add documents using MapR-DB Shell:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user001" , "first_name":"John", "last_name":"Doe"}'
+
+maprdb mapr:&gt; find /apps/user_profiles
+</code></pre>
+
+<h4>Adding Table Replication</h4>
+
+<p>Let&rsquo;s now enable replication between <code>user_profiles</code> on <code>cluster1</code> to a <code>user_profiles</code> table in <code>cluster2</code>.</p>
+
+<p>In <code>cluster1</code>, on a terminal window as <code>mapr</code> run the following command:</p>
+
+<pre><code>$ maprcli table replica autosetup -path /apps/user_profiles -replica /mapr/cluster2/apps/user_profiles -multimaster yes
+</code></pre>
+
+<p>You can get information about the replication configuration for the table using the following command:</p>
+
+<pre><code>$ maprcli table replica list -path /apps/user_profiles -json
+</code></pre>
+
+<h4>Testing Replication</h4>
+
+<p>Open another terminal in <code>cluster2</code> and use MapR-DB Shell to look at the replicated data:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; find /apps/user_profiles
+{"_id":"user001","first_name":"John","last_name":"Doe"}
+1 document(s) found.
+</code></pre>
+
+<p>You can also use the full path <code>/mapr/cluster2/apps/user_profiles</code></p>
+
+<p>In <code>cluster1</code> add a new document using MapR-DB Shell:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user002" , "first_name":"Simon", "last_name":"Dupont"}'
+
+maprdb mapr:&gt; find /apps/user_profiles
+</code></pre>
+
+<p>Do a find in <code>cluster2</code> table, and you will see that the data have been replicated.</p>
+
+<p>You can insert or delete a document in <code>cluster2</code> and do a find in <code>cluster1</code>, you will see that the new document is also replicated in the other direction.</p>
+
+<p>Note, for this demonstration, we use 2 terminals connected to each cluster you can do some test using the Global Namespace in a single MapR-DB Shell.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial you have learned how to setup the MapR-DB Multi-Master replication to have data automatically replicated between 2 clusters.</p>
+
+<p>MapR-DB Table Replication provides many options, not only in term of topology (master-slave/mult-master), but also some options and commands to:</p>
+
+<ul>
+<li>replicate some columns/attributes or column family</li>
+<li>configure replication in a secured cluster</li>
+<li>pause replication.</li>
+</ul>
+
+
+<p>You can find more information about the MapR-DB Table Replication, and MapR-Gateway in the documentation:</p>
+
+<ul>
+<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ReplicatingMapR-DBTables.html">Table Replication</a></li>
+<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ConfiguringMapRClustersForTR.html">Setting up Table Replication</a></li>
+<li><a href="http://maprdocs.mapr.com/home/Gateways/MapRGateways.html">Configuring and Managing MapR Gateways</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Save MapR Streams Messages Into MapR DB JSON]]></title>
+    <link href="http://tgrall.github.io/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json/"/>
+    <updated>2016-03-31T09:00:07+02:00</updated>
+    <id>http://tgrall.github.io/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json</id>
+    <content type="html"><![CDATA[<p>In this article you will learn how to create a MapR Streams Consumer that saves all the messages into a <a href="http://maprdocs.mapr.com/51/#MapR-DB/JSON_DB/mapr_db_json_top.html">MapR-DB JSON Table</a>.</p>
+
+<!-- more -->
+
+
+<h3>Install and Run the sample MapR Streams application</h3>
+
+<p>The steps to install and run the applications are the same as the one defined in the following article:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">MapR Streams application</a></li>
+</ul>
+
+
+<p>Once you have the default producer and consumer running in your environment using the commands:</p>
+
+<p>Producer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run producer
+</code></pre>
+
+<p>Consumer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run consumer
+</code></pre>
+
+<h3>Save messages into MapR-DB JSON</h3>
+
+<p>The <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java">DBConsumer</a> class is a copy of the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/Consumer.java">Consumer</a> class with small changes to save the messages coming from the <code>/sample-stream:fast-messages</code> topic into a MapR-DB table named <code>/apps/fast-messages</code>.</p>
+
+<p><strong>1- Add MapR-DB Maven dependency to your project</strong></p>
+
+<p>Edit the <code>pom.xml</code> file and add the following entry in the <code>dependencies</code> tag:</p>
+
+<pre><code class="xml">   &lt;dependency&gt;
+      &lt;groupId&gt;com.mapr.db&lt;/groupId&gt;
+      &lt;artifactId&gt;maprdb&lt;/artifactId&gt;
+      &lt;version&gt;5.1.0-mapr&lt;/version&gt;
+   &lt;/dependency&gt;
+</code></pre>
+
+<p>This add support for:</p>
+
+<ul>
+<li><a href="http://ojai.io/">OJAI</a> Open JSON Application Interface</li>
+<li><a href="http://maprdocs.mapr.com/51/#MapR-DB/JSON_DB/crud_with_maprdb_ojai_java_api.html">MapR-DB JSON API</a></li>
+</ul>
+
+
+<p><strong>2- Create and Get a JSON Table</strong></p>
+
+<p>To save the messages, the application must access a JSON Table, for this just call the <code>MapRDB.getTable(TABLE_PATH)</code> method. If the table does not exist, create it with the <code>MapRDB.createTable(TABLE_PATH)</code>.</p>
+
+<p>This is what the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L113-L119"><code>DBConsumer.getTable(TABLE_PATH)</code></a> method is doing.</p>
+
+<pre><code class="java">  private static Table getTable(String tablePath) {
+    if ( ! MapRDB.tableExists(tablePath)) {
+      return MapRDB.createTable(tablePath);
+    } else {
+      return MapRDB.getTable(tablePath);
+    }
+  }
+</code></pre>
+
+<p>When the DBConsumer starts the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L41"><code>getTable("/apps/fast-messages")</code></a> method is called.</p>
+
+<pre><code>  Table fastMessagesTable = getTable("/apps/fast-messages");
+</code></pre>
+
+<p>The table <code>fastMessagesTable</code> is not available to the consumer.</p>
+
+<p><strong>3- Save messages into the JSON Table</strong></p>
+
+<p>Messages can be saved into the table using the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L78-L81">MapR-DB JSON Java API</a>.</p>
+
+<p>The producer sends the message as JSON String that is converted into a JSON object names <code>msg</code>. This object can be used to create an OJAI Document:</p>
+
+<pre><code>  Document messageDocument = MapRDB.newDocument(msg);
+</code></pre>
+
+<p>To be saved into MapR-DB, a document must have a <code>_id</code> field. In this example let’s use the message number generated by the producer <em>(JSON field <code>k</code>)</em>.</p>
+
+<pre><code>  messageDocument.setId( Integer.toString(messageDocument.getInt("k")));
+</code></pre>
+
+<p>Let’s now save the document into the table:</p>
+
+<pre><code>  fastMessagesTable.insertOrReplace( messageDocument );       
+</code></pre>
+
+<p>Each time the producer will be executed, the message number counter will be initialized to 0. So the document _id will be the same, and the document into the table must be replaced; this is why the <code>insertOrReplace</code> method is used.</p>
+
+<p>Let’s run the new consumer.</p>
+
+<p><strong>4- Run the DBConsumer</strong></p>
+
+<p>To run the DBConsumer just pass the parameter <code>dbconsumer</code> as follow:</p>
+
+<p>Consumer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run dbconsumer
+</code></pre>
+
+<p>Note that a new <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L48-L54">group is created</a> to be sure that messages are read by the two different consumers (Consumer and DBConsumer).</p>
+
+<p><strong>5- Query the messages saved into MapR-DB</strong></p>
+
+<p>Messages are saved into the <code>/apps/fast-messages</code> table, let’s used the MapR DBShell to query the data. On your cluster run the following commands, as <code>mapr</code>:</p>
+
+<pre><code>$ mapr dbshell
+maprdb mapr:&gt; find /apps/fast-messages --id 100
+{"_id":"100","type":"test","t":64986.787,"k":{"$numberLong":100}}
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>In this very simple example, the DBConsumer takes each message and saved it as a simple JSON Document into MapR-DB JSON. The table can be used to create any type of application, or using Apache Drill <em>(1.6 or later)</em> to do some analytics.</p>
+
+<p>In a real application the messages will probably be modified, enriched and/or aggregated and then the result be saved into MapR-DB Table. The goal of this sample is just to show that it is easy to integrate MapR Streams and MapR-DB.</p>
+
+<p>You have also other alternative to achieve the same thing using for example:</p>
+
+<ul>
+<li>Spark Streaming</li>
+<li>3rd Party ETL and Tools</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

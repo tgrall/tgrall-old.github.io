@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Everybody Says “Hackathon”! - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="TLTR: MongoDB &amp; Sage organized an internal Hackathon
+We use the new X3 Platform based on MongoDB, Node.js and HTML to add cool features to the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2015/01/23/everybody-says-hackathon/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Everybody Says “Hackathon”!</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-23T10:54:20+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:54 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h4>TLTR:</h4>
+
+<ul>
+<li>MongoDB &amp; Sage organized an internal Hackathon</li>
+<li>We use the new X3 Platform based on MongoDB, Node.js and HTML to add cool features  to the ERP</li>
+<li>This shows that “any” enterprise can (should) do it to:
+
+<ul>
+<li>look differently at software development</li>
+<li>build strong team spirit</li>
+<li>have fun!</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>Introduction</h3>
+
+<p>I have like many of you participated to multiple Hackathons where developers, designer and entrepreneurs are working together to build applications in few hours/days. As you probably know more and more companies are running such events internally, it is the case for example at Facebook, Google, but also ING (bank), AXA (Insurance), and many more.</p>
+
+<p>Last week, I have participated to the first Sage Hackathon!</p>
+
+<p>In case you do not know Sage is a 30+ years old ERP vendor. I have to say that I could not imagine that coming from such company… Let me tell me more about it.</p>
+
+<p><img class="center" src="/images/posts/everybody-says-hackathon/00-logo.png"></p>
+
+<!-- more -->
+
+
+<h3>Sage Hackathon</h3>
+
+<h5>How did it start?</h5>
+
+<p>I have met the development team few months back when I learned that Sage was using MongoDB. We discussed about use cases, architecture,&hellip; And this is when I was the most surprised! The new version of Sage ERP X3 is a mix of legacy components (RDBMS, C++ based proprietary middleware), and brand new layer based on Node.js, MongoDB and HTML/CSS/JS (AngularJS like). The Sage team has open sourced some of the JS libraries, see <a href="https://github.com/sage">https://github.com/sage</a> Pretty cool isn’t?</p>
+
+<p>I was really excited to see how MongoDB and Node.js are used by Sage modernize the ERP. So I asked more and more questions about the product, looked at some demonstrations. This leads to a broader discussion to see how we can use this new architecture to develop more features using it.</p>
+
+<p>This is how we started to talk about an internal hackathon. Everybody, developers, marketing and managers were very excited about the idea.</p>
+
+<h5>Hackathon Preparation</h5>
+
+<p>Sage and MongoDB teams worked together to organize the event, with the following constraints:</p>
+
+<ul>
+<li>The hackathon will be a 24h (noon to noon) event, to allow Sage management to have corporate meetings before and after the event,</li>
+<li>40 persons limit - 6 teams max - with a mix of developers, designer, product owner, quality engineer, … (coming from various countries),</li>
+<li>The event will occur offsite to <em>daily duty noise</em></li>
+</ul>
+
+
+<p>Also since the hackathon will be short, 24h!, we decided to propose in advance many subjects and teams. This to be able to focus on the implementation on D-Day and avoid &ldquo;team and project&rdquo; selection.</p>
+
+<p>So we define a list of 6 ideas that would extend the ERP in a cool way, for example: notification platform, collaboration feature such as business discussion, caching layer with query capabilities, office tool integration, plug social network like LinkedIn and Twitter to ERP business objects,&hellip;</p>
+
+<p>Once we had a good vision of the event, Sage marketing and product management organized an internal presentation to announce the event, and ask for more ideas. We were all surprised to see so many ideas coming out of this presentation!</p>
+
+<h5>Let&rsquo;s code!</h5>
+
+<p>So we all met at the location, a very nice conference center, <a href="http://www.les-fontaines.com/">Les Fontaines</a>, where fresh coffee was waiting for us!</p>
+
+<p>The event started with a very short presentation of the teams, projects, and jury.</p>
+
+<p><img class="center" src="/images/posts/everybody-says-hackathon/01-sage-hack-intro.png" title="Presentation" ></p>
+
+<p>Quickly the teams started to draw things on whiteboard, discuss architecture, and design&hellip; The organizers, included myself, were
+very happy to see that everybody was diving into it.</p>
+
+<p><img src="/images/posts/everybody-says-hackathon/02-team-work.png" title="Team Work" > <img src="/images/posts/everybody-says-hackathon/03-motto.png"></p>
+
+<p>MongoDB (<a href="http://twitter.com/alainhelaili">Alain</a> and I), and Sage architects were here to help; so we did. I pushed hard to be sure all the teams start to develop, design
+as early as possible. I also gave many advices around document design and other things around MongoDB and node.</p>
+
+<p>In the evening we stopped for a nice dinner, this is the big difference between a startup event, and a corporate one, good wine, soup, duck confit, wine, and fantastic desserts. Yummy!</p>
+
+<p>Let&rsquo;s go back to the code thing, so all the teams were working like crazy on their project. I had lot of interesting discussions with all of them.</p>
+
+<p><img src="/images/posts/everybody-says-hackathon/04-night-coding.png" title="Night Coding" > <img src="/images/posts/everybody-says-hackathon/05-night-coding.png" title="Night Coding" ></p>
+
+<p>I went to bed at 11:30pm, <em>yeah, I am a loser!</em>, while everybody was still working.</p>
+
+<p><img src="/images/posts/everybody-says-hackathon/06-night-coding.png" title="Night Coding" ><img src="/images/posts/everybody-says-hackathon/07-night-coding.png" title="Night Coding" ></p>
+
+<p>I as back in the <em>war room</em> around 6:00am, and helped some team to finish their project.</p>
+
+<p>All the teams used the morning to polish the feature and prepare the demonstration.</p>
+
+<h5>Let&rsquo;s vote!</h5>
+
+<p>At noon each team started to demonstrate their feature in 5mn. All the teams did a live demonstration, with the feature well integrated to the Sage X3 screens.
+It was really cool. A team even created a small video clip to explain the feature and vision.</p>
+
+<p><img src="/images/posts/everybody-says-hackathon/08-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/10-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/11-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/12-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/13-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/14-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/15-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/09-demonstration.png"></p>
+
+<p>It was very hard to chose a winner, but we agreed on a very rich and promising notification platform.</p>
+
+<h5>What&rsquo;s next?</h5>
+
+<p>It was really nice for me to see the excitement of all the teams, and the pride of being able to develop something that fast!</p>
+
+<p>I cannot talk for Sage, but I think they all realize something: they can do stuff a lot faster, and this should try to push this into the product now!
+It is also a good opportunity to see how to developer and deliver new addons for X3.</p>
+
+<p>On my side, I am very happy of the result, and see that MongoDB and new technologies can really change the way we work with our data. And I hope to be able to do that again
+with other companies.</p>
+
+<h3>What about you?</h3>
+
+<p>I believe that any organization that has an IT/Development team should organize such event, for example every year.</p>
+
+<p>Honestly, we can &ldquo;stop&rdquo; working on our daily duties for 1,2 or 3 days and do this. If you look at your agenda, I am sure that you have wasted
+more time on none productive meetings; remember :</p>
+
+<blockquote><p>If a picture is worth 1000 words</p>
+
+<p>A prototype is worth 1000 meetings!</p></blockquote>
+
+<p>by @ideo</p>
+
+<p>You will be surprised to see what can be done when you let the passionate people do what they love, but also it will be a good opportunity to motivate your team.</p>
+
+<p>I will be pleased to discuss that you will, so feel free to drop me a comment.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-01-23T10:54:20+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>10:54 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/events/'>events</a>, <a class='category' href='/blog/categories/hackathon/'>hackathon</a>, <a class='category' href='/blog/categories/mongodb/'>mongodb</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2015/01/23/everybody-says-hackathon/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2015/01/23/everybody-says-hackathon/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/01/21/nantes-mug-event-number-2/" title="Previous Post: Nantes MUG : Event #2">&laquo; Nantes MUG : Event #2</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/" title="Next Post: Moving my beers from Couchbase to MongoDB">Moving my beers from Couchbase to MongoDB &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2015/01/23/everybody-says-hackathon/';
+        var disqus_url = 'http://tgrall.github.io/blog/2015/01/23/everybody-says-hackathon/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

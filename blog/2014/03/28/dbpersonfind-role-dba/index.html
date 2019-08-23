@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>db.person.find( { &#8216;Role&#8217; : &#8216;DBA&#8217; } ) - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Wow! it has been a while since I posted something on my blog post. I have been very busy, moving to MongoDB, learning, learning, learning…finally I &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2014/03/28/dbpersonfind-role-dba/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">db.person.find( { &#8216;Role&#8217; : &#8216;DBA&#8217; } )</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-28T07:00:32+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Wow! it has been a while since I posted something on my blog post. I have been very busy, moving to MongoDB, learning, learning, learning…finally I can breath a little and answer some questions.</p>
+
+<p>Last week I have been helping my colleague Norberto to deliver a MongoDB Essentials Training in Paris. This was a very nice experience, and I am impatient to deliver it on my own. I was happy to see that the audience was well balanced between developers and operations, mostly DBA.</p>
+
+<h3>What! I still need DBA?</h3>
+
+<p><img src="http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg"></p>
+
+<p>This is a good opportunity to raise a point, or comment a wrong idea: the fact that you are using MongoDB, or any other NoSQL datastore does not mean that you do not need a DBA… Like any project, an administrator is not mandatory, but if you have one it is better. So even when MongoDB is pushed by development team it is very important to understand the way the database works, and how to administer, monitor it.</p>
+
+<p>If you are lucky enough to have real operations teams, with good system and database administrators use them! They are very important for your application.</p>
+
+<p>Most DBA/System Administrators have been maintaining systems in production for many years. They know how to keep your application up and running. They also most of the time experienced many “disasters”, and then recover (I hope).</p>
+
+<p>Who knows, you may encounter big issues with your application and you will be happy to have them on your side at this moment.</p>
+
+<h3>&ldquo;Great, but the DBA is slowing down my development!&rdquo;</h3>
+
+<p>I hear this, sometimes, and I had this feeling in the past to as developer in large organization. Is it true?</p>
+
+<p>Developers and DBA are today, not living in the same worlds:</p>
+
+<ul>
+<li>Developers want to integrate new technologies as soon as possible, not only because it is fun and they can brag about it during meetups/conferences; but because these technologies, most of the time, are making them more productive, and offer better service/experience to the consumer</li>
+<li>DBA, are here to keep the applications up and running! So every time they do not feel confident about a technology they will push back. I think this is natural and I would be probably the same in their position. Like all geeks, they would love to adopt new technologies but they need to understand and trust it before.</li>
+</ul>
+
+
+<p>System administrators, DBAS look at the technology with a different angle than developers.</p>
+
+<p>Based on this assumption, it is important to bring the operation team as early as possible when  the development team wants to integrate MongoDB or any new data store. Having the operation team in the loop early will ease the global adoption of MongoDB in the company.</p>
+
+<p>Personally, and this will show my age, I have seen a big change in the way developers and DBAs are working together.</p>
+
+<p>Back in the 90&rsquo;s, when the main architecture was based on client/server architecture  developers and DBAs where working pretty well togethers; probably because they were speaking the same language: SQL was everywhere.  I had regular meetings wit</p>
+
+<p>Then, since mid 2000, mots of applications have moved to a web based architecture , with for example Java middleware, and the developers stopped working with DBAs. Probably because the abstraction data layer provided by the ORM exposed the database as a &ldquo;commodity&rdquo; service that is supposed to work: &ldquo;Hey Mr DBA, my application has been written with the best middleware technology on the market, so now deal with the performance and scalability! I am done!&rdquo;</p>
+
+<p>Yes it is a cliché, but I am sure that some of you will recognize that.</p>
+
+<p>Nevertheless each time I can, I have been pushing developers to talk more to administrators and look closely to their database!</p>
+
+<h3>A new era for operations and development teams</h3>
+
+<p>The fast adoption of MongoDB by developers, is a great opportunity to fix what we have broken 10 years ago in large information systems:</p>
+
+<ul>
+<li>Let&rsquo;s talk again!</li>
+</ul>
+
+
+<p>MongoDB has been built first for developers. The document oriented approach gives lot of flexibility to quickly adapt to change. So anytime your business users need a new feature you can implement it, even if this change impact the data structure. Your data model is now driven and controlled by the application, not the database engine.</p>
+
+<p>However, the applications still need to be available 24x7, and performs well. These topics are managed - and shared- by administrator and developers! This has been always the case but, as I described it earlier, it looks like some of us have forgotten that.</p>
+
+<p>Schemas design, change velocity, are driven by the application, so the business and development teams, but all this impacts the database, for example:</p>
+
+<ul>
+<li>How storage will grow ?</li>
+<li>Which indexes must be created to speed up my application?</li>
+<li>How to organize my cluster to leverage the infrastructure properly:
+
+<ul>
+<li>Replica-Set organization (and related write concerns, managed by developer)</li>
+<li>Sharding options</li>
+</ul>
+</li>
+<li>And the most important of them : backup/recovery strategies</li>
+</ul>
+
+
+<p>So many things that could be managed by the project team, but if you have an operation team with you, it will be better to do that as a single team.</p>
+
+<p>You, the developer, are convinced that MongoDB is the best database for your projects! Now it is time to work with the ops team and convince them too.  So you should for sure explain why MongoDB is good for you as developer, but also you should highlight all the benefits for the operations, starting with built-in high-availability with replica sets, and easy scalability with sharding. MongoDB is also here to make the life of the administrator easier! I have shared in the next paragraph a lit of resources that are interesting for operations people.</p>
+
+<p>Let’s repeat it another time, try to involve the operation team as soon as possible, and use that as an opportunity to build/rebuild the relationship between developers and system administrators!</p>
+
+<h3>Resources</h3>
+
+<p>You can find many good resources on the Site to helps operations or learn about this:</p>
+
+<ul>
+<li>Documentation : <a href="http://docs.mongodb.org/manual/administration/">Operations</a></li>
+<li>Online Training :
+
+<ul>
+<li><a href="https://education.mongodb.com/courses/10gen/M102/2014_May/about">M102: MongoDB for DBAs</a></li>
+<li><a href="https://education.mongodb.com/courses/10gen/M202/2014_April/about">M202: MongoDB Advanced Deployment and Operations</a></li>
+</ul>
+</li>
+<li>And many others such as White Papers and <a href="http://www.mongodb.com/webinars">Webinars</a>.</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-03-28T07:00:32+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:00 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/devops/'>devops</a>, <a class='category' href='/blog/categories/mongodb/'>mongodb</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>, <a class='category' href='/blog/categories/ops/'>ops</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2014/03/28/dbpersonfind-role-dba/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2014/03/28/dbpersonfind-role-dba/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/10/01/pagination-with-couchbase/" title="Previous Post: Pagination with Couchbase">&laquo; Pagination with Couchbase</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/" title="Next Post: Introduction to MongoDB Geospatial feature">Introduction to MongoDB Geospatial feature &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2014/03/28/dbpersonfind-role-dba/';
+        var disqus_url = 'http://tgrall.github.io/blog/2014/03/28/dbpersonfind-role-dba/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

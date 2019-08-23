@@ -1,0 +1,619 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Pagination With Couchbase - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="If you have to deal with a large number of documents when doing queries against a Couchbase cluster it is important to use pagination to get rows by &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Pagination With Couchbase</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-10-01T02:00:00+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>2:00 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>If you have to deal with a large number of documents when doing queries against a Couchbase cluster it is important to use pagination to get rows by page. You can find some information in the documentation in the chapter &ldquo;<a href="http://docs.couchbase.com/couchbase-manual-2.2/#pagination">Pagination</a>&rdquo;, but I want to go in more details and sample code in this article.</p>
+
+<p>For this example I will start by creating a simple view based on the <code>beer-sample</code> dataset, the view is used to find brewery by country:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s2">&quot;brewery&quot;</span> <span class="o">&amp;</span><span class="nx">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="nx">amp</span><span class="p">;</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">country</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">country</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This view list all the breweries by country, the index looks like:</p>
+
+<table>
+<tbody>
+<tr><th>Doc id</th><th>Key</th><th>Value</th></tr>
+<tr><td>bersaglier</td><td>Argentina</td><td>null</td></tr>
+<tr><td>cervecera_jerome</td><td>Argentina</td><td>null</td></tr>
+<tr><td>brouwerij_nacional_balashi</td><td>Aruba</td><td>null</td></tr>
+<tr><td>australian_brewing_corporation</td><td>Australia</td><td>null</td></tr>
+<tr><td>carlton_and_united_breweries</td><td>Australia</td><td>null</td></tr>
+<tr><td>coopers_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>foster_s_australia_ltd</td><td>Australia</td><td>null</td></tr>
+<tr><td>gold_coast_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>lion_nathan_australia_hunter_street</td><td>Australia</td><td>null</td></tr>
+<tr><td>little_creatures_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>malt_shovel_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>matilda_bay_brewing</td><td>Australia</td><td>null</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>yellowstone_valley_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>yuengling_son_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>zea_rotisserie_and_brewery</td><td>United States</td><td>null</td></tr>
+<tr><td>fosters_tien_gang</td><td>Viet Nam</td><td>null</td></tr>
+<tr><td>hue_brewery</td><td>Viet Nam</td><td>null</td></tr>
+</tbody></table>
+
+
+<p>So now you want to navigate in this index with a page size of 5 rows.</p>
+
+<!--more-->
+
+
+<h3>Using skip / limit Parameters</h3>
+
+<p>The most simplistic approach is to use <span style="font-family: Courier New, Courier, monospace;">limit</span> and <span style="font-family: Courier New, Courier, monospace;">skip</span> parameters for example:</p>
+
+<p>Page 1 : <code>?limit=5&amp;amp;skip0</code><br/>
+Page 2 : <code>?limit=5&amp;amp;skip=5</code>
+&hellip;
+Page x : <code>?limit=5&amp;amp;skip(limit*(page-1))</code></p>
+
+<p>You can obviously use any other parameters you need to do range or key queries (<code>startkey/endkey, key, keys</code>) and sort option (<code>descending</code>).</p>
+
+<p>This is simple but not the most efficient way, since the query engine has to read all the rows that match the query, until the skip value is reached.</p>
+
+<p>Some code sample in python that paginate using this view :</p>
+
+<div><script src='https://gist.github.com/6174762.js'></script>
+<noscript><pre><code>from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+  hasRow = False
+    skip = 0 if page == 0 else 1
+    page = page + 1
+    print &quot;-- Page %s --&quot; % (page)
+    rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+    for row in rows:
+        hasRow = True
+        print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+        currentStartkey = row.key
+        startDocId = row.docid
+    print &quot; -- -- -- -- \n&quot;
+
+
+
+</code></pre></noscript></div>
+
+
+<p>This application loops on all the pages until the end of the index.</p>
+
+<p>As I said before this is not the best approach since the system must read all the values until the skip is reached. The following example shows a better way to deal with this.</p>
+
+<h3>Using startkey / startkey_docid parameters</h3>
+
+<p>To make this pagination more efficient it is possible to take another approach. This approach uses the  <code>startkey</code> and <code>startkey_docid</code>  to select the proper documents.</p>
+
+<ul>
+<li><code>The startkey</code> parameter will be the value of the key where the query should start to read (based on the last key of the &ldquo;previous page&rdquo;</li>
+<li>Since for a key for example &ldquo;Germany&rdquo; you may have one or more ids (documents) it is necessary to say to Couchbase query engine where to start, for this you need to use the <code>startkey_docid</code> parameter, and ignore this id since it is the last one of the previous page.</li>
+</ul>
+
+
+<p>So if we look at the index, and add a row number to explain the pagination</p>
+
+<table>
+<tbody>
+<tr><th>Row num</th><th>Doc id</th><th>Key</th><th>Value</th></tr>
+<tr><td colspan="4"><br />
+Query for page 1<br />
+<span style="font-family: Courier New, Courier, monospace;">?limit=5</span></td></tr>
+<tr><td>1</td><td></td><td>bersaglier</td><td>Argentina</td><td>null</td></tr>
+<tr><td>2</td><td></td><td>cervecera_jerome</td><td>Argentina</td><td>null</td></tr>
+<tr><td>3</td><td></td><td>brouwerij_nacional_balashi</td><td>Aruba</td><td>null</td></tr>
+<tr><td>4</td><td></td><td>australian_brewing_corporation</td><td>Australia</td><td>null</td></tr>
+<tr><td>5</td><td></td><td>carlton_and_united_breweries</td><td>Australia</td><td>null</td></tr>
+<tr><td colspan="4">
+Query for page 2<br />
+<span style="font-family: Courier New, Courier, monospace;">?limit=5&amp;startkey=&#8221;Australia&#8221;&amp;startkey_docid=carlton_and_united_breweries&amp;skip=1
+</td></tr>
+<tr><td>6</td><td></td><td>coopers_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>7</td><td></td><td>foster_s_australia_ltd</td><td>Australia</td><td>null</td></tr>
+<tr><td>8</td><td></td><td>gold_coast_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>9</td><td></td><td>lion_nathan_australia_hunter_street</td><td>Australia</td><td>null</td></tr>
+<tr><td>10</td><td></td><td>little_creatures_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td colspan="4"><br />
+Query for page 3<br />
+<span style="font-family: Courier New, Courier, monospace;">?limit=5&amp;startkey=&#8221;Australia&#8221;&amp;startkey_docid=little_creatures_brewery</span><span style="font-family: 'Courier New', Courier, monospace;">&amp;skip=1</span>
+</td></tr>
+<tr><td>11</td><td></td><td>malt_shovel_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>12</td><td></td><td>matilda_bay_brewing</td><td>Australia</td><td>null</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td></td><td>yellowstone_valley_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>yuengling_son_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>zea_rotisserie_and_brewery</td><td>United States</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>fosters_tien_gang</td><td>Viet Nam</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>hue_brewery</td><td>Viet Nam</td><td>null</td></tr>
+</tbody></table>
+
+
+<p>So as you can see in the examples above, the query uses the startkey, a document id, and just passes it using skip=1.</p>
+
+<p>Let&rsquo;s now look at the application code, once again in Python</p>
+
+<div><script src='https://gist.github.com/6176322.js'></script>
+<noscript><pre><code>
+from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+    hasRow = False
+    skip = 0 if page == 0 else 1
+    page = page + 1
+    print &quot;-- Page %s --&quot; % (page)
+    rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+    for row in rows:
+        hasRow = True
+        print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+        currentStartkey = row.key
+        startDocId = row.docid
+    print &quot; -- -- -- -- \n&quot;
+
+</code></pre></noscript></div>
+
+
+<p>This application loops on all the pages until the end of the index</p>
+
+<p>Using this approach, the application start to read the index at a specific key (<code>startkey</code> parameter), and only loop on the necessary entry in the index. This is more efficient than using the simple skip approach.</p>
+
+<h4>Views with Reduce function</h4>
+
+<p>When your view is using a reduce function, if you want to paginate on the various keys only (with the reduce function) you need to use the <code>skip</code> and <code>limit</code> parameters.</p>
+
+<p>When you are using the  paramater <code>startkey_docid</code> with a reduce function it will calculate the reduce only to the subset of document ids that are part of your query.</p>
+
+<h3>Couchbase Java SDK Paginator</h3>
+
+<p>In the previous examples, I have showed how to do pagination using the various query parameters. The Java SDK provides a Paginator object to help developers to deal with pagination. The following example is using the same view with the Paginator API.</p>
+
+<div><script src='https://gist.github.com/6774932.js'></script>
+<noscript><pre><code>package com.couchbase.devday;
+
+import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class JavaPaginatorSample {
+
+public static void main(String[] args) {
+
+    configure();
+    System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+    System.out.println(&quot;\tCouchbase - Paginator&quot;);
+    System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+
+    List&lt;URI&gt; uris = new LinkedList&lt;URI&gt;();
+    uris.add(URI.create(&quot;http://127.0.0.1:8091/pools&quot;));
+
+    CouchbaseClient cb = null;
+    try {
+        cb = new CouchbaseClient(uris, &quot;beer-sample&quot;, &quot;&quot;);
+        System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+        System.out.println(&quot;Breweries (by_name) with docs &amp; JSON parsing&quot;);
+        View view = cb.getView(&quot;test&quot;, &quot;by_country&quot;);
+        Query query = new Query();
+        int docsPerPage = 5;
+
+        Paginator paginatedQuery = cb.paginatedQuery(view, query, docsPerPage);
+        int pageCount = 0;
+        while(paginatedQuery.hasNext()) {
+            pageCount++;
+            System.out.println(&quot; -- Page &quot;+ pageCount +&quot; -- &quot;);
+            ViewResponse response = paginatedQuery.next();
+            for (ViewRow row : response) {
+                System.out.println(row.getKey() + &quot; : &quot; + row.getId());
+            }
+            System.out.println(&quot; -- -- -- &quot;);
+        }
+        
+        System.out.println(&quot;\n\n&quot;);
+        cb.shutdown(10, TimeUnit.SECONDS);
+    } catch (Exception e) {
+        System.err.println(&quot;Error connecting to Couchbase: &quot; + e.getMessage());
+    }
+}
+
+
+
+private static void configure() {
+
+    for(Handler h : Logger.getLogger(&quot;com.couchbase.client&quot;).getParent().getHandlers()) {
+        if(h instanceof ConsoleHandler) {
+            h.setLevel(Level.OFF);
+        }
+    }
+    Properties systemProperties = System.getProperties();
+    systemProperties.put(&quot;net.spy.log.LoggerImpl&quot;, &quot;net.spy.memcached.compat.log.SunLogger&quot;);
+    System.setProperties(systemProperties);
+
+    Logger logger = Logger.getLogger(&quot;com.couchbase.client&quot;);
+    logger.setLevel(Level.OFF);
+    for(Handler h : logger.getParent().getHandlers()) {
+        if(h instanceof ConsoleHandler){
+            h.setLevel(Level.OFF);
+        }
+    }
+}
+
+}
+</code></pre></noscript></div>
+
+
+<p>So as you can see you can easily paginate on the results of a Query using the Java Paginator.</p>
+
+<ul>
+<li>At the line #37, the Paginator is created from using the view and query objects and a page size is specified</li>
+<li>Then you just need to use the hasNext() and next() methods to navigate in the results.</li>
+</ul>
+
+
+<p>The Java Paginator  is aware of the fact that they query is using a reduce or not, so you can use it with all type of queries - Internally it will switch between the skip/limit approach and the doc_id approaches. You can <a href="https://github.com/couchbase/couchbase-java-client/blob/1.1.9/src/main/java/com/couchbase/client/protocol/views/Paginator.java#L176-L195">see how it is done in the Paginator class</a>.</p>
+
+<p>Note that if you want to do that in a Web application between HTTP request you must keep the Paginator object in the user session since the current API keeps the current page in its state.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this blog post you have  learned how to deal with pagination in Couchbase views; to summarize</p>
+
+<ul>
+<li>The pagination is based on some specific parameters that you send when executing a query.</li>
+<li>Java developers can use the <a href="http://www.couchbase.com/autodocs/couchbase-java-client-1.2.0/com/couchbase/client/protocol/views/Paginator.html">Paginator</a> class that simplifies pagination.</li>
+</ul>
+
+
+<p>I am inviting you to look at the new Couchbase Query Language N1QL, still under development, that will provide more options to developers including pagination, using LIMIT &amp; OFFSET parameters, for example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">fname</span><span class="p">,</span> <span class="n">age</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">tutorial</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">age</span> <span class="o">&gt;</span> <span class="mi">30</span>
+</span><span class='line'><span class="k">LIMIT</span> <span class="mi">2</span>
+</span><span class='line'><span class="k">OFFSET</span> <span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you want to learn more about N1QL:</p>
+
+<ul>
+<li><a href="http://query.couchbase.com/">N1QL on Couchbase Community Portal</a></li>
+<li><a href="http://query.pub.couchbase.com/tutorial/">N1QL Online Tutorial</a></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-10-01T02:00:00+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>2:00 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/couchbase/'>couchbase</a>, <a class='category' href='/blog/categories/json/'>json</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/07/18/how-to-implement-document-versioning-with-couchbase/" title="Previous Post: How to implement Document Versioning with Couchbase">&laquo; How to implement Document Versioning with Couchbase</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/03/28/dbpersonfind-role-dba/" title="Next Post: db.person.find( { 'role' : 'DBA' } )">db.person.find( { &#8216;role&#8217; : &#8216;DBA&#8217; } ) &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase/';
+        var disqus_url = 'http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

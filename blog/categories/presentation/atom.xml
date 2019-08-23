@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Presentation | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/presentation/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[USI2009: The Geek and Boss French Conference]]></title>
+    <link href="http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/"/>
+    <updated>2009-07-08T08:53:57+02:00</updated>
+    <id>http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference</id>
+    <content type="html"><![CDATA[<p>This year I was lucky enough to have a presentation at the second edition of the &ldquo;<a href="http://www.universite-du-si.com/">Université du SI</a>&rdquo;, organized by <a href="http://octo.com/">Octo Technologies</a>. I have to say that this conference is one of the best that I have attended, for sure it is the best in France. Unfortunately I was only able to attend the first day of the conference, but even in one day, I was very happy with the content of the presentations, keynotes, and networking opportunities.</p>
+
+<p>I won&rsquo;t go in details in all the presentations that I have seen, Google for the Enterprise, Application Server Future, Usability concerns, and keynotes. If you want to have a good feedback about this conference I invite you to read, in French, the reports from <a href="http://www.touilleur-express.fr/tag/usi/">Le Touilleur Express</a>.</p>
+
+<p>Let me just share the presentation that I gave with <a href="http://massol.net/">Vincent Massol</a> from <a href="http://www.xwiki.com/">XWiki</a>, about CMS vs Wiki.</p>
+
+<p><strong>Wiki vs CMS duel</strong></p>
+
+<p>First of all, the room was packed, so it looks like it is an interesting subject for many of you, so do not hesitate to post comments or question on this entry. Vincent and I will be pleased to update our presentation for a new event.</p>
+
+<p>The main message of the talk was:</p>
+
+<ul>
+<li><strong>For collaboration on content</strong> the wiki is king</li>
+<li><strong>For publication of content</strong> the CMS is king</li>
+</ul>
+
+
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1678352 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> 
+<a href="http://www.slideshare.net/tgrall/wiki-vs-cms-1678352" title="Wiki vs CMS ">Wiki vs CMS </a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Next Generation Portals : How OpenSocial Standard Adds Social to the Mix?]]></title>
+    <link href="http://tgrall.github.io/blog/2009/04/07/next-generation-portals-how-opensocial-standard-adds-social-to-the-mix/"/>
+    <updated>2009-04-07T02:45:36+02:00</updated>
+    <id>http://tgrall.github.io/blog/2009/04/07/next-generation-portals-how-opensocial-standard-adds-social-to-the-mix</id>
+    <content type="html"><![CDATA[<p>I have published on SlideShare a new presentation about OpenSocial and eXo Platform.</p>
+
+<p>Feel free to test OpenSocial and eXo Platform integration by downloading latest release of eXo products.</p>
+
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1258208 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
+]]></content>
+  </entry>
+  
+</feed>

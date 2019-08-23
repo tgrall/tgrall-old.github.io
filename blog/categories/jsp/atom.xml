@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Jsp | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/jsp/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Some Cool Stuff About JSP 2.0]]></title>
+    <link href="http://tgrall.github.io/blog/2004/11/26/some-cool-stuff-about-jsp-2-dot-0/"/>
+    <updated>2004-11-26T07:24:39+01:00</updated>
+    <id>http://tgrall.github.io/blog/2004/11/26/some-cool-stuff-about-jsp-2-dot-0</id>
+    <content type="html"><![CDATA[<p>J2EE 1.4 introduces a major release of JSP: 2.0.</p>
+
+<p>Here some of the cool new features:</p>
+
+<!-- more -->
+
+
+<h5>Direct usage of Expression Language (EL) in your JSP</h5>
+
+<p>You do not need to put the EL in any tag now, just use it as needed:</p>
+
+<pre><code class="html">&lt;html&gt;
+&lt;head&gt;&lt;title&gt;JSP 2.0 new features&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+Hello ${param.name}
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Find more about JSP 2.0 Expression Language in <a href="http://java.sun.com/j2ee/1.4/docs/tutorial/doc/JSPIntro7.html">the J2EE 1.4 tutorial</a>.</p>
+
+<h5>Easy tags creation with .tag files</h5>
+
+<p>It is now easier to create your own tags.
+You just need to create a new .tag file (or .tagx if you want to use XML syntax) in the WEB-INF/tags directory of your Web application; or META-INF/tags if you want to package the Tags in Jar file. So creating a .tag file is easy, using the attribute directive. The following example is a new tag named mytag.tag that prints a title set using the attribute title, in the color specified in the attribute textColor.</p>
+
+<p>&#8220;` html
+&lt;%@ attribute name=&ldquo;title&rdquo; required=&ldquo;true&rdquo; description=&ldquo;Title of the document&rdquo;%>
+&lt;%@ attribute name=&ldquo;textColor&rdquo; required=&ldquo;true&rdquo; description=&ldquo;Color of the Title&rdquo;%></p>
+
+<h1 style="color:${textColor}">${title}</h1>
+
+
+<pre><code>
+Here is the JSP that uses this new Tag:
+</code></pre>
+
+<p>&lt;%@ taglib tagdir=&ldquo;/WEB-INF/tags/&rdquo; prefix=&ldquo;tags&rdquo;%>
+<html>
+<head>
+</head>
+<body></p>
+
+<p>
+<tags:mytag title="My new JSP" textColor="blue"/>
+</p>
+
+
+<p>
+Hello World${param.name}
+</p>
+
+
+<p></body>
+</html>
+&#8220;`</p>
+
+<h5>Easy header and footer template using the prelude and coda includes</h5>
+
+<p>In most of the Web application that I have built, I started by creating template for my HTML pages; most of them to handle header and footer. Oracle JSP implementation provides this for a while using the <a href="http://download-west.oracle.com/docs/cd/B10464_01/web.904/b10320/trandepl.htm#1005780">Global Include feature</a>. JSP 2.0 introduces a standard way of doing that using prelude and coda includes. I <em>hate</em> the choice made by the spec to call that prelude and coda. May be good Java developer are necessary musicians, since this is commonly used there? Why not simply header/footer or using a prefix like pre&hellip;/post&hellip;. Anyway, that is not the point.</p>
+
+<p>The way you can set a prelude and/or coda include to your JSPs is done with the new Web Descriptor tag: <code>&lt;jsp-property-group&gt;</code>. This new tag allows you to configure a set of JSP that matches a specific URL. Part of the subtags of <code>&lt;jsp-property-group&gt;</code> are:</p>
+
+<ul>
+<li><code>&lt;include-coda&gt;</code> : the path to JSP fragment (.jspf) to include in the beginning all the JSP that matched the URL.</li>
+<li><code>&lt;include-prelude&gt;</code>:the path to the JSP fragment to include in the end all the JSP that matched the URL.</li>
+</ul>
+
+
+<p>An example configuration:</p>
+
+<pre><code class="html">&lt;jsp-config&gt;
+&lt;jsp-property-group&gt;
+&lt;url-pattern&gt;*.jsp&lt;/url-pattern&gt;
+&lt;include-prelude&gt;/WEB-INF/includes/prelude.jsp&lt;/include-prelude&gt;
+&lt;include-coda&gt;/WEB-INF/includes/coda.jsp&lt;/include-coda&gt;
+&lt;/jsp-property-group&gt;
+&lt;/jsp-config&gt;
+</code></pre>
+
+<p>This 3 new features of JSP 2.0 are just a very small list of the features introduced in JSP and Servlet in J2EE 1.4, but are my favorites. They are very easy to test and to adopt.</p>
+]]></content>
+  </entry>
+  
+</feed>

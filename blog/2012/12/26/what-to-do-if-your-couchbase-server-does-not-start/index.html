@@ -1,0 +1,472 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>What to Do if Your Couchbase Server Does Not Start? - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Working with the Couchbase 2.0.0 release you may have issues when trying to access the Web Admin Console or simply starting the server. This is due &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">What to Do if Your Couchbase Server Does Not Start?</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-12-26T11:08:37+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>11:08 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Working with the Couchbase 2.0.0 release you may have issues when trying to access the Web Admin Console or simply starting the server. This is due to the way Couchbase Server uses the IP address/hostname during the installation process. So when you have one of the following errors :</p>
+
+<ul>
+<li>On Windows, Server is not working at all, even after installation. You can access the sever on port 8092 (Couchbase API port), but cannot on port 8091</li>
+<li>You have the following error when accessing the console <code>"[10:02:02] IP address seems to have changed. Unable to listen on 'ns_1@10.0.2.15'"</code></li>
+</ul>
+
+
+<p><img src="http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png"></p>
+
+<ul>
+<li>When you try to restart the server it does not start and you have the following error message in the error log :
+<code>"Configured address '10.0.2.15' seems to be invalid. Will refuse to start for safety reasons"</code></li>
+</ul>
+
+
+<p>Some of these issues are related to a known issue on Windows ( see <a href="http://www.couchbase.com/issues/browse/MB-7417">MB-7417</a> that will be fixed in 2.0.1) or the fact that Couchbase server does not support change of the IP address after installation.  This is documented in the section “<a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-bestpractice-cloud-ip.html">Using Couchbase in the Cloud: Handling Changes in IP Addresses</a>” of the Couchbase Server Manual. This article explains what should be done when configuring Couchbase Server on Windows, but you can do equivalent steps on any platform using the shell scripts available on Linux and/or Mac OS X.</p>
+
+<p>Once you have installed Couchbase, you can see in the console that the IP address of your server is used :
+  <img src="http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png"></p>
+
+<p>Typically the address 192.168.0.97 is stored in the configuration of Couchbase. If your server receives a new address from the DHCP server, Couchbase will not work anymore. In this article you will see how you can configure Couchbase to use another IP address or Hostname.</p>
+
+<p><strong>Important:</strong> The steps that follow will completely destroy any data and configuration from the node, so it is best to start with a fresh Couchbase install. If you can not, you should backup your data using the file based backup-restore documented <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-backup-restore.html">here</a>.</p>
+
+<!-- more -->
+
+
+<h3>Setting up a hostname in hosts file</h3>
+
+<p>The best practice is to register Couchbase using a hostname instead of an IP Address. For this you will need to associate this hostname to an IP address in the <code>hosts</code> file.</p>
+
+<p>Since the <code>hosts</code> file is part of the system, <em>you need to edit it as administrator</em>. You have different approaches to achieve this:</p>
+
+<p>The following steps explain the easiest way to do it:</p>
+
+<ol>
+<li>Click “Start Menu”</li>
+<li>Navigate to “All Programs &gt; Accessories”</li>
+<li>“Right Click” on “Notepad” (or your favorite text editor)</li>
+<li>Click “Run as Administrator”</li>
+</ol>
+
+
+<p><img src="http://4.bp.blogspot.com/-gxd-rAWLqd8/ULy-vIxak3I/AAAAAAAAAZc/00pNi3Iu0uc/s320/Screen+Shot+2012-12-03+at+3.57.16+PM.png"></p>
+
+<p>You can now open the file <code>C:\Windows\System21\drivers\etc\hosts</code></p>
+
+<p>Add a new entry with a host name that will be used by Couchbase Server for example something like :</p>
+
+<p><code>127.0.0.1    couchbase-node1.mycompany.com</code></p>
+
+<p>Here I am using the local address (127.0.0.1) like that I won&rsquo;t have to change it even when my IP address changes. (This is useful when you are working in a single node mode)</p>
+
+<h3>Configure Couchbase to use the hostname or new IP address</h3>
+
+<p>During the installation Couchbase has been registered as a Windows Service. To be able to associate Couchbase to the new hostname (or IP address) the service needs to re-configured and reinstalled.</p>
+
+<p>This could be done using the scripts provided with the product. To run the scripts you need to do it as administrators, you can do it with one of the following methods:</p>
+
+<ul>
+<li>Search for the file and right click and select <code>Run as Administrator</code> (documented below)</li>
+<li>Run the terminal as administrator and run all the command from there (documented below)</li>
+<li>Search for the file and run it using <code>Ctrl+Shift+Enter</code></li>
+</ul>
+
+
+<h4>Option 1 : Using the Start Menu and Search Program</h4>
+
+<p><strong>Stop Couchbase Server Windows Service</strong></p>
+
+<p>The first thing to do, is to stop this service that is automatically started after the installation:</p>
+
+<ol>
+<li>Click <code>Start Menu</code></li>
+<li>Type <code>Services</code> in the Search Program form</li>
+<li>Click on <code>Services</code></li>
+<li>In the Services Application navigate to <code>CouchbaseServer</code></li>
+<li>Right Click and Click on <code>Stop</code></li>
+<li>Couchbase is now stopped.</li>
+</ol>
+
+
+<p><strong>Edit the Service Register script</strong></p>
+
+<p>Note: Due to a small formatting issue (See <a href="http://www.couchbase.com/issues/browse/MB-7322">MB-7322</a>), Notepad could not be used, a solution is to take <a href="http://notepad-plus-plus.org/">Notepad++</a> or any other advanced editing tool.</p>
+
+<ol>
+<li>As Administrator, open the <code>C:\Program Files\Couchbase\Server\bin\service_register.bat</code> file with your favorite editor. To open the editor as Administrator you can use the approach described in the previous step.</li>
+<li>Edit the line 9 to replace <code>%IP_ADDR%</code> by your hostname, the line should look like: <code>NS_NAME=ns_1@couchbase-node1.mycompany.com</code></li>
+<li>Save the file</li>
+</ol>
+
+
+<p><strong>Delete existing configuration and logs</strong></p>
+
+<ol>
+<li>Using the file explorer, go into: <code>C:\Program Files\Couchbase\Server\var\lib\couchbase\mnesia</code></li>
+<li>Delete its content (Select All and Right Click)</li>
+</ol>
+
+
+<p><strong>Register the new Configuration as Service</strong></p>
+
+<ol>
+<li>Using the file explorer, go into: <code>C:\Program Files\Couchbase\Server\bin</code></li>
+<li>Right Click on <code>service_reregister.bat</code></li>
+<li>Click on <code>Run as Administrator</code></li>
+</ol>
+
+
+<p>This script recreates the Couchbase Server Windows Service and starts it automatically.</p>
+
+<p><strong>Check the configuration</strong></p>
+
+<ol>
+<li>Launch your Internet Browser</li>
+<li>Go to <a href="http://localhost:8091">http://localhost:8091</a></li>
+<li>Follow the Couchbase Installation Steps</li>
+<li>Once install connect to the console</li>
+<li>Go to <code>Server Nodes</code> tab</li>
+<li>Check that the server name is now <code>couchbase-node1.mycompany.com</code></li>
+</ol>
+
+
+<p><img src="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png"></p>
+
+<p>Your Couchbase node is now configured to use the hostname of your server.</p>
+
+<h4>Option 2 : Using the Command Line</h4>
+
+<p><strong>Launch Command Prompt as Administrator</strong></p>
+
+<ol>
+<li>Click <code>Start Menu</code></li>
+<li>Type <code>Command Prompt</code> in the Search program form</li>
+<li>Type <code>Ctrl+Shift+Enter</code></li>
+<li>Go to <code>C:\Program Files\Couchbase\Server\bin</code> (or other location if you have chosen another location during installation)</li>
+</ol>
+
+
+<p>You are now ready to do the administration tasks.</p>
+
+<ol>
+<li>Execute the <code>service_stop.bat</code></li>
+<li><p>Edit the Service Register script</p></li>
+<li><p>Open <code>service_register.bat</code></p></li>
+<li>Edit the line 9 to replace <code>%IP_ADDR%`` by your hostname (or your IP address), the line should look like:</code>set NS_NAME=<a href="&#109;&#x61;&#105;&#x6c;&#116;&#x6f;&#x3a;&#110;&#115;&#95;&#x31;&#64;&#99;&#x6f;&#x75;&#99;&#104;&#98;&#x61;&#x73;&#x65;&#45;&#110;&#x6f;&#100;&#101;&#x31;&#x2e;&#x6d;&#121;&#x63;&#111;&#109;&#112;&#x61;&#110;&#x79;&#x2e;&#x63;&#x6f;&#x6d;">&#110;&#115;&#x5f;&#x31;&#x40;&#99;&#x6f;&#x75;&#x63;&#104;&#98;&#x61;&#115;&#x65;&#45;&#110;&#x6f;&#x64;&#101;&#x31;&#46;&#109;&#x79;&#99;&#x6f;&#109;&#x70;&#97;&#x6e;&#x79;&#x2e;&#x63;&#x6f;&#x6d;</a>`</li>
+<li>Save the file3.  Delete the content of: <code>C:\Program Files\Couchbase\Server\var\lib\couchbase\mnesia</code></li>
+<li>Execute the `service_reregister.bat</li>
+</ol>
+
+
+<p>This script recreates the Couchbase Server Windows Service and starts it automatically.</p>
+
+<p><strong>Check the configuration</strong></p>
+
+<ol>
+<li>Launch your Internet Browser</li>
+<li>Go to <a href="http://localhost:8091">http://localhost:8091</a></li>
+<li>Follow the Couchbase Installation Steps</li>
+<li>Once install connect to the console</li>
+<li>Go to <code>Server Nodes</code> tab</li>
+<li>Check that the server name is now <code>couchbase-node1.mycompany.com</code></li>
+</ol>
+
+
+<p><img src="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png"></p>
+
+<p>Your Couchbase node is now configured to use the hostname of your server.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2012-12-26T11:08:37+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>11:08 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/couchbase/'>couchbase</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>, <a class='category' href='/blog/categories/windows/'>windows</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/12/01/new-adventure-dot-dot-dot/" title="Previous Post: New Adventure...">&laquo; New Adventure&#8230;</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/" title="Next Post: Couchbase 101: Create views (MapReduce) from your Java application">Couchbase 101: Create views (MapReduce) from your Java application &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/';
+        var disqus_url = 'http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Streams | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/streams/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With Kafka REST Proxy for MapR Streams]]></title>
+    <link href="http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/"/>
+    <updated>2017-01-20T10:31:22+01:00</updated>
+    <id>http://tgrall.github.io/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>MapR Ecosystem Package 2.0 (MEP) is coming with some new features related to MapR Streams:</p>
+
+<ul>
+<li><a href="http://maprdocs.mapr.com/home/Kafka/kafkaREST.html">Kafka REST Proxy for MapR Streams</a> provides a RESTful interface to MapR Streams and Kafka clusters to consume and product messages and to perform administrative operations.</li>
+<li><a href="http://maprdocs.mapr.com/home/Kafka/kafkaConnect.html">Kafka Connect for MapR Streams</a> is a utility for streaming data between MapR Streams and Apache Kafka and other storage systems.</li>
+</ul>
+
+
+<p>MapR Ecosystem Packs (MEPs) are a way to deliver ecosystem upgrades decoupled from core upgrades - allowing you to upgrade your tooling independently of your Converged Data Platform. You can lean more about MEP 2.0 in <a href="https://www.mapr.com/blog/announcing-mapr-ecosystem-pack-mep-20">this article</a>.</p>
+
+<p>In this blog we describe how to use the REST Proxy to publish and consume messages to/from MapR Streams. The REST Proxy is a great addition to the MapR Converged Data Platform allowing any programming language to use MapR Streams.</p>
+
+<p>The Kafka REST Proxy provided with the MapR Streams tools, can be used with MapR Streams (default), but also used in a hybrid mode with Apache Kafka. In this article we will focus on MapR Streams.</p>
+
+<!-- more -->
+
+
+<h2>Prerequisites</h2>
+
+<ul>
+<li>MapR Converged Data Platform 5.2 with MEP 2.0
+
+<ul>
+<li>with MapR Streams Tools</li>
+</ul>
+</li>
+<li>curl, wget or any HTTP/REST Client tool</li>
+</ul>
+
+
+<h2>Create the MapR Streams and Topic</h2>
+
+<p>A stream is a collection of topics that you can manage as a group by:</p>
+
+<ol>
+<li>Setting security policies that apply to all topics in that stream</li>
+<li>Setting a default number of partitions for each new topic that is created in the stream</li>
+<li>Set a time-to-live for messages in every topic in the stream</li>
+</ol>
+
+
+<p>You can find more information about MapR Streams concepts in the <a href="http://maprdocs.mapr.com/home/MapR_Streams/mapr_streams.html">documentation</a>.</p>
+
+<p>On your Mapr Cluster or Sandbox, run the following commands:</p>
+
+<pre><code>$ maprcli stream create -path /apps/iot-stream -produceperm p -consumeperm p -topicperm p
+
+$ maprcli stream topic create -path /apps/iot-stream -topic sensor-json -partitions 3
+
+$ maprcli stream topic create -path /apps/iot-stream -topic sensor-binary -partitions 3
+</code></pre>
+
+<h2>Start Kafka Console Producers and Consumers</h2>
+
+<p>Open two terminal windows and run the consumer Kafka utilities using the following commands:</p>
+
+<h4>Consumer</h4>
+
+<ul>
+<li>Topic sensor-json</li>
+</ul>
+
+
+<pre><code>$ /opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-consumer.sh --new-consumer --bootstrap-server this.will.be.ignored:9092 --topic /apps/iot-stream:sensor-json
+</code></pre>
+
+<ul>
+<li>Topic sensor-binary</li>
+</ul>
+
+
+<pre><code>$ /opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-consumer.sh --new-consumer --bootstrap-server this.will.be.ignored:9092 --topic /apps/iot-stream:sensor-binary
+</code></pre>
+
+<p>This two terminal windows will allow you to see the messages posted on the different topics</p>
+
+<h2>Using Kafka REST Proxy</h2>
+
+<h3>Inspect Topic Metadata</h3>
+
+<p>The endpoint <code>/topics/[topic_name]</code> allows you to get some informations about the topic. In MapR Streams, topics are part of a <em>stream</em> identified by a path;
+to use the topic using the REST API you have to use the full path, and encode it in the URL; for example:</p>
+
+<ul>
+<li><code>/apps/iot-stream:sensor-json</code> will be encoded with <code>%2Fapps%2Fiot-stream%3Asensor-json</code></li>
+</ul>
+
+
+<p>Run the following command, to get information about the <code>sensor-json</code> topic</p>
+
+<pre><code>$ curl -X GET  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>Note: For simplicity reason I am running the command from the node where the Kafka REST proxy is running, so it is possible to use <code>localhost</code>.</p>
+
+<p>You can print JSON in a pretty way, by adding a Python command such as :</p>
+
+<pre><code>$ curl -X GET  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json | python -m json.tool
+</code></pre>
+
+<p><strong>Default Stream</strong></p>
+
+<p>As mentioned above, the Stream path is part of the topic name you have to use in the command;
+however it is possible to configure the MapR Kafka REST Proxy to use a default stream.
+For this you should add the following property in the <code>/opt/mapr/kafka-rest/kafka-rest-2.0.1/config/kafka-rest.properties</code> file:</p>
+
+<ul>
+<li><code>streams.default.stream=/apps/iot-stream</code></li>
+</ul>
+
+
+<p> When you change the Kafka REST proxy configuration, you must restart the service using maprcli or MCS.</p>
+
+<p> The main reason to use the <code>streams.default.stream</code> properties is to simplify the URLs used by the application for example
+ * with <code>streams.default.stream</code> you can use <code>curl -X GET  http://localhost:8082/topics/</code>
+ * without this configuration, or if you want to use a specific stream you must specify it in the URL <code>http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json</code></p>
+
+<p> In this article, all the URLs contains the encoded stream name, like that you can start using the Kafka REST proxy without changind the configuration and also use it with different streams.</p>
+
+<h3>Publishing Messages</h3>
+
+<p>The Kafka REST Proxy for MapR Streams allows application to publish messages to MapR Streams. Messages could be send as JSON or Binary content (base64 encoding).</p>
+
+<h4>To send a JSON Message:</h4>
+
+<ul>
+<li>the query should be a HTTP <code>POST</code></li>
+<li>the Content-Type should be : <code>application/vnd.kafka.json.v1+json</code></li>
+<li>the Body:</li>
+</ul>
+
+
+<pre><code class="JSON">{
+  "records":
+  [
+    {
+      "value":
+      {
+        "temp" : 10 ,
+        "speed" : 40 ,
+        "direction" : "NW"
+        }  
+      }
+  ]
+}
+</code></pre>
+
+<p>The complete request is:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
+  --data '{"records":[{"value": {"temp" : 10 , "speed" : 40 , "direction" : "NW"}  }]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>You should see the message printed in the terminal window where the <code>/apps/iot-stream:sensor-json</code> consumer is running.</p>
+
+<h4>To send a binary Message:</h4>
+
+<ul>
+<li>the query should be a HTTP <code>POST</code></li>
+<li>the Content-Type should be : <code>application/vnd.kafka.binary.v1+json</code></li>
+<li>the Body:</li>
+</ul>
+
+
+<pre><code class="JSON">{
+  "records":
+  [
+    {
+      "value":"SGVsbG8gV29ybGQ="
+    }
+  ]
+}
+</code></pre>
+
+<p>Note that <code>SGVsbG8gV29ybGQ=</code> is the string &ldquo;Hello World&rdquo; encoded in Base64.</p>
+
+<p>The complete request is:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.binary.v1+json" \
+  --data '{"records":[{"value":"SGVsbG8gV29ybGQ="}]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>You should see the message printed in the terminal window where the <code>/apps/iot-stream:sensor-binary</code> consumer is running.</p>
+
+<h4>Sending multiple messages</h4>
+
+<p>The <code>records</code> field of the HTTP Body allows you to send multiple messages for example you can send:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.json.v1+json" \
+  --data '{"records":[{"value": {"temp" : 12 , "speed" : 42 , "direction" : "NW"}  }, {"value": {"temp" : 10 , "speed" : 37 , "direction" : "N"}  } ]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>This command will send 2 messages, and increment the offset by 2. You can do the same
+with binary content, just add new element in the JSON array; for example:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.binary.v1+json" \
+  --data '{"records":[{"value":"SGVsbG8gV29ybGQ="}, {"value":"Qm9uam91cg=="}]}' \
+  http://localhost:8082/topics/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>As you probably know, it is possible to set a key to a message to be sure that all the messages
+with the same key will arrive in the same partition. For this, add the <code>key</code> attribute to the message as follow:</p>
+
+<pre><code class="JSON">{
+  "records":
+  [
+    {
+      "key": "K001",
+      "value":
+      {
+        "temp" : 10 ,
+        "speed" : 40 ,
+        "direction" : "NW"
+        }  
+      }
+  ]
+}
+</code></pre>
+
+<p>Now that you know how to post messages to MapR Stream topics usinf the REST Proxy, let&rsquo;s see how to consume the messages.</p>
+
+<h3>Consuming Messages</h3>
+
+<p>The REST proxy can also be used to consume messages from topics; for this you need to:</p>
+
+<ol>
+<li>Create a consumer instance.</li>
+<li>Use this URL returned by the first call to read message.</li>
+<li>Delete the consumer instanced if needed.</li>
+</ol>
+
+
+<h4>Creating the consumer instance</h4>
+
+<p>The following request creates the consumer instance:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.v1+json" \
+      --data '{"name": "iot_json_consumer", "format": "json", "auto.offset.reset": "earliest"}' \
+      http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>The response from the server looks like:</p>
+
+<pre><code class="json">{
+  "instance_id":"iot_json_consumer",
+  "base_uri":"http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-json/instances/iot_json_consumer"
+}
+</code></pre>
+
+<p>Note that we have used the <code>/consumers/[topic_name]</code> to create the consumer.</p>
+
+<p>The <code>base_uri</code> will be used by the subsequent requests to get the messages from the topic. Like any MapR Streams/Kafka consumer the <code>auto.offset.reset</code> defines its behavior. In this example the value is set to <code>earliest</code>, this means that the consumer will read the messages from the beginning. You can find more information about the consumer configuration in the <a href="http://maprdocs.mapr.com/home/MapR_Streams/configuration_parameters_for_consumers.html">MapR Streams documentation</a>.</p>
+
+<h4>Consuming the messages</h4>
+
+<p>To consume the messages, just add the Mapr Streams topic to the URL of the consumer isntance.</p>
+
+<p>The following request consumes the messages from the topic:</p>
+
+<pre><code>curl -X GET -H "Accept: application/vnd.kafka.json.v1+json" \
+http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-json/instances/iot_json_consumer/topics/%2Fapps%2Fiot-stream%3Asensor-json
+</code></pre>
+
+<p>This call returns the messages in a JSON document:</p>
+
+<pre><code class="json">[
+  {"key":null,"value":{"temp":10,"speed":40,"direction":"NW"},"topic":"/apps/iot-stream:sensor-json","partition":1,"offset":1},
+  {"key":null,"value":{"temp":12,"speed":42,"direction":"NW"},"topic":"/apps/iot-stream:sensor-json","partition":1,"offset":2},
+  {"key":null,"value":{"temp":10,"speed":37,"direction":"N"},"topic":"/apps/iot-stream:sensor-json","partition":1,"offset":3}
+]
+</code></pre>
+
+<p>Each call to the API returns the new messages published, based on the offset of the last call.</p>
+
+<p>Note that the Consumer will be destroyed:</p>
+
+<ul>
+<li>after some idle time set by the <code>consumer.instance.timeout.ms</code> (default value set to 300000ms / 5 minutes)</li>
+<li>where it is destroyed using a REST API call (see below).</li>
+</ul>
+
+
+<h3>Consuming binary format messages</h3>
+
+<p>The approach is the same if you need to consume binary messages, you need to change the format and accept header.</p>
+
+<p>Call this URL to create a consumer instance for the binary topic:</p>
+
+<pre><code>curl -X POST -H "Content-Type: application/vnd.kafka.v1+json" \
+      --data '{"name": "iot_binary_consumer", "format": "binary", "auto.offset.reset": "earliest"}' \
+      http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>Then consume messages, the accept header is set to <code>application/vnd.kafka.binary.v1+json</code>:</p>
+
+<pre><code>curl -X GET -H "Accept: application/vnd.kafka.binary.v1+json" \
+http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-binary/instances/iot_binary_consumer/topics/%2Fapps%2Fiot-stream%3Asensor-binary
+</code></pre>
+
+<p>This call returns the messages in a JSON document, and the value is encoded in Base64</p>
+
+<pre><code class="json">[
+  {"key":null,"value":"SGVsbG8gV29ybGQ=","topic":"/apps/iot-stream:sensor-binary","partition":1,"offset":1},
+  {"key":null,"value":"Qm9uam91cg==","topic":"/apps/iot-stream:sensor-binary","partition":1,"offset":2}
+]
+</code></pre>
+
+<h3>Delete consumer instances</h3>
+
+<p>As mentioned before the consumer will be destroyed automatically based on the <code>consumer.instance.timeout.ms</code> configuration of the REST Proxy;
+it is also possible to destroyed the instance using the consumer instance URI and an HTTP DELETE call, as follow:</p>
+
+<pre><code>curl -X DELETE http://localhost:8082/consumers/%2Fapps%2Fiot-stream%3Asensor-binary/instances/iot_binary_consumer
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to use the Kafka REST Proxy for MapR Streams that allow any application to
+use messages published in the MapR Converged Data Platform.</p>
+
+<p>You can find more information about the Kafka REST Proxy in the <a href="http://maprdocs.mapr.com/home/Kafka/REST-proxy.html">MapR documentation</a> and the following resources:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">Getting Started with MapR Streams</a></li>
+<li><a href="https://www.mapr.com/streaming-architecture-using-apache-kafka-mapr-streams">&ldquo;Streaming Architecture: New Designs Using Apache Kafka and MapR Streams&rdquo; ebook by Ted Dunning and Ellen Friedman</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Save MapR Streams Messages Into MapR DB JSON]]></title>
+    <link href="http://tgrall.github.io/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json/"/>
+    <updated>2016-03-31T09:00:07+02:00</updated>
+    <id>http://tgrall.github.io/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json</id>
+    <content type="html"><![CDATA[<p>In this article you will learn how to create a MapR Streams Consumer that saves all the messages into a <a href="http://maprdocs.mapr.com/51/#MapR-DB/JSON_DB/mapr_db_json_top.html">MapR-DB JSON Table</a>.</p>
+
+<!-- more -->
+
+
+<h3>Install and Run the sample MapR Streams application</h3>
+
+<p>The steps to install and run the applications are the same as the one defined in the following article:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">MapR Streams application</a></li>
+</ul>
+
+
+<p>Once you have the default producer and consumer running in your environment using the commands:</p>
+
+<p>Producer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run producer
+</code></pre>
+
+<p>Consumer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run consumer
+</code></pre>
+
+<h3>Save messages into MapR-DB JSON</h3>
+
+<p>The <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java">DBConsumer</a> class is a copy of the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/Consumer.java">Consumer</a> class with small changes to save the messages coming from the <code>/sample-stream:fast-messages</code> topic into a MapR-DB table named <code>/apps/fast-messages</code>.</p>
+
+<p><strong>1- Add MapR-DB Maven dependency to your project</strong></p>
+
+<p>Edit the <code>pom.xml</code> file and add the following entry in the <code>dependencies</code> tag:</p>
+
+<pre><code class="xml">   &lt;dependency&gt;
+      &lt;groupId&gt;com.mapr.db&lt;/groupId&gt;
+      &lt;artifactId&gt;maprdb&lt;/artifactId&gt;
+      &lt;version&gt;5.1.0-mapr&lt;/version&gt;
+   &lt;/dependency&gt;
+</code></pre>
+
+<p>This add support for:</p>
+
+<ul>
+<li><a href="http://ojai.io/">OJAI</a> Open JSON Application Interface</li>
+<li><a href="http://maprdocs.mapr.com/51/#MapR-DB/JSON_DB/crud_with_maprdb_ojai_java_api.html">MapR-DB JSON API</a></li>
+</ul>
+
+
+<p><strong>2- Create and Get a JSON Table</strong></p>
+
+<p>To save the messages, the application must access a JSON Table, for this just call the <code>MapRDB.getTable(TABLE_PATH)</code> method. If the table does not exist, create it with the <code>MapRDB.createTable(TABLE_PATH)</code>.</p>
+
+<p>This is what the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L113-L119"><code>DBConsumer.getTable(TABLE_PATH)</code></a> method is doing.</p>
+
+<pre><code class="java">  private static Table getTable(String tablePath) {
+    if ( ! MapRDB.tableExists(tablePath)) {
+      return MapRDB.createTable(tablePath);
+    } else {
+      return MapRDB.getTable(tablePath);
+    }
+  }
+</code></pre>
+
+<p>When the DBConsumer starts the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L41"><code>getTable("/apps/fast-messages")</code></a> method is called.</p>
+
+<pre><code>  Table fastMessagesTable = getTable("/apps/fast-messages");
+</code></pre>
+
+<p>The table <code>fastMessagesTable</code> is not available to the consumer.</p>
+
+<p><strong>3- Save messages into the JSON Table</strong></p>
+
+<p>Messages can be saved into the table using the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L78-L81">MapR-DB JSON Java API</a>.</p>
+
+<p>The producer sends the message as JSON String that is converted into a JSON object names <code>msg</code>. This object can be used to create an OJAI Document:</p>
+
+<pre><code>  Document messageDocument = MapRDB.newDocument(msg);
+</code></pre>
+
+<p>To be saved into MapR-DB, a document must have a <code>_id</code> field. In this example let’s use the message number generated by the producer <em>(JSON field <code>k</code>)</em>.</p>
+
+<pre><code>  messageDocument.setId( Integer.toString(messageDocument.getInt("k")));
+</code></pre>
+
+<p>Let’s now save the document into the table:</p>
+
+<pre><code>  fastMessagesTable.insertOrReplace( messageDocument );       
+</code></pre>
+
+<p>Each time the producer will be executed, the message number counter will be initialized to 0. So the document _id will be the same, and the document into the table must be replaced; this is why the <code>insertOrReplace</code> method is used.</p>
+
+<p>Let’s run the new consumer.</p>
+
+<p><strong>4- Run the DBConsumer</strong></p>
+
+<p>To run the DBConsumer just pass the parameter <code>dbconsumer</code> as follow:</p>
+
+<p>Consumer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run dbconsumer
+</code></pre>
+
+<p>Note that a new <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L48-L54">group is created</a> to be sure that messages are read by the two different consumers (Consumer and DBConsumer).</p>
+
+<p><strong>5- Query the messages saved into MapR-DB</strong></p>
+
+<p>Messages are saved into the <code>/apps/fast-messages</code> table, let’s used the MapR DBShell to query the data. On your cluster run the following commands, as <code>mapr</code>:</p>
+
+<pre><code>$ mapr dbshell
+maprdb mapr:&gt; find /apps/fast-messages --id 100
+{"_id":"100","type":"test","t":64986.787,"k":{"$numberLong":100}}
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>In this very simple example, the DBConsumer takes each message and saved it as a simple JSON Document into MapR-DB JSON. The table can be used to create any type of application, or using Apache Drill <em>(1.6 or later)</em> to do some analytics.</p>
+
+<p>In a real application the messages will probably be modified, enriched and/or aggregated and then the result be saved into MapR-DB Table. The goal of this sample is just to show that it is easy to integrate MapR Streams and MapR-DB.</p>
+
+<p>You have also other alternative to achieve the same thing using for example:</p>
+
+<ul>
+<li>Spark Streaming</li>
+<li>3rd Party ETL and Tools</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR Streams]]></title>
+    <link href="http://tgrall.github.io/blog/2016/03/10/getting-started-with-mapr-streams/"/>
+    <updated>2016-03-10T10:09:32+01:00</updated>
+    <id>http://tgrall.github.io/blog/2016/03/10/getting-started-with-mapr-streams</id>
+    <content type="html"><![CDATA[<p>You can find a new tutorial that explains how to deploy an Apache Kafka application to MapR Streams, the tutorial is available here:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">Getting Started with MapR Streams</a></li>
+</ul>
+
+
+<p>MapR Streams is a new distributed messaging system for streaming event data at scale, and it’s integrated into the MapR converged platform.
+MapR Streams uses the Apache Kafka API, so if you’re already familiar with Kafka, you’ll find it particularly easy to get started with MapR Streams.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With Sample Programs for Apache Kafka 0.9]]></title>
+    <link href="http://tgrall.github.io/blog/2016/02/10/getting-started-with-sample-programs-for-apache-kafka-0-dot-9/"/>
+    <updated>2016-02-10T10:25:44+01:00</updated>
+    <id>http://tgrall.github.io/blog/2016/02/10/getting-started-with-sample-programs-for-apache-kafka-0-dot-9</id>
+    <content type="html"><![CDATA[<p>Ted Dunning and I have worked on a tutorial that explains how to write your first Kafka application. In this tutorial you will learn how to:</p>
+
+<ul>
+<li>Install and start Kafka</li>
+<li>Create and Run a producer and a consumer</li>
+</ul>
+
+
+<p>You can find the tutorial on the MapR blog:</p>
+
+<ul>
+<li><a href="https://goo.gl/cWmbmY">Getting Started with Sample Programs for Apache Kafka 0.9</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

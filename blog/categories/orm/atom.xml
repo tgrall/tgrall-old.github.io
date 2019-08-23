@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Orm | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/orm/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle TopLink: Happy 10th Anniversary]]></title>
+    <link href="http://tgrall.github.io/blog/2004/11/17/oracle-toplink-happy-10th-anniversary/"/>
+    <updated>2004-11-17T09:15:22+01:00</updated>
+    <id>http://tgrall.github.io/blog/2004/11/17/oracle-toplink-happy-10th-anniversary</id>
+    <content type="html"><![CDATA[<p>In the context of the 10th anniversary of Oracle TopLink, <a href="http://theserverside.com/news/thread.tss?thread_id=30017" target="_tugSite">The Server Side published an interview of Mike Keith and Doug Clark</a>, architect and product manager of TopLink. They talk about persistence in J2EE using EJB 3.0, but also the differences between TopLink and other persistence solutions&hellip;</p>
+]]></content>
+  </entry>
+  
+</feed>

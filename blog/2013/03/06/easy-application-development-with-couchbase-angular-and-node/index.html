@@ -1,0 +1,779 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Easy Application Development With Couchbase, Angular and Node - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Note : This article has been written in March 2013, since Couchbase and its drivers have a changed a lot. I am not working with/for Couchbase anymore &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Easy Application Development With Couchbase, Angular and Node</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-03-06T02:35:47+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>2:35 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><blockquote><p>Note : This article has been written in March 2013, since Couchbase and its drivers have a changed a lot. I am not working with/for Couchbase anymore, with no time to update the code.</p></blockquote>
+
+<p>A friend of mine wants to build a simple system to capture ideas, and votes. Even if you can find many online services to do that, I think it is a good opportunity to show how easy it is to develop new application using a Couchbase and Node.js.</p>
+
+<p>So how to start?</p>
+
+<p>Some of us will start with the UI, other with the data, in this example I am starting with the model. The basics steps are :</p>
+
+<ol>
+<li>Model your documents</li>
+<li>Create Views</li>
+<li>Create Services</li>
+<li>Create the UI</li>
+<li>Improve your application by iteration</li>
+</ol>
+
+
+<p>The sources of this sample application are available in Gihub :</p>
+
+<p><a href="https://github.com/tgrall/couchbase-node-ideas">https://github.com/tgrall/couchbase-node-ideas</a></p>
+
+<p>Use the following command to clone the project locally :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git clone https://github.com/tgrall/couchbase-node-ideas.git</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>Note:</em> my goal is not to provide a complete application, but to describe the key steps to develop an application.</p>
+
+<!--more-->
+
+
+<h3>Model your documents</h3>
+
+<p>For this application you need 3 types of document :</p>
+
+<ul>
+<li>Ideas : describes the idea with a author, title and description</li>
+<li>Vote : the author and a comment - note that it is a choice to not put a value for the vote, in this first version if the vote exists this means user like the idea.</li>
+<li>User : contains all the information about the user (not used in this first version of the application)</li>
+</ul>
+
+
+<p>You can argue that it is possible to put the votes as a list of element inside the idea document. In this case I prefer to use different document and reference the idea in the vote since we do not know how many votes/comments will have. Using different documents is also interesting in this case for the following reasons :</p>
+
+<ul>
+<li>No &ldquo;concurrent&rdquo; access, when a user wants to vote he does not change the idea document itself, so no need to put an optimistic locking in place.</li>
+<li>The size of the document will be smaller and easier to cache in memory.</li>
+</ul>
+
+
+<p>So documents will look like:</p>
+
+<div><script src='https://gist.github.com/79f57b13e7a637c7e62e.js'></script>
+<noscript><pre><code>{
+  &quot;type&quot; : &quot;idea&quot;,
+  &quot;id&quot; : &quot;idea:4324&quot;,
+  &quot;title&quot; : &quot;Free beer during bug hunt&quot;,
+  &quot;description&quot; : &quot;It will be great to have free beer during our test campaign!&quot;,
+  &quot;user_id&quot; : &quot;user:234&quot;
+}</code></pre></noscript></div>
+
+
+<p>What I really like is the fact that I can quickly create a small dataset to validate that it is correct and help me to design the view. The way I do it, I start my server, launch the Couchbase Administration Console, create a bucket, and finally insert document manually and validate the model and views.</p>
+
+<h3>Create Views</h3>
+
+<p>Now that I have created some documents, I can think about the way I want to get the information out of the database. For this application I need:</p>
+
+<ul>
+<li>The list of ideas</li>
+<li>The votes by ideas</li>
+</ul>
+
+
+<p>The list of idea for this first version is very simple, we just need to emit the title:</p>
+
+<div><script src='https://gist.github.com/989a5450811dec8f305e.js'></script>
+<noscript><pre><code>function (doc, meta) {
+  if (doc.type == &quot;idea&quot;) {
+    emit(doc.title);
+  }
+}</code></pre></noscript></div>
+
+
+<p>For the votes by ideas, I choose to create a collated view, this will give me some interesting options when I will expose them into an API/View layer. I am also for this view using <code>sum()</code> reduce function to be sure I capture the number of votes.</p>
+
+<div><script src='https://gist.github.com/5fe945cbc12cc59e9dbd.js'></script>
+<noscript><pre><code>function (doc, meta) {
+  switch (doc.type){
+    case &quot;idea&quot; :
+      emit([meta.id,0, doc.title],0);
+      break;
+    case &quot;vote&quot; :
+      emit([doc.idea_id,1],1);
+      break;
+  }  
+}</code></pre></noscript></div>
+
+
+<p>I have my documents, I have some views that allow me to retrieve the list of ideas, the number of vote by idea and count the vote&hellip; So I am ready to expose all these informations to the application using a simple API layer.</p>
+
+<h3>Create Services</h3>
+
+<p>Lately I have been playing a lot with Node.js, just because it is nice to learn new stuff and also because it is really easy to use with Couchbase. Think about it Couchbase loves JSON, and Node.js object format is JSON, this means I do not have any marshaling/unmarshaling to do.</p>
+
+<p>My API layer is quite simple, I just need to create a set of REST endpoint to deal with:</p>
+
+<ul>
+<li>CRUD operation on each type of document</li>
+<li>List the different Documents</li>
+</ul>
+
+
+<p>The code of the services is available in branch <a href="https://github.com/tgrall/couchbase-node-ideas/tree/01-simple-services">01-simple-services</a>:</p>
+
+<p>You can run the application &nbsp;with simple services using the following command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; git checkout -f 01-simple-services
+</span><span class='line'>&gt; node app.js</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and go to you browser using the <a href="http://127.0.0.1:3000">http://127.0.0.1:3000</a></p>
+
+<p><em>About the project</em></p>
+
+<p>For this project I am using only 2 node modules <a href="http://expressjs.com/">Express</a> and <a href="https://github.com/couchbase/couchnode">Couchbase</a>. The package.json file looks like :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;couchbase-ideas-management&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;private&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;dependencies&quot;</span><span class="p">:</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;express&quot;</span><span class="p">:</span> <span class="s2">&quot;3.x&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;couchbase&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.11&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After running the install, let&rsquo;s code the new API interface, as said before I am using an iterative approach so for now I am not dealing with the security, I just want to get the basic actions to work.</p>
+
+<p>I am starting with the endpoints to get and set the documents. I am creating a generic endpoints that take the type as URI parameter allowing user/application to do a get/post on <code>/api/vote</code>, <code>/api/idea</code>. The following code captures this:</p>
+
+<div><script src='https://gist.github.com/42f0b936a55fd2dcefac.js'></script>
+<noscript><pre><code> // get document
+ app.get(&#39;/api/:type/:id&#39;, function(req, res) {
+    if (type == &#39;idea&#39; || type == &#39;vote&#39; || type == &#39;user&#39;) {
+        get(req, res, type);
+    } else {
+        res.send(400);
+    }
+});
+
+// create new document
+app.post(&#39;/api/:type&#39;, function(req, res) {
+    if (type == &#39;idea&#39; || type == &#39;vote&#39; || type == &#39;user&#39;) {
+        upsert(req, res, type);
+    } else {
+        res.send(400);
+    }
+});
+</code></pre></noscript></div>
+
+
+<p>In each case I start to test if the URI is one of the supported types (idea, vote, user) and if this is the case I call the <code>get()</code> or <code>upsert()</code> method that will do the call to Couchbase.</p>
+
+<p>The <code>get()</code> and <code>upsert()</code> methods are using more or less the same approach. I test if the document exists, if the type is correct and do the operation to Couchbase. Let&rsquo;s focus on the <code>upsert()`` method. I call it</code>upsert()` since the same operation is used to create and update the document.</p>
+
+<div><script src='https://gist.github.com/91858dcad51affdf3521.js'></script>
+<noscript><pre><code>function upsert(req, res, docType) {
+    // check if the body contains a know type, if not error
+    if (req.body != null &amp;&amp; req.body.type == docType) {
+        var id = req.body.id;
+        if (id == null) {
+            // increment the sequence and save the doc
+            cb.incr(&quot;counter:&quot;+req.body.type, function(err, value, meta) {
+                id = req.body.type + &quot;:&quot; + value;
+                req.body.id = id;
+                cb.add(id, req.body, function(err, meta) {
+                    res.send(200);
+                });
+            });
+        } else {
+            cb.replace(id, req.body, function(err, meta) {
+                res.send(200);
+            });
+        }
+    } else {
+        res.send(403);
+    }
+}</code></pre></noscript></div>
+
+
+<p>In this function I start by testing if the document contains a type and if the type is the one expected (line 3).</p>
+
+<p>Then I check if the document id is present, to see if I need to create it or not. This is one of the reason why I like to keep the id/key in the document, yes I duplicate it, but it makes the development really easy. So if I have to create a new document I have to generate a new id. I chose to create a counter for each type. this is why I call the incr function (line 7) and then use the returned value to create the document (line 10).</p>
+
+<p><em>Note:</em> as you can see, my documents contain the an ID as part of the attributes. This ID is the same value that the one used to set the document (the &ldquo;key&rdquo;). It is not necessary a good practice to duplicate this information, and in many case the application only use the document key itself. I personally like to put the ID in the document itself too, because it simplifies a lot the development.</p>
+
+<p>If the ID is present, I just call the update operation to save the document. (line 15)</p>
+
+<p>The delete operation is equivalent to the get, using the delete HTTP operation.</p>
+
+<p>So now I can get, insert and update the documents. I still need to do some work to deal with the lists. As you can guess, here I need to call the views. I won&rsquo;t go in the detail of the simple list of ideas. Let&rsquo;s focus on the view that shows the result of the votes.</p>
+
+<div><script src='https://gist.github.com/6468058737ff53553ae1.js'></script>
+<noscript><pre><code>app.get(&#39;/api/results/:id?&#39;, function(req, res) {
+    var queryParams = {
+        stale: false,
+        group_level : 3
+    };
+    if (req.params.id != null) {
+        queryParams.startkey = [req.params.id,0];
+        queryParams.endkey = [req.params.id,2];
+    }
+ 
+    cb.view(&quot;ideas&quot;, &quot;votes_by_idea&quot;, queryParams, function(err, view) {
+        var result = new Array();
+        var idx = -1;
+        var currentKey = null;
+        for (var i = 0; i &lt; view.length; i++) {
+            key = view[i].key[0];
+            if (currentKey == null || currentKey != key ) {
+                idx = idx +1;
+                currentKey = key;
+                result[idx] = { id : key, title : view[i].key[2], value : 0 };
+            } else {
+                result[idx].value = view[i].value;
+            }
+        }
+        res.send(result);
+    });     
+});</code></pre></noscript></div>
+
+
+<p>For this part of the application I use a small trick to use the collated view. The <code>/api/results/</code> call returns the list of ideas with their title and the total number of votes. The result looks like the following:</p>
+
+<div><script src='https://gist.github.com/6cfdedf1410ca99744bd.js'></script>
+<noscript><pre><code>[
+    {
+        &quot;id&quot;: &quot;idea:0&quot;,
+        &quot;title&quot;: &quot;Add new electric company cars&quot;,
+        &quot;value&quot;: 0
+    },
+    {
+        &quot;id&quot;: &quot;idea:1&quot;,
+        &quot;title&quot;: &quot;Develop new blog on Jekyll&quot;,
+        &quot;value&quot;: 3
+    },
+    {
+        &quot;id&quot;: &quot;idea:2&quot;,
+        &quot;title&quot;: &quot;Bring your own device project&quot;,
+        &quot;value&quot;: 1
+    },
+    {
+        &quot;id&quot;: &quot;idea:3&quot;,
+        &quot;title&quot;: &quot;Test the new Rasperry Pi&quot;,
+        &quot;value&quot;: 1
+    }
+]</code></pre></noscript></div>
+
+
+<p>Note that it is also possible to select only one idea , you just need to pass the id to the call for example.</p>
+
+<p>If you look in more detail the function, not only I call the view, but I build an array in which I put the idea id, label, then on the next loop, I add the number of vote. This is possible because the view is a collated view of the ideas and its votes.</p>
+
+<p>I have now my REST Services, including advanced query capabilities. It is time now to use these services and build the user interface.</p>
+
+<h3>Create the UI</h3>
+
+<p>For the view I am using AngularJS, that I am packaging in the same node.js application for simplicity reason</p>
+
+<h4>Simple UI without Login/Security</h4>
+
+<p>The code of the application without login is available branch in <a href="https://github.com/tgrall/couchbase-node-ideas/tree/02-simple-ui-no-login">02-simple-ui-no-login</a></p>
+
+<p>You can run the application &nbsp;with simple services using the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">&gt;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">-f</span> <span class="mi">02</span><span class="err">-simple-ui-no-login</span>
+</span><span class='line'><span class="err">&gt;</span> <span class="err">node</span> <span class="err">app.js</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The application is based on AngularJS and Twitter Boostrap.</p>
+
+<p>I am using basic feature and packaging for Angular :</p>
+
+<ul>
+<li><code>/public/js/app.js</code> contains the module declaration and all the routes to the different views/controllers</li>
+<li><code>/public/js/controllers.js</code> contains all the controller. I will show some of them but basically this is where that I call the services that I have created above.</li>
+<li><code>/views/partials/</code> contains the different pages/screens used by the application.</li>
+</ul>
+
+
+<p>Because the application is quite simple I have not done any packaging of directive, or other functions. This is true at for AngularJS and Node.js parts.</p>
+
+<p><em>Dummy user management</em></p>
+
+<p>In this first version of the UI I have not yet integrated any login/security, so I fake the user login using a global scope variable that <code>$scope.user</code> that you can see in the controller <code>AppCtrl()</code>. Since I have not yet implemented the login/security, I have added at the bottom of the page a textfield where you can enter a &ldquo;dummy&rdquo; username to test the application. This field is inserted in the <code>/views/index.html</code> page.</p>
+
+<p><em>List Views and Number of Votes</em></p>
+
+<p>The home page of the application contains the list of ideas and number of votes.</p>
+
+<p><img src="http://2.bp.blogspot.com/-tniNkr_Pl0Q/USidTLKHw1I/AAAAAAAAAbQ/BWtfTaAWG1w/s320/ideas-home-page.png"></p>
+
+<p>Look at the EntriesListCtrl controller and the <code>view/index.html</code> file. As you can guess this is based on the Couchbase collated view that return the list of ideas and number of vote.</p>
+
+<p><em>Create/Edit an idea</em></p>
+
+<p>When the user click on the New link in the navigation, the application call the view <code>/view/partials/idea-form.html</code>. &nbsp;This form is called using the &ldquo;/#/idea/new&rdquo; URL.</p>
+
+<p>Just look at the <code>IdeaFormCtrl</code> controller to see what is happening :</p>
+
+<p>Error processing input, expected syntax: {% img [class name(s)] [http[s]:/]/path/to/image [width [height]] [title text | &ldquo;title text&rdquo; [&ldquo;alt text&rdquo;]] %}</p>
+
+<p>First of all I test if the controller is called with a idea identifier in the URL ( <code>$routeParams.id</code> - line 3) . If the ID is present, I call the REST API to get the idea and set it into the <code>$scope.idea</code> variable.</p>
+
+<p>Then on line 9, you can see the <code>$scope.save()</code> function that calls the REST API to save/update the idea to Couchbase. I use the line 10 and 11 to set the user and the type of data to the idea.</p>
+
+<p><em>Note:</em> It is interesting to look at these lines, by adding the two attributes (user &amp; type) I modify the &ldquo;schema&rdquo; of my data. I am adding new fields to my document that will be stored as it is in Couchbase. Once again, you see here that I drive the data type from my application. I could take another approach and force the type in the service layer. For this example I chose to put that in the application layer, that is supposed to send the proper data types.</p>
+
+<p><em>Other Interactions</em></p>
+
+<p>The same approach is used to create a vote associated to a user/idea as you can see in the <code>VoteFormCtrl</code>  controller.</p>
+
+<p>I won&rsquo;t go in all the details of all operations, I am just inviting you to look at the code of the application, and feel free to add comment to this blog post if I need to clarify other part of the application.</p>
+
+<h4>Iterative Development : adding a value to the vote!</h4>
+
+<p>The code of the services is available in branch 01-simple-services:</p>
+
+<p>You can run the application with simple services using the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">&gt;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">-f</span> <span class="mi">03</span><span class="err">-vote-with-value</span>
+</span><span class='line'><span class="err">&gt;</span> <span class="err">node</span> <span class="err">app.js</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>Adding the field in the form</em></p>
+
+<p>Something that I really like about working with AngularJS, Node and Couchbase is the fact that the developer uses JSON from the database to the browser.</p>
+
+<p>So let&rsquo;s implement a new feature, where instead of having only a comment the user can give a rate to its vote from 1 to 5. Doing that is quite easy, here are the steps:</p>
+
+<ul>
+<li>Modify the UI : adding a new field</li>
+<li>Modify the Couchabe View to use the new field</li>
+</ul>
+
+
+<p>This is it! AngularJS deals with the binding of the new field, so I just need to edit the <code>/views/partials/idea-form.html</code> to add this. For this I need to add the list of values in the controller and expose it into a select box in form.</p>
+
+<p>The list of value located in the <code>$scope.ratings</code> variable :</p>
+
+<div><script src='https://gist.github.com/fe7c8625a6f54dfd2425.js'></script>
+<noscript><pre><code>  $scope.ratings = [
+  {
+    &quot;id&quot;: &quot;0&quot;,
+    &quot;label&quot;: &quot;0 - No Interest&quot;,
+    },
+    {
+        &quot;id&quot;: &quot;1&quot;,
+        &quot;label&quot;: &quot;1 - Low Interest&quot;,
+    },
+    {
+        &quot;id&quot;: &quot;2&quot;,
+        &quot;label&quot;: &quot;2 - Medium&quot;,
+    },
+    {
+        &quot;id&quot;: &quot;3&quot;,
+        &quot;label&quot;: &quot;3 - Good&quot;,
+    },
+    {
+        &quot;id&quot;: &quot;4&quot;,
+        &quot;label&quot;: &quot;4 - Outstanding&quot;,
+    }, 
+    {
+        &quot;id&quot;: &quot;5&quot;,
+        &quot;label&quot;: &quot;5 - Must be done. Now!&quot;,
+    }];</code></pre></noscript></div>
+
+
+<p>Once this is done you can add a select box into your view using the following code :</p>
+
+<div><script src='https://gist.github.com/d4115c3dbdd5a25614d9.js'></script>
+<noscript><pre><code>&lt;div class=&quot;control-group&quot;&gt;  
+    &lt;label class=&quot;control-label&quot; &gt;Rate&lt;/label&gt;  
+    &lt;div class=&quot;controls&quot;&gt;  
+            &lt;select required ng-model=&quot;vote.rating&quot; ng-options=&quot;value.id as value.label group by value.group for value in ratings&quot;&gt;
+            &lt;/select&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre></noscript></div>
+
+
+<p>To add the select box into the form, I just use AngularJS features:</p>
+
+<ul>
+<li>the list of value described in my controller using the <code>ng-options</code> attribute</li>
+<li>the binding to the vote.rating field object using <code>ng-model</code> attribute.</li>
+</ul>
+
+
+<p>I am adding the field in my form, I bind this field to my Javascript object; and&hellip; nothing else! Since my REST API is just consuming the JSON object as it is, AngularJS will send the vote object with the new attribute.</p>
+
+<p><em>Update the view to use the rating</em></p>
+
+<p>Now that my database is dealing with a new attribute in the vote, I need to update my view to use this in the sum function. (I could calculate an average too, but here I want the sum of all the vote/ratings).</p>
+
+<div><script src='https://gist.github.com/c2fb3f9a3127df75e454.js'></script>
+<noscript><pre><code>function (doc, meta) {
+  switch (doc.type){
+    case &quot;idea&quot; :
+      emit([meta.id,0, doc.title],0);
+      break;
+    case &quot;vote&quot; :
+      emit([doc.idea_id,1], (doc.rating)?doc.rating:2 );
+      break;
+  }  
+}</code></pre></noscript></div>
+
+
+<p>The only line that I have changed is the line number 7. The logic is simple, if the rating is present I emit it, if not I emit a 2, that is a medium rating for an idea.</p>
+
+<p>This is a small tip that allow me to have a working view/system without having to update all the existing document if I have some.</p>
+
+<p>I&rsquo;ll stop here for now, and will add new feature later such as User Authentication and User Management using for example <a href="http://passportjs.org/">Passport</a>.</p>
+
+<h3>Version and Upgrade Management</h3>
+
+<p>If you looked closely to the code of the application the views are automatically imported from the app.js file when the application is starting.</p>
+
+<p>In fact I have added a small function that check the current version installed and update the views with the correct version when needed.</p>
+
+<p>You can look at the function <a href="https://github.com/tgrall/couchbase-node-ideas/blob/03-vote-with-value/app.js#L21"><code>initApplication()</code></a> :</p>
+
+<ul>
+<li>Load the version number from Couchbase (document with ID &ldquo;<code>app.version</code>&rdquo;)</li>
+<li>Check the version of if this is different</li>
+<li>Update/Create the view (I am doing it in production mode here, in real application it will be better to use dev mode - just prefix the design document ID with <code>"dev_"</code> )</li>
+<li>Once the view is created update/create the <code>"app.version"</code> document with the new ID.</li>
+</ul>
+
+
+<h3>Conclusion</h3>
+
+<p>In this article we have seen how you can quickly develop your application/prototype and leverage the flexibility of NoSQL for developers. The steps to do this are:</p>
+
+<ol>
+<li>Design your document model and API (REST)</li>
+<li>Create the UI that consumes the API</li>
+<li>Modify your model by simply adding field into the UI</li>
+<li>Update the view to adapt your lists to your new model</li>
+</ol>
+
+
+<p>In addition to this, I have also quickly explain how you can from your code control the version of your application and deploy new views (and other things) automatically.</p>
+
+<p>I will post another blog post in few days to explain how you can easily integrate user management, security to your application and database easily</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-03-06T02:35:47+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>2:35 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/angular/'>angular</a>, <a class='category' href='/blog/categories/couchbase/'>couchbase</a>, <a class='category' href='/blog/categories/node/'>node</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/02/18/how-to-get-the-latest-document-by-date-slash-time-field/" title="Previous Post: How to get the latest document by date/time field?">&laquo; How to get the latest document by date/time field?</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/04/29/screencast-fun-with-couchbase-mapreduce-and-twitter/" title="Next Post: Screencast : Fun with Couchbase MapReduce and Twitter">Screencast : Fun with Couchbase MapReduce and Twitter &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/';
+        var disqus_url = 'http://tgrall.github.io/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

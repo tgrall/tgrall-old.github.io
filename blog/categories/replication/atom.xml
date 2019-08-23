@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Replication | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/replication/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR-DB Table Replication]]></title>
+    <link href="http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication/"/>
+    <updated>2017-08-08T10:01:19+02:00</updated>
+    <id>http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication</id>
+    <content type="html"><![CDATA[<h2>Introduction</h2>
+
+<p>MapR-DB Table Replication allows data to be replicated to another table that could be on on the same cluster or in another cluster. This is different from the automatic and intra-cluster replication that copies the data into different physical nodes for high availability and prevent data loss.</p>
+
+<p>This tutorial focuses on the MapR-DB Table Replication that replicates data between tables on different clusters.</p>
+
+<p>Replicating data between different clusters allows you to:</p>
+
+<ul>
+<li>provide another level of disaster recovery that protects your data and applications against global data center failure,</li>
+<li>push data close to the applications and users,</li>
+<li>aggregate the data from mutliple datacenters.</li>
+</ul>
+
+
+<p><strong>Replication Topologies</strong></p>
+
+<p>MapR-DB Table Replication provides various topologies to adapt the replication to the business and technical requirements:</p>
+
+<ul>
+<li><em>Master-slave replication</em> : in this topology, you replicate one way from source tables to replicas. The replicas can be in a remote cluster or in the cluster where the source tables are located.</li>
+<li><em>Multi-Master replication</em> : in this replication topology, there are two master-slave relationships, with each table playing both the role of a master and a slave. Client applications update both tables and each table replicates updates to the other.</li>
+</ul>
+
+
+<p>In this example you will learn how to setup multi-master replication.</p>
+
+<!-- more -->
+
+
+<h3>Prerequisites</h3>
+
+<ul>
+<li>2 MapR Clusters 5.x with Enterprise Edition license
+
+<ul>
+<li>in this demonstration they are called <code>cluster1</code> and <code>cluster2</code></li>
+</ul>
+</li>
+</ul>
+
+
+<h2>Setting Up Replication</h2>
+
+<p>In the next steps you will configure your clusters to enable mutip-master replication as follow:</p>
+
+<p><img src="http://tgrall.github.io/images/posts/maprdb-replication/replication.png" alt="Architecture" /></p>
+
+<h3>Configuring the clusters</h3>
+
+<p>Each node of the source cluster must communicate with the destination cluster&rsquo;s CLDB nodes. On each node of your source cluster edit the <code>mapr-clusters.conf</code> file and add the destination cluster information.</p>
+
+<p><em>Cluster 1 Configuration</em></p>
+
+<p>In all the nodes of <code>cluster1</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster2</code> configuration. The file should look like the following:</p>
+
+<pre><code>cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
+
+cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
+</code></pre>
+
+<p><em>Cluster 2 Configuration</em></p>
+
+<p>In all the nodes of <code>cluster2</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster1</code> configuration. The file should look like the following:</p>
+
+<pre><code>cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
+
+cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
+</code></pre>
+
+<p>You can find information about the <code>mapr-clusters.conf</code> format in <a href="http://maprdocs.mapr.com/home/ReferenceGuide/mapr-clusters.conf.html">the documentation</a>.</p>
+
+<p>Open a terminal window on one of the <code>cluster1</code> node using <code>mapr</code> user, and do the following:</p>
+
+<pre><code>$ ls /mapr/cluster1/
+apps   hbase  installer  opt  tmp  user  var
+
+$ ls /mapr/cluster2/
+apps   hbase  installer  opt  tmp  user  var
+</code></pre>
+
+<h3>Installing and Configuring the MapR Gateway</h3>
+
+<p>A MapR gateway mediates one-way communication between a source MapR cluster and a destination MapR cluster. In this example you will use mult-master replication, this means that data will be replicated from <code>cluster1</code> to <code>cluster2</code> and from <code>cluster2</code> to <code>cluster1</code>.</p>
+
+<p>The good practice is to install the MapR-Gateway to the destination cluster, so in our case let&rsquo;s install one gateway on one of the <code>cluster1</code> node, and one gateway on one of the <code>cluster2</code> node. Note that this configuration will not be highly available, and usually you will deploy more than 1 gateway by cluster.</p>
+
+<h4>Installing the MapR-Gateway</h4>
+
+<p>As root on one node of the <code>cluster1</code>, adapt the command to your linux environment, for example on the node <code>cluster1-node2</code></p>
+
+<pre><code>$ yum install mapr-gateway
+
+
+# Update MapR configuration
+$ /opt/mapr/server/configure.sh -N cluster1 -C cluster1-node1:7222,cluster1-node2:7222,cluster1-node3:7222 -R
+</code></pre>
+
+<p>Do the same on <code>cluster2</code>, for example on the node <code>cluster2-node2</code>:</p>
+
+<pre><code>$ yum install mapr-gateway
+
+
+# Update MapR configuration
+$ /opt/mapr/server/configure.sh -N cluster1 -C cluster2-node1:7222,cluster2-node2:7222,cluster2-node3:7222 -R
+</code></pre>
+
+<h4>Registering the Gateway to the Clusters</h4>
+
+<p>Now that we have a gateway running on each cluster, you have to <strong><em>register the gateway</em></strong> in each cluster.</p>
+
+<p>On <code>cluster1</code> run the following command to register the <code>cluster2</code> gateway as destination:</p>
+
+<pre><code>$ maprcli cluster gateway set -dstcluster cluster2 -gateways cluster2-node2
+
+# Check the configuration
+$ maprcli cluster gateway list
+</code></pre>
+
+<p>On <code>cluster2</code> run the following command to register the <code>cluster1</code> gateway as destination:</p>
+
+<pre><code>$ maprcli cluster gateway set -dstcluster cluster1 -gateways cluster1-node2
+
+# Check the configuration
+$ maprcli cluster gateway list
+</code></pre>
+
+<h3>Creating Table with Replication</h3>
+
+<p>In a terminal window, as <code>mapr</code> user on <code>cluster1</code>, create a table and insert documents:</p>
+
+<pre><code>$ maprcli table create -path /apps/user_profiles  -tabletype json
+</code></pre>
+
+<p>This create a new JSON table; it is also possible to use <code>/mapr/cluster1/apps/user_profiles</code>.</p>
+
+<p>Let&rsquo;s now add documents using MapR-DB Shell:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user001" , "first_name":"John", "last_name":"Doe"}'
+
+maprdb mapr:&gt; find /apps/user_profiles
+</code></pre>
+
+<h4>Adding Table Replication</h4>
+
+<p>Let&rsquo;s now enable replication between <code>user_profiles</code> on <code>cluster1</code> to a <code>user_profiles</code> table in <code>cluster2</code>.</p>
+
+<p>In <code>cluster1</code>, on a terminal window as <code>mapr</code> run the following command:</p>
+
+<pre><code>$ maprcli table replica autosetup -path /apps/user_profiles -replica /mapr/cluster2/apps/user_profiles -multimaster yes
+</code></pre>
+
+<p>You can get information about the replication configuration for the table using the following command:</p>
+
+<pre><code>$ maprcli table replica list -path /apps/user_profiles -json
+</code></pre>
+
+<h4>Testing Replication</h4>
+
+<p>Open another terminal in <code>cluster2</code> and use MapR-DB Shell to look at the replicated data:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; find /apps/user_profiles
+{"_id":"user001","first_name":"John","last_name":"Doe"}
+1 document(s) found.
+</code></pre>
+
+<p>You can also use the full path <code>/mapr/cluster2/apps/user_profiles</code></p>
+
+<p>In <code>cluster1</code> add a new document using MapR-DB Shell:</p>
+
+<pre><code>$ mapr dbshell
+
+maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user002" , "first_name":"Simon", "last_name":"Dupont"}'
+
+maprdb mapr:&gt; find /apps/user_profiles
+</code></pre>
+
+<p>Do a find in <code>cluster2</code> table, and you will see that the data have been replicated.</p>
+
+<p>You can insert or delete a document in <code>cluster2</code> and do a find in <code>cluster1</code>, you will see that the new document is also replicated in the other direction.</p>
+
+<p>Note, for this demonstration, we use 2 terminals connected to each cluster you can do some test using the Global Namespace in a single MapR-DB Shell.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this tutorial you have learned how to setup the MapR-DB Multi-Master replication to have data automatically replicated between 2 clusters.</p>
+
+<p>MapR-DB Table Replication provides many options, not only in term of topology (master-slave/mult-master), but also some options and commands to:</p>
+
+<ul>
+<li>replicate some columns/attributes or column family</li>
+<li>configure replication in a secured cluster</li>
+<li>pause replication.</li>
+</ul>
+
+
+<p>You can find more information about the MapR-DB Table Replication, and MapR-Gateway in the documentation:</p>
+
+<ul>
+<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ReplicatingMapR-DBTables.html">Table Replication</a></li>
+<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ConfiguringMapRClustersForTR.html">Setting up Table Replication</a></li>
+<li><a href="http://maprdocs.mapr.com/home/Gateways/MapRGateways.html">Configuring and Managing MapR Gateways</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

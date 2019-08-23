@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Parquet | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/parquet/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Convert a CSV File to Apache Parquet With Drill]]></title>
+    <link href="http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/"/>
+    <updated>2015-08-17T14:07:00+02:00</updated>
+    <id>http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill</id>
+    <content type="html"><![CDATA[<p>A very common use case when working with Hadoop is to store and query simple files (CSV, TSV, &hellip;); then to get better performance and efficient storage convert these files into more efficient format, for example <a href="https://parquet.apache.org/">Apache Parquet</a>.</p>
+
+<p><a href="https://parquet.apache.org/">Apache Parquet</a> is a <a href="https://en.wikipedia.org/wiki/Column-oriented_DBMS">columnar storage format</a> available to any project in the Hadoop ecosystem. Apache Parquet has the following characteristics:</p>
+
+<ul>
+<li>Self-describing</li>
+<li>Columnar format</li>
+<li>Language-independent</li>
+</ul>
+
+
+<p>Let&rsquo;s take a concrete example, you can find many interesting Open Data sources that distribute data as CSV files- or equivalent format-. So you can store them into your distributed file system and use them in your applications/jobs/analytics queries. This is not the most efficient way especially when we know that these data won&rsquo;t move that often. So instead of simply storing the CSV let&rsquo;s copy this information into Parquet.</p>
+
+<h3>How to convert CSV files into Parquet files?</h3>
+
+<p>You can use code to achieve this, as you can see in the <a href="https://github.com/Parquet/parquet-compatibility/blob/master/parquet-compat/src/test/java/parquet/compat/test/ConvertUtils.java">ConvertUtils</a> sample/test class. You can use a simpler way with Apache Drill. Drill allows you save the result of a query as Parquet files.</p>
+
+<p>The following steps will show you how to do convert a simple CSV into a Parquet file using Drill.</p>
+
+<!-- more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Apache Drill : Standalone <a href="https://drill.apache.org/">Apache Drill</a> or using <a href="https://www.mapr.com/products/mapr-sandbox-hadoop/download-sandbox-drill">Apache Drill Sandbox from MapR</a></li>
+<li>Some CSV Files: for example <a href="http://www.flysfo.com/media/facts-statistics/air-traffic-statistics">Passenger Dataset from SFO Air Traffic Statistics</a></li>
+</ul>
+
+
+<h4>Querying the CSV file</h4>
+
+<p>Let&rsquo;s execute a basic query:</p>
+
+<pre><code class="sql">SELECT *
+FROM dfs.`/opendata/Passenger/SFO_Passenger_Data/MonthlyPassengerData_200507_to_201503.csv`
+LIMIT 5;
+
+["200507","ATA Airlines","TZ","ATA Airlines","TZ","Domestic","US","Deplaned","Low Fare","Terminal 1","B","27271\r"]
+...
+...
+</code></pre>
+
+<p>As you can see, by default Drill processes each line as an array of columns, all values being simple String. So if you need to do some operations with these values (projection or where clause) you must use the column index, and cast the value to the proper type. You can see a simple example below:</p>
+
+<pre><code>SELECT
+columns[0] as `DATE`,
+columns[1] as `AIRLINE`,
+CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+FROM dfs.`/opendata/Passenger/SFO_Passenger_Data/*.csv`
+WHERE CAST(columns[11] AS DOUBLE) &lt; 5
+;
+
++---------+-----------------------------------+------------------+
+|  DATE   |              AIRLINE              | PASSENGER_COUNT  |
++---------+-----------------------------------+------------------+
+| 200610  | United Airlines - Pre 07/01/2013  | 2.0              |
+...
+...
+</code></pre>
+
+<p>We are now ready to create our Parquet files using the &ldquo;Create Table As Select&rdquo; (aka <a href="http://drill.apache.org/docs/create-table-as-ctas-command/">CTAS</a>)</p>
+
+<pre><code class="sql">alter session set `store.format`='parquet';
+
+
+CREATE TABLE dfs.tmp.`/stats/airport_data/` AS
+SELECT
+CAST(SUBSTR(columns[0],1,4) AS INT)  `YEAR`,
+CAST(SUBSTR(columns[0],5,2) AS INT) `MONTH`,
+columns[1] as `AIRLINE`,
+columns[2] as `IATA_CODE`,
+columns[3] as `AIRLINE_2`,
+columns[4] as `IATA_CODE_2`,
+columns[5] as `GEO_SUMMARY`,
+columns[6] as `GEO_REGION`,
+columns[7] as `ACTIVITY_CODE`,
+columns[8] as `PRICE_CODE`,
+columns[9] as `TERMINAL`,
+columns[10] as `BOARDING_AREA`,
+CAST(columns[11] AS DOUBLE) as `PASSENGER_COUNT`
+FROM dfs.`/opendata/Passenger/SFO_Passenger_Data/*.csv`
+</code></pre>
+
+<p>That&rsquo;s it! You have now a Parquet file, a single file in our case since our dataset is really small. Apache Drill will create multiples files for the tables depending of the size and configuration your environment.</p>
+
+<p>I invite you to read this Chapter in the Apache Drill documentation to learn more about <a href="https://drill.apache.org/docs/parquet-format/">Drill and Parquet</a>.</p>
+
+<h3>Query Parquet Files</h3>
+
+<p>Now that you have created your Parquet files you can use them in any of your Hadoop processes, but you can also use them in Drill, as follow:</p>
+
+<pre><code>
+SELECT *
+FROM dfs.tmp.`/stats/airport_data/*`
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to convert a CSV file using an Apache Drill query.</p>
+
+<p>You can do that with any source supported by Drill, for example from JSON to Parquet, or even a complex join query between multiple data sources. You can also chose a different output format for example JSON, or a CSV.</p>
+]]></content>
+  </entry>
+  
+</feed>

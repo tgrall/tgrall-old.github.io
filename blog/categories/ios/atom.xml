@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ios | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/ios/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[iOS 101: How to Convert a String to a NSDate]]></title>
+    <link href="http://tgrall.github.io/blog/2011/01/02/ios-101-how-to-convert-a-string-to-a-nsdate/"/>
+    <updated>2011-01-02T10:22:01+01:00</updated>
+    <id>http://tgrall.github.io/blog/2011/01/02/ios-101-how-to-convert-a-string-to-a-nsdate</id>
+    <content type="html"><![CDATA[<p>During my vacations, I took some time to play with iOS development. I have been struggling with many small issues&hellip; This is the price to pay when learning a new technology, and this is part of the fun of doing it. I will try to document some of these issues in articles&hellip;  Let&rsquo;s start with a very common story : working with date.</p>
+
+<p>Objective-C and iOS SDK provide a class to help formatting date (marshaling and unmarshaling), this class is <a href="http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSDateFormatter_Class/Reference/Reference.html">NSDateFormatter</a>. No surprise, the NSDateFormatter uses the <a href="http://unicode.org/reports/tr35/#Date_Format_Patterns">Unicode Date Format Patterns</a>.</p>
+
+<p>A small example of date creating from a string:</p>
+
+<pre><code class="objectivec">
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    NSDate *date = [dateFormatter dateFromString:publicationDate ];
+    [dateFormatter release];
+     // use your date object
+</code></pre>
+
+<p>The date that I have to create from a sting looks like &ldquo;<code>2010-11-12</code>&rdquo;. So I do not have any time information. When I do convert this string with the code above, the result is  &ldquo;<code>2010-11-11 23:00:00 +0000</code>&rdquo;. As you can see the date is calculated from my current time zone, small reminder I am in France. So the &ldquo;date&rdquo; object itself is perfectly fine, but in my example I want to have the date independently of the time.</p>
+
+<p>To be able to manage the date without any time/timezone information, I can force the timezone I want to use when using the  <code>NSDateFormatter</code> class. I just need to use the <code>setTimeZone</code> instance method.</p>
+
+<p>The code looks like that now (see line#3):</p>
+
+<pre><code class="objectivec">    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    NSDate *date = [dateFormatter dateFromString:publicationDate ];
+    [dateFormatter release];
+     // use your date object
+</code></pre>
+
+<p>Hope that helps!</p>
+]]></content>
+  </entry>
+  
+</feed>

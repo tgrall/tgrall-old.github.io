@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Code | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/code/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[How to Create a Pub/sub Application With MongoDB ? Introduction]]></title>
+    <link href="http://tgrall.github.io/blog/2015/01/12/how-to-create-a-pub-slash-sub-application-with-mongodb-introduction/"/>
+    <updated>2015-01-12T09:21:03+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/01/12/how-to-create-a-pub-slash-sub-application-with-mongodb-introduction</id>
+    <content type="html"><![CDATA[<p>In this article we will see how to create a pub/sub application (messaging, chat, notification), and this fully based on MongoDB (without any message broker like RabbitMQ, JMS, &hellip; ).</p>
+
+<p>So, what needs to be done to achieve such thing:</p>
+
+<ul>
+<li>an application &ldquo;publish&rdquo; a message. In our case, we simply save a document into MongoDB</li>
+<li>another application, or thread, subscribe to these events and will received message automatically. In our case this means that the application should automatically receive newly created document out of MongoDB</li>
+</ul>
+
+
+<p>All this is possible with some very cool MongoDB features: <a href="http://docs.mongodb.org/manual/core/capped-collections/">capped collections</a> and <a href="http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/">tailable cursors</a>,</p>
+
+<!-- more -->
+
+
+<h2>Collections and Tailable Cursors</h2>
+
+<p>As you can see in the documentation, Capped Collections are fixed sized collections, that work in a way similar to circular buffers: once a collection fills its allocated space, it makes room for new documents by overwriting the oldest documents.</p>
+
+<p>MongoDB Capped Collections can be queried using Tailable Cursors, that are similar to the unix <code>tail -f</code> command. Your application continue to retrieve documents as they are inserted into the collection. I also like to call this a &ldquo;continuous query&rdquo;.</p>
+
+<p>Now that we have seen the basics, let&rsquo;s implement it.</p>
+
+<h2>Building a very basic application</h2>
+
+<h4>Create the collection</h4>
+
+<p>The first thing to do is to create a new capped collection:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=capped-collection'></script>
+<noscript><pre><code>$&gt; mongo
+
+use chat
+
+db.messages.drop()
+
+db.createCollection(&#39;messages&#39;, { capped: true, size: 10000 })
+
+db.messages.insert({&quot;type&quot;:&quot;init&quot;});
+
+</code></pre></noscript></div>
+</p>
+
+<p>For simplicity, I am using the MongoDB Shell to create the <code>messages</code> collection in the <code>chat</code> database.</p>
+
+<p>You can see on line #7 how to create a capped collection, with 2 options:</p>
+
+<ul>
+<li><code>capped : true</code> : this one is obvious</li>
+<li><code>size : 10000</code> : this is a mandatory option when you create a capped collection. This is the maximum size in bytes. (will be raised to a multiple of 256)</li>
+</ul>
+
+
+<p>Finally, on line #9, I insert a dummy document, this is also mandatory to be able to get the tailable cursor to work.</p>
+
+<h4>Write an application</h4>
+
+<p>Now that we have the collection, let&rsquo;s write some code. First in <em>node.js</em>:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=app.js'></script>
+<noscript><pre><code>var mongo = require(&quot;mongodb&quot;);
+
+var mongodbUri = &quot;mongodb://127.0.0.1/chat&quot;;
+
+mongo.MongoClient.connect (mongodbUri, function (err, db) {
+
+  db.collection(&#39;messages&#39;, function(err, collection) {
+    // open a tailable cursor
+    console.log(&quot;== open tailable cursor&quot;);
+    collection.find({}, {tailable:true, awaitdata:true, numberOfRetries:-1})
+                      .sort({ $natural: 1 })
+                      .each(function(err, doc) {
+      console.log(doc);
+    })
+  });
+
+});</code></pre></noscript></div>
+</p>
+
+<p>From lines #1 to 5 I just connect to my local mongoDB instance.</p>
+
+<p>Then on line #7, I get the <code>messages</code> collection.</p>
+
+<p>And on line #10, I execute a find, using a tailable cursor, using specific options:</p>
+
+<ul>
+<li><code>{}</code> : no filter, so all documents will be returned</span></li></li>
+<li><code>tailable : true</code> : this one is clear, to say that we want to create a tailable cursor</li>
+<li><code>awaitdata : true</code> : to say that we wait for data before returning no data to the client</li>
+<li><code>numberOfRetries : -1</code> : The number of times to retry on time out, -1 is infinite, so the application will keep trying</li>
+</ul>
+
+
+<p>Line #11 just force the sort to the natural order.</p>
+
+<p>Then on line #12, the cursor returns the data, and the document is printed in the console each time it is inserted.</p>
+
+<h4>Test the Application</h4>
+
+<p>Start the application</p>
+
+<p><code>node app.js</code></p>
+
+<p>Insert documents in the messages collection, from the shell or any other tool.</p>
+
+<p>You can find below a screencast showing this very basic application working:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/uSuiYvssKuo?color=white&theme=light"></iframe></p>
+
+<p>The source code of this sample application in this Github repository, take the step-01 branch; clone this branch using:</p>
+
+<p><code>git clone -b step-01 https://github.com/tgrall/mongodb-realtime-pubsub.git</code></p>
+
+<p>I have also created a gist showing the same behavior in <em>Java</em>:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=MyApp.java'></script>
+<noscript><pre><code>package org.mongodb.demos.tailable;
+
+import com.mongodb.*;
+
+public class MyApp {
+
+    public static void main(String[] args) throws Exception {
+
+        MongoClient mongoClient = new MongoClient();
+        DBCollection coll = mongoClient.getDB(&quot;chat&quot;).getCollection(&quot;messages&quot;);
+
+        DBCursor cur = coll.find().sort(BasicDBObjectBuilder.start(&quot;$natural&quot;, 1).get())
+                .addOption(Bytes.QUERYOPTION_TAILABLE | Bytes.QUERYOPTION_AWAITDATA);
+
+        System.out.println(&quot;== open cursor ==&quot;);
+
+        Runnable task = () -&gt; {
+            System.out.println(&quot;\tWaiting for events&quot;);
+            while (cur.hasNext()) {
+                DBObject obj = cur.next();
+                System.out.println( obj );
+
+            }
+        };
+        new Thread(task).start();
+        
+    }
+    
+}</code></pre></noscript></div>
+</p>
+
+<p>Mathieu Ancelin has written it in <em>Scala</em>:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=App.scala'></script>
+<noscript><pre><code>package org.mongodb.demos.tailable
+
+import reactivemongo.api._
+import reactivemongo.bson._
+import play.api.libs.iteratee.Iteratee
+import scala.concurrent.ExecutionContext.Implicits.global
+import reactivemongo.api.collections.default.BSONCollection
+
+object Capped extends App {
+
+  val driver = new MongoDriver
+  val connection = driver.connection(List(&quot;localhost&quot;))
+  val db = connection(&quot;chat&quot;)
+  val collection = db.collection[BSONCollection](&quot;messages&quot;)
+
+  val cursor = collection
+        .find(BSONDocument())
+          .options(QueryOpts().tailable.awaitData)
+            .cursor[BSONDocument]
+
+  println(&quot;== open tailable cursor&quot;)
+  
+  cursor.enumerate().apply(Iteratee.foreach { doc =&gt;
+    println(s&quot;Document inserted: ${BSONDocument.pretty(doc)}&quot;)
+  })
+}</code></pre></noscript></div>
+</p>
+
+<h3>Add some user interface</h3>
+
+<p>We have the basics of a publish subscribe based application:</p>
+
+<ul>
+<li>publish by inserting document into MongoDB</li>
+<li>subscribe by reading document using a tailable cursor</li>
+</ul>
+
+
+<p>Let&rsquo;s now push the messages to a user using for example socket.io. For this we need to:</p>
+
+<ul>
+<li>add socket.io dependency to our node project</li>
+<li>add HTML page to show messages</li>
+</ul>
+
+
+<p>The following gists shows the updated version of the app.js and index.html, let&rsquo;s take a look:</p>
+
+<p><div><script src='https://gist.github.com/d8c2acfdc416abcc5d18.js?file=app.js'></script>
+<noscript><pre><code>&quot;use strict&quot;;
+
+var mongo = require(&quot;mongodb&quot;),
+    fs = require(&quot;fs&quot;),         // to read static files
+    io = require(&quot;socket.io&quot;),  // socket io server
+    http = require(&quot;http&quot;);
+
+var mongodbUri = &quot;mongodb://127.0.0.1/chat&quot;;
+
+var app = http.createServer(handler);
+io = io.listen(app);
+app.listen(3000);
+console.log(&quot;http server on port 3000&quot;);
+
+function handler(req, res){
+  fs.readFile(__dirname + &quot;/index.html&quot;,
+  function (err, data) {
+    res.writeHead(200);
+    res.end(data);
+  });
+}
+
+mongo.MongoClient.connect (mongodbUri, function (err, db) {
+
+  db.collection(&#39;messages&#39;, function(err, collection) {
+
+    // open socket
+    io.sockets.on(&quot;connection&quot;, function (socket) {
+      // open a tailable cursor
+      console.log(&quot;== open tailable cursor&quot;);
+      collection.find({}, {tailable:true, awaitdata:true, numberOfRetries:-1}).sort({ $natural: 1 }).each(function(err, doc) {
+        console.log(doc);
+        // send message to client
+        if (doc.type == &quot;message&quot;) {
+          socket.emit(&quot;message&quot;,doc);
+        }
+      })
+
+    });
+
+  });
+
+});
+</code></pre></noscript></div>
+</p>
+
+<p>The node application has been updated with the following features:</p>
+
+<ul>
+<li>lines #4-7: import of http, file system and socket.io</li>
+<li>lines #10-21: configure and start the http server. You can see that I have created a simple handler to serve static html file</li>
+<li>lines #28-39: I have added support to Web socket using socket.io where I open the tailable cursor, and push/emit the messages on the socket.</li>
+</ul>
+
+
+<p>As you can see, the code that I have added is simple. I do not use any advanced framework, nor manage exceptions, this for simplicity and readability.</p>
+
+<p>Let&rsquo;s now look at the client (html page).</p>
+
+<p><div><script src='https://gist.github.com/d8c2acfdc416abcc5d18.js?file=index.html'></script>
+<noscript><pre><code>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;MongoDB pub/sub&lt;/title&gt;
+  &lt;style&gt;
+  * { margin: 0; padding: 10px; box-sizing: border-box; }
+  body { font: 13px Helvetica, Arial; }
+  #messages { list-style-type: none; margin: 0; padding: 0; }
+  #messages li { padding: 5px 10px; }
+  #messages li:nth-child(odd) { background: #eee; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h2&gt;MongoDB/Socket.io demonstration&lt;/h2&gt;
+
+  &lt;ul id=&quot;messages&quot;&gt;&lt;/ul&gt;
+
+  &lt;script src=&quot;https://cdn.socket.io/socket.io-1.2.0.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://code.jquery.com/jquery-2.1.3.min.js&quot;&gt;&lt;/script&gt;
+  &lt;script&gt;
+  var socket = io();
+  socket.on(&#39;message&#39;, function(doc){
+    $(&#39;#messages&#39;).append($(&#39;&lt;li&gt;&#39;).text(doc.text));
+  });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></noscript></div>
+</p>
+
+<p>Same as the server, it is really simple and does not use any advanced libraries except socket.io client (line #18) and JQuery (line #19), and used:</p>
+
+<ul>
+<li>on line #22 to received messages ans print them in the page using JQuery on line #23</li>
+</ul>
+
+
+<p>I have created a screencast of this version of the application:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/N9fDxuohdy8?color=white&theme=light"></iframe></p>
+
+<p>You can find the source code in this Github repository, take the step-02 branch; clone this branch using:</div></p>
+
+<p><code>git clone -b step-02 https://github.com/tgrall/mongodb-realtime-pubsub.git</code></p>
+
+<h3>Conclusion</h3>
+
+<p>In this first post, we have:</p>
+
+<ul>
+<li>learned about tailable cursor and capped collection</li>
+<li>see how it can be used to develop a pub/sub application</li>
+<li>expose this into a basic web socket based application</li>
+</ul>
+
+
+<p>In the next article we will continue to develop a bigger application using these features.</p>
+]]></content>
+  </entry>
+  
+</feed>

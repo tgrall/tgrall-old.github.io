@@ -1,0 +1,852 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Create and Deploy a JAX-RS REST Service on Google App Engine - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="In this article you will learn how to create a REST service using JAX-RS reference implementation (Jersey) and deploy it on Google AppEngine. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Create and Deploy a JAX-RS REST Service on Google App Engine</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2010-02-28T05:33:10+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>5:33 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this article you will learn how to create a REST service using JAX-RS reference implementation (Jersey) and deploy it on Google AppEngine.</p>
+
+<h3>Prerequisites</h3>
+
+<p>For this tutorial you will need:</p>
+
+<ul>
+<li>a Google AppEngine account : <a href="http://code.google.com/appengine/">http://code.google.com/appengine/</a></li>
+<li>Eclipse Galileo (3.5.x)</li>
+<li>Google App Engine SDK for Java</li>
+</ul>
+
+
+<!-- more -->
+
+
+<ul>
+<li>Install the Google Plugin for Eclipse as documented <a href="http://code.google.com/eclipse/docs/install-eclipse-3.5.html">here</a> (Check that you are using the release 1.3.1 of the GAE Java SDK, if not download it and configure the plugin to use it)
+
+<ul>
+<li>it is also useful to have the AppEngine documentation locally, you can download it from <a href="http://code.google.com/appengine/downloads.html#Download_the_Google_App_Engine_Documentation">here</a>.</li>
+<li>JAX-RS Reference Implementation, be sure you take the
+Jersey 1.1.5 release. You can download it from <a href="https://jersey.dev.java.net/">here</a>.</li>
+<li>Unzip the file in a directory that we will call <code>$JERSEY_HOME</code></li>
+<li>JAXB 2.2 Implementation to simplify the marshalling/unmarshalling of the XML, and also facilitate the JSON support. Download it from <a href="https://jaxb.dev.java.net/">here</a></li>
+</ul>
+</li>
+</ul>
+
+
+<h3>Creating new application</h3>
+
+<p>To create a new App Engine project in Eclipse:</p>
+
+<p>1-  Click on the &ldquo;<strong>New Web Application Project</strong>&rdquo; button <img src="http://2.bp.blogspot.com/_aoQgQ1obiyE/S4pv-VRkifI/AAAAAAAAAKc/cNoURwz9n8M/s320/new_app_button.png" alt="" /> in the toolbar . It is also possible to do it using the menu <strong>File &gt; Web Application Project</strong></p>
+
+<p>2-  The &ldquo;Create a Web Application Project&rdquo; wizard opens:</p>
+
+<ul>
+<li>Project Name: <code>EmployeeService</code></li>
+<li>Package : <code>com.grallandco.employee.service</code></li>
+<li>Uncheck &ldquo;<code>Use Google Web Toolkit</code>&rdquo;</li>
+<li>Check that the SDK version your are using is &ldquo;<code>App Engine 1.3.0</code>&rdquo;; if not configure the project to use it.</li>
+<li>The screen should look like the following screen :</li>
+</ul>
+
+
+<p><img src="http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png"></p>
+
+<ul>
+<li>Click Finish</li>
+<li>The project should look like the following screen :</li>
+</ul>
+
+
+<p><img src="http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png"></p>
+
+<h4>Running the application</h4>
+
+<p>The App Egine SDK, installed with the Eclipse plugin contains a Web server (based on Jetty), that could be used for testing and debugging. To test that your application has been created correctly select the menu <strong>Run &gt; Run As &gt; Web Application</strong>. I personally most of the time run my server using the debug command <strong>Run &gt; DebugAs &gt; Web Application</strong>. In debug mode you can change source code and test is without restarting the server.</p>
+
+<p>The web server is starting automatically, you should see the following messagein the Eclipse console</p>
+
+<p>The server is runningat <code>http://localhost:8080/</code></p>
+
+<p>You can access the application, and the sample servlet that has been created using the URL: <code>http://localhost:8080/employeeservice</code>.</p>
+
+<p>To stop the server, click on the terminate button <img src="http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png"> in the Eclipse console.</p>
+
+<h3>Configuring the REST support in the application</h3>
+
+<p>To be able to create and run REST services in your application you need to:</p>
+
+<ul>
+<li>Add the JAX-RS, JAXB Jars in your project and application</li>
+<li><p>Configure the web application (web.xml) to handle REST requests <strong>Add JAX-RS, JAXB to your project</strong></p></li>
+<li><p>Right click on the project and select menu entry <strong>Build Path &gt; Configure Build Path&hellip;</strong></p></li>
+<li>Click on the Add External JARs button</li>
+<li>Select all the JARs located in $JERSEY_HOME/lib and $JAXB_HOME/lib folders. You can for better visibility and reuse create a user library with all these JARs</li>
+<li>You also need to copy the JARs in the web-inf/lib directory of your application, this step is mandatory to be sure that the JARs are included in the application when deployed to App Engine.
+<em>Note: I do not like this step. I would prefer to do that by configuration of the build path, to automatically add the JARs to the WEB-INF/lib directory when executing/deploying the application. Unfortunately I did not find the way to do it, so if you know it, feel free to post a comment and I will
+update the article.</em></li>
+</ul>
+
+
+<p><strong>Configure the web application</strong></p>
+
+<p>In this step you will register a new URI to handle REST requests. To do that you need to register a new servlet that is using the Jersey API and configure it to a specific URI (eg: /ressources  and/or /rest) and configure what are the Java packages that contain the REST implementation classes. So you need to modify the web.xml of your application with the following entries:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;servlet&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;servlet-name&gt;</span>Jersey Web Application<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;servlet-class&gt;</span>com.sun.jersey.spi.container.servlet.ServletContainer<span class="nt">&lt;/servlet-class&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;init-param&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;param-name&gt;</span>com.sun.jersey.config.property.packages<span class="nt">&lt;/param-name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;param-value&gt;</span>com.grallandco.employee.service.rest.impl<span class="nt">&lt;/param-value&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/init-param&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
+</span><span class='line'><span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'><span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;servlet-name&gt;</span>Jersey Web Application<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;url-pattern&gt;</span>/resources/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'><span class="nt">&lt;/servlet-mapping&gt;</span>
+</span><span class='line'><span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;servlet-name&gt;</span>Jersey Web Application<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;url-pattern&gt;</span>/rest/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'><span class="nt">&lt;/servlet-mapping&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This servlet that will answer to the /resources/ and /rest/ URL. The configuration parameter <code>com.sun.jersey.config.property.packages</code> is used by Jersey to list the packages where REST services implementation are located.Note that you can put as many package as you need to, you just need to separate the package names by a ; .</p>
+
+<h3>Creating a simple REST Service to test the environment</h3>
+
+<p>The project is now ready to contain REST service. It is time to create  one.Create for example the class <code>com.grallandco.employee.service.rest.impl.HelloWorldResource</code>, be sure to use the package name that you have configured in the web.xml for the Jersey servlet, based on the configuration we have made in previous step the package is <code>com.grallandco.employee.service.rest.impl</code></p>
+
+<p>Here a sample class with the JAX-RS annotations:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">grallandco</span><span class="o">.</span><span class="na">employee</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">rest</span><span class="o">.</span><span class="na">impl</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Path</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.GET</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Produces</span><span class="o">;</span>
+</span><span class='line'><span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/hr/&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeResource</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@GET</span>
+</span><span class='line'>  <span class="nd">@Produces</span><span class="o">(</span><span class="s">&quot;text/plain&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/employee&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getEmployee</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;Hello World!&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should be able to test it, stop the server and run it again, enter the following URL in your browser:</p>
+
+<p><code>http://localhost:8080/resources/hr/employee</code></p>
+
+<p>or</p>
+
+<p><code>http://localhost:8080/rest/hr/employee</code></p>
+
+<h4>Deploying the application to Google App Engine</h4>
+
+<p>Before deploying the application you need to register a new application in Google App Engine using the Administartion Console, see the documentation <a href="http://code.google.com/appengine/docs/theadminconsole.html">here</a>. In my example I have used &ldquo;<code>tugdual</code>&rdquo; as Application ID.</p>
+
+<p>You can easily now deploy the application to Google App Engine by clicking on the  &ldquo;Deploy App Engine Project&rdquo; button <img src="../../google-rest-crud/img/ae_deploy_button.png" title="Deploy App Engine Project Button" alt="Deploy App Engine Project Button" /> available in the Eclipse toolbar.</p>
+
+<p>To be able to deploy your application to Google App Engine, you need to check that your application can be registered, the application ID is stored  in the <code>WEB-INF/lib/appengine-web.xml</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;appengine-web-app</span> <span class="na">xmlns=</span><span class="s">&quot;http://appengine.google.com/ns/1.0&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;application&gt;</span>[your-application-id]<span class="nt">&lt;/application&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>1<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="c">&lt;!-- Configure java.util.logging --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;system-properties&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;java.util.logging.config.file&quot;</span> <span class="na">value=</span><span class="s">&quot;WEB-INF/logging.properties&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/system-properties&gt;</span>
+</span><span class='line'><span class="nt">&lt;/appengine-web-app&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The App Engine deploy button prompts you for multiple informations: username (your Google account) and password.</p>
+
+<p>When the deployment is complete you can access your application using the following URL:</p>
+
+<p><code>http://[your-application-id].appspot.com/resources/hr/employee</code></p>
+
+<p>or</p>
+
+<p><code>http://[your-application-id].appspot.com/rest/hr/employee</code></p>
+
+<h3>Ading XML and JSON support to the service</h3>
+
+<p>Let&rsquo;s now add new method to manipulate an &ldquo;Employee&rdquo; object using the service, and the data format should be based on JSON and XML. This is where JAXB is useful, since it allows easily to transform marshall/unmarshall Java objects in XML -obviously- and JSON (cool isn&rsquo;t!)</p>
+
+<h4>Creating an Employee Class</h4>
+
+<p>Start with the creation of a new class to manipulate Employee data, this is a very simple Java class that could look like the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">grallandco</span><span class="o">.</span><span class="na">employee</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">model</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.Date</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">firstName</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">lastName</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Date</span> <span class="n">hireDate</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">email</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">Employee</span><span class="o">(</span><span class="n">String</span> <span class="n">firstName</span><span class="o">,</span> <span class="n">String</span> <span class="n">lastName</span><span class="o">,</span> <span class="n">Date</span> <span class="n">hireDate</span><span class="o">,</span> <span class="n">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">firstName</span> <span class="o">=</span> <span class="n">firstName</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">lastName</span> <span class="o">=</span> <span class="n">lastName</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">hireDate</span> <span class="o">=</span> <span class="n">hireDate</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">email</span> <span class="o">=</span> <span class="n">email</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">Employee</span><span class="o">()</span> <span class="o">{}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getFirstName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">firstName</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setFirstName</span><span class="o">(</span><span class="n">String</span> <span class="n">firstName</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">firstName</span> <span class="o">=</span> <span class="n">firstName</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getLastName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">lastName</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setLastName</span><span class="o">(</span><span class="n">String</span> <span class="n">lastName</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">lastName</span> <span class="o">=</span> <span class="n">lastName</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Date</span> <span class="nf">getHireDate</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">hireDate</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setHireDate</span><span class="o">(</span><span class="n">Date</span> <span class="n">hireDate</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">hireDate</span> <span class="o">=</span> <span class="n">hireDate</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getEmail</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">email</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEmail</span><span class="o">(</span><span class="n">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">email</span> <span class="o">=</span> <span class="n">email</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">StringBuffer</span> <span class="n">sb</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">StringBuffer</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;First: &quot;</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">getFirstName</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot; - Last: &quot;</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">getLastName</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot; - Date: &quot;</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">getHireDate</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot; - Email: &quot;</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">getEmail</span><span class="o">());</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">sb</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When implementing your &ldquo;real&rdquo; application with some persistence layer
+this POJO is the one as JDO/JPA entity.</p>
+
+<h4>Create a Converter class for your entity</h4>
+
+<p>I usually encapsulate all the transformation in some converter class, like that I do not directly couple my business class to the serialisation mechanism. (So I do that for classes and lists of classes). So instead of adding the JAXB annotations to the Employee class itself, let&rsquo;s create an EmployeeConverter class that will be responsible of the transformation and used by your REST service.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">grallandco</span><span class="o">.</span><span class="na">employee</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">converter</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.util.Date</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.xml.bind.annotation.XmlElement</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.xml.bind.annotation.XmlRootElement</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.grallandco.employee.service.model.Employee</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@XmlRootElement</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;employee&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeConverter</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Employee</span> <span class="n">entity</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">EmployeeConverter</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">entity</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Employee</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">EmployeeConverter</span><span class="o">(</span><span class="n">Employee</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">entity</span> <span class="o">=</span> <span class="n">entity</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@XmlElement</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getFirstName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">entity</span><span class="o">.</span><span class="na">getFirstName</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@XmlElement</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getLastName</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">entity</span><span class="o">.</span><span class="na">getLastName</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@XmlElement</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Date</span> <span class="nf">getHireDate</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">entity</span><span class="o">.</span><span class="na">getHireDate</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@XmlElement</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getEmail</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">entity</span><span class="o">.</span><span class="na">getEmail</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Employee</span> <span class="nf">getEmployee</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">entity</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setFirstName</span><span class="o">(</span><span class="n">String</span> <span class="n">firstName</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">entity</span><span class="o">.</span><span class="na">setFirstName</span><span class="o">(</span><span class="n">firstName</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setHireDate</span><span class="o">(</span><span class="n">Date</span> <span class="n">hireDate</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">entity</span><span class="o">.</span><span class="na">setHireDate</span><span class="o">(</span><span class="n">hireDate</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setLastName</span><span class="o">(</span><span class="n">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">entity</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="n">email</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEmail</span><span class="o">(</span><span class="n">String</span> <span class="n">lastName</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">entity</span><span class="o">.</span><span class="na">setLastName</span><span class="o">(</span><span class="n">lastName</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can now update your service to use this utility/converter class to return XML or JSON ojbect based on the content type of the request.</p>
+
+<h4>Add support to JSON and XML to your REST service</h4>
+
+<p>You need to change the <code>EmployeeRessource</code> class, to change the signature and add new annotations of the <code>getEmployee()</code> method.</p>
+
+<p>The annotation you are adding:</p>
+
+<ul>
+<li><code>@Produces({"application/xml", "application/json"})</code> : indicates which type of content will be produced by the service. Based on the type of the request.</li>
+<li><code>@Path("/employee/{employeeEmail}/")</code> : change the Path to indicate a Path parameter, here for example the URL can accept an email in the URI - not the best example, but you get the point&hellip;</li>
+<li><code>public EmployeeConverter getEmployee( @PathParam ("employeeEmail") String email)</code> : change the type returned by the method and take a parameter as String that match the Path param defined in the @Path annotation.</li>
+</ul>
+
+
+<p>Here the complete class code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">grallandco</span><span class="o">.</span><span class="na">employee</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">rest</span><span class="o">.</span><span class="na">impl</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Path</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.GET</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.PathParam</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Produces</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.grallandco.employee.service.converter.EmployeeConverter</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.grallandco.employee.service.model.Employee</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/hr/&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeRessource</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@GET</span>
+</span><span class='line'>  <span class="nd">@Produces</span><span class="o">({</span><span class="s">&quot;application/xml&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span><span class="o">})</span>
+</span><span class='line'>  <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/employee/{employeeEmail}/&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">EmployeeConverter</span> <span class="nf">getEmployee</span><span class="o">(</span> <span class="nd">@PathParam</span> <span class="o">(</span><span class="s">&quot;employeeEmail&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">//dummy code</span>
+</span><span class='line'>    <span class="n">Employee</span> <span class="n">emp</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Employee</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">emp</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="n">email</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">emp</span><span class="o">.</span><span class="na">setFirstName</span><span class="o">(</span><span class="s">&quot;John&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">emp</span><span class="o">.</span><span class="na">setLastName</span><span class="o">(</span><span class="s">&quot;Doe&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">EmployeeConverter</span> <span class="n">converter</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">EmployeeConverter</span><span class="o">(</span><span class="n">emp</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">converter</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Test the service</h3>
+
+<p>You can now run the server locally and test the service</p>
+
+<p><code>http://localhost:8080/resources/hr/employee/tug@grallandco.com</code></p>
+
+<p>This will return an XML document.</p>
+
+<p>If you want to test the JSON call you have multiple choice:</p>
+
+<ul>
+<li>Using following command</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tgrall<span class="nv">$ </span>curl -H <span class="s2">&quot;Accept: application/json&quot;</span> http://localhost:8080/resources/hr/employee/tug@grallandco.com
+</span><span class='line'>    <span class="o">{</span><span class="s2">&quot;email&quot;</span>:<span class="s2">&quot;tug@grallandco.com&quot;</span>,<span class="s2">&quot;firstName&quot;</span>:<span class="s2">&quot;John&quot;</span>,<span class="s2">&quot;lastName&quot;</span>:<span class="s2">&quot;Doe&quot;</span><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Using an HTTP client that allows your to configure/set the HTTP request completely, I am using the <a href="https://addons.mozilla.org/en-US/firefox/addon/2691">Poster Firefox Plugin</a></li>
+<li>Using some Javascript code in an application</li>
+</ul>
+
+
+<p>You can repeat the test on your deployed application on Google AppEngine.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this article you have learned how to create and deploy a new REST Service on Google App Engine. This service has been created with the JAX-RS Reference Implementation the Jersey project. In the next article you will learn how to add persistence and create a CRUD Rest service on Google App Engine.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2010-02-28T05:33:10+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2010</span></span> <span class='time'>5:33 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/cloud/'>cloud</a>, <a class='category' href='/blog/categories/gae/'>gae</a>, <a class='category' href='/blog/categories/google/'>google</a>, <a class='category' href='/blog/categories/java/'>java</a>, <a class='category' href='/blog/categories/rest/'>rest</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2010/02/24/virtualbox-how-to-clone-a-virtual-machine/" title="Previous Post: VirtualBox: How to clone a virtual machine?">&laquo; VirtualBox: How to clone a virtual machine?</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2010/10/29/what-apples-announcement-really-means-to-java-developers/" title="Next Post: What Apple’s Announcement Really Means to Java Developers">What Apple’s Announcement Really Means to Java Developers &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/';
+        var disqus_url = 'http://tgrall.github.io/blog/2010/02/28/create-and-deploy-a-jax-rs-rest-service-on-google-app-engine/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

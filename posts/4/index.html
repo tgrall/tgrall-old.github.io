@@ -1,0 +1,2005 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Note : This article has been written in March 2013, since Couchbase and its drivers have a changed a lot. I am not working with/for Couchbase anymore &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/posts/4/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/">Easy Application Development With Couchbase, Angular and Node</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-03-06T02:35:47+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>2:35 am</span></time>
+        
+           | <a href="/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><blockquote><p>Note : This article has been written in March 2013, since Couchbase and its drivers have a changed a lot. I am not working with/for Couchbase anymore, with no time to update the code.</p></blockquote>
+
+<p>A friend of mine wants to build a simple system to capture ideas, and votes. Even if you can find many online services to do that, I think it is a good opportunity to show how easy it is to develop new application using a Couchbase and Node.js.</p>
+
+<p>So how to start?</p>
+
+<p>Some of us will start with the UI, other with the data, in this example I am starting with the model. The basics steps are :</p>
+
+<ol>
+<li>Model your documents</li>
+<li>Create Views</li>
+<li>Create Services</li>
+<li>Create the UI</li>
+<li>Improve your application by iteration</li>
+</ol>
+
+
+<p>The sources of this sample application are available in Gihub :</p>
+
+<p><a href="https://github.com/tgrall/couchbase-node-ideas">https://github.com/tgrall/couchbase-node-ideas</a></p>
+
+<p>Use the following command to clone the project locally :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git clone https://github.com/tgrall/couchbase-node-ideas.git</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>Note:</em> my goal is not to provide a complete application, but to describe the key steps to develop an application.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/03/06/easy-application-development-with-couchbase-angular-and-node/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/18/how-to-get-the-latest-document-by-date-slash-time-field/">How to Get the Latest Document by Date/time Field?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-02-18T20:32:06+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>8:32 pm</span></time>
+        
+           | <a href="/blog/2013/02/18/how-to-get-the-latest-document-by-date-slash-time-field/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/02/18/how-to-get-the-latest-document-by-date-slash-time-field/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I read this question on Twitter, let me answer the question in this short article.</p>
+
+<p>First of all you need to be sure your documents have an attribute that contains a date ;), something like :</p>
+
+<div><script src='https://gist.github.com/178061fa19ca5fc81508.js'></script>
+<noscript><pre><code>{
+  &quot;type&quot; : &quot;emp&quot;,
+  &quot;id&quot;:&quot;001&quot;,
+  &quot;name&quot;:&quot;John Doe&quot;,
+  &quot;hiredate&quot;:&quot;Jan 1, 2013 8:32:00 AM&quot;
+}</code></pre></noscript></div>
+
+
+<p>To get the &ldquo;latest hired employee&rdquo; you need to create a view, and emit the hire date as key. The important part is to check that this date is emitted in a format that is sorted properly, for example an array of value using dateToArray function, or the time as numerical value. In the following view I am using the date as an array like that I will be able to do some grouping but this is another topic. The view looks like the following:</p>
+
+<div><script src='https://gist.github.com/02fb7123c5e444b5107c.js'></script>
+<noscript><pre><code>function (doc, meta) {
+  if (doc.hiredate) {
+    emit( dateToArray(doc.hiredate) );
+  }
+}</code></pre></noscript></div>
+
+
+<p>Now that you have a view. You can now query it using the parameters:</p>
+
+<ul>
+<li>descending = true</li>
+<li>limit = 1</li>
+</ul>
+
+
+<p>If you use Java SDK the code will look like the following :</p>
+
+<div><script src='https://gist.github.com/3e872557d8a5af454c2b.js'></script>
+<noscript><pre><code>import com.couchbase.client.protocol.views.Query;
+import com.couchbase.client.protocol.views.View;
+import com.couchbase.client.protocol.views.ViewResponse;
+import com.couchbase.client.protocol.views.ViewRow;
+...
+...
+...
+
+  View view = cb.getView(&quot;employees&quot;, &quot;by_hiredate&quot;);
+  Query query = new Query();
+  query.setIncludeDocs(true);
+  query.setLimit(1);
+  query.setDescending(true);
+  ViewResponse viewResponse = cb.query(view, query);
+  for (ViewRow row : viewResponse) {
+    String documentJson = row.getDocument();
+  }</code></pre></noscript></div>
+
+
+<p>Finally it is important when you work with views to understand how the index are managed by the server so be sure your read the chapter &ldquo;<a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-writing-stale.html">Index Updates and the stale Parameter</a>&rdquo;.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/13/introduction-to-collated-views-with-couchbase-2-dot-0/">Introduction to Collated Views With Couchbase 2.0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-02-13T03:38:32+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>3:38 am</span></time>
+        
+           | <a href="/blog/2013/02/13/introduction-to-collated-views-with-couchbase-2-dot-0/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/02/13/introduction-to-collated-views-with-couchbase-2-dot-0/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Most of the applications have to deal with &ldquo;master/detail&rdquo; type of data:</p>
+
+<ul>
+<li>breweries and beer</li>
+<li>department and employees</li>
+<li>invoices and items</li>
+<li>&hellip;</li>
+</ul>
+
+
+<p>This is necessary for example to create application view like the following:
+  <img src="http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png"></p>
+
+<p>With Couchbase, and many of the document oriented databases you have different ways to deal with this, you can:</p>
+
+<ul>
+<li>Create a single document for each master and embed all the children in it</li>
+<li>Create a master and child documents and link them using an attribute.</li>
+</ul>
+
+
+<p>In the first case when all the information are stored in a single document it is quite easy to use the entire set of data and for example create a screen that shows all the information, but what about the second case?</p>
+
+<p>In this post I am explaining how it is possible to use Couchbase views to deal with that an make it easy to create master/detail views.</p>
+
+<p>As an ex-Oracle employee, I am using the infamous SCOTT schema with the DEPT and EMP tables, as the first example. Then at the end I will extend this to the beer sample data provided with Couchbase.</p>
+
+<h3>The Data</h3>
+
+<p>Couchbase is a schema-less database, and you can store “anything you want” into it, but for this you need to use JSON documents and create 2 types of document : “department” and “employee”.</p>
+
+<p>The way we usually do that is using a technical attribute to type the document. So the employee and department document will look as follow :</p>
+
+<p>Department</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dept&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Accounting&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;city&quot;</span><span class="p">:</span> <span class="s2">&quot;New York&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Employee</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;emp&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">7782</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Blake&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;job&quot;</span><span class="p">:</span> <span class="s2">&quot;Clark&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;manager&quot;</span><span class="p">:</span> <span class="mi">7839</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;salary&quot;</span><span class="p">:</span> <span class="mi">2450</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;dept_id&quot;</span><span class="p">:</span> <span class="s2">&quot;dept__10&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This shows just the document, in Couchbase you have to associate a document to a key. For this example I am using a simple pattern : <code>type__id</code>, for these documents the keys will look like the following:</p>
+
+<ul>
+<li><code>dept__10</code></li>
+<li><code>emp__20</code></li>
+</ul>
+
+
+<p>You can use any pattern to create a key, for example for the employee you could chose to put an email.</p>
+
+<p>Note the “dept_id” attribute in the employee document. This is the key of the department; you can see that as the “foreign key”. But remember, the relationship between the department and employee documents are managed entirely by the application, Couchbase Server does not enforce it.</p>
+
+<p>I have created a Zip file that contains all the data, you can download it from <a href="http://db.tt/NsUfweBM">here</a>; and import the data into Couchbase using the <span style="font-family: Courier New, Courier, monospace;">cbdocloader</span> utility. To import the data run the following command from a terminal window:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">./cbdocloader</span> <span class="err">-n</span> <span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span><span class="err">:</span><span class="mi">8091</span> <span class="err">-u</span> <span class="err">Administrator</span> <span class="err">-p</span> <span class="err">password</span> <span class="err">-b</span> <span class="err">default</span> <span class="err">~/Downloads/emp-dept.zip</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can learn more about the <code>cbdocloader</code> tool in <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-admin-cmdline-cbdocloader.html">the documentation</a>.</p>
+
+<h3>The View</h3>
+
+<p>Queries inside Couchbase are based on <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-basics.html">views</a>; and views build indexes, so we have to create a view, a &ldquo;collated view&rdquo; to be exact.</p>
+
+<p>The idea behing a collated view is to produce an index where the keys are ordered so that a parent id appears first followed by its children. So we are generating an index that will look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">DEPT_</span><span class="mi">10</span><span class="err">,</span> <span class="err">Accounting</span>
+</span><span class='line'><span class="err">DEPT_</span><span class="mi">10</span><span class="err">,</span> <span class="err">Blake</span>
+</span><span class='line'><span class="err">DEPT_</span><span class="mi">10</span><span class="err">,</span> <span class="err">Miller</span>
+</span><span class='line'><span class="err">DEPT_</span><span class="mi">20</span><span class="err">,</span> <span class="err">Research</span>
+</span><span class='line'><span class="err">DEPT_</span><span class="mi">20</span><span class="err">,</span> <span class="err">Adams</span>
+</span><span class='line'><span class="err">DEPT_</span><span class="mi">20</span><span class="err">,</span> <span class="err">Ford</span>
+</span><span class='line'><span class="err">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is in fact quite easy to do with Couchbase views. The only trick here is to control the order and be sure the master is always the first one, just before its children.</p>
+
+<p>So to control this we can create an compound key that contains the department id, a &ldquo;sorting&rdquo; element and the name (beer or brewery)</p>
+
+<p>So the map function of the view looks like the following:</p>
+
+<div><script src='https://gist.github.com/bfb625e0ff175b1778bc.js'></script>
+<noscript><pre><code>function (doc, meta) {
+  if (doc.type == &quot;emp&quot; || doc.type == &quot;dept&quot;) {
+    switch(doc.type) {
+      case &quot;dept&quot; :
+        emit( [meta.id, 0, doc.name], 0 );
+        break;
+      case &quot;emp&quot; :
+        emit( [doc.dept_id, 1, doc.name ], doc.salary + ((doc.comm)?doc.comm:0) );
+        break;
+    }
+  }
+}
+</code></pre></noscript></div>
+
+
+<p>The key is composed of:</p>
+
+<ul>
+<li>the department id extracted from the department document itself or from the employee document depending of the type of document</li>
+<li>an arbitrary number that is used to control the ordering. I put 0 for the department, 1 for the employee</li>
+<li>the name of the department or the employee, this also allows to sort the result by name</li>
+</ul>
+
+
+<p>In addition to the key, this view is used to emit some information about the salary of the employees. The salary is simply the sum of the salary plus thecommission when exists. The result of the view looks like:</p>
+
+<p><img src="http://2.bp.blogspot.com/-wLmoUPfo-f8/URtierY_qBI/AAAAAAAAAaw/i3DMCvilCcU/s400/Screen+Shot+2013-02-13+at+10.52.30+AM.png"></p>
+
+<p>With this view you can now use the result of the view to build report for your application. It is also possible to use parameters in your query to see only a part of the data, for example by departement, using for example <code>startkey=["dept__20",0]&amp;amp;endkey=["dept__20",2]</code> to view only the data -Department and Employees- of the deparment 20-Research.</p>
+
+<h3>The Beer Sample Application</h3>
+
+<p>You can create an equivalent view for the beer sample application where you print all the breweries and beers in the same report. The view is called &ldquo;<code>all_with_beers</code>&rdquo; in the design document &ldquo;<code>brewery</code>&rdquo;. The view looks like:</p>
+
+<div><script src='https://gist.github.com/4944154.js'></script>
+<noscript><pre><code>function(doc, meta) {
+  switch(doc.type) {
+    case &quot;brewery&quot;:
+      emit([meta.id, 0, doc.name]);
+      break;
+    case &quot;beer&quot;:
+      if (doc.name &amp;&amp; doc.brewery_id) {
+        emit([doc.brewery_id, 1, doc.name], null);
+      }
+  }                    
+}
+</code></pre></noscript></div>
+
+
+<p>Once you have publish it in production you can use it in the Beer Sample application, for this example I have modified the Java sample application.</p>
+
+<p><strong>Create a servlet to handle user request and on the /all URI.</strong></p>
+
+<p>The &ldquo;BreweryAndBeerServlet&rdquo; that calls the view using the following code :</p>
+
+<div><script src='https://gist.github.com/4944142.js'></script>
+<noscript><pre><code>        View view = client.getView(&quot;brewery&quot;, &quot;all_with_beers&quot;);
+        Query query = new Query();
+        query.setIncludeDocs(true).setLimit(100);
+        ViewResponse result = client.query(view, query);
+
+        ArrayList&lt;HashMap&lt;String, String&gt;&gt; items =
+                new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+        for(ViewRow row : result) {
+            HashMap&lt;String, String&gt; parsedDoc = gson.fromJson(
+                    (String)row.getDocument(), HashMap.class);
+
+            HashMap&lt;String, String&gt; item = new HashMap&lt;String, String&gt;();
+            item.put(&quot;id&quot;, row.getId());
+            item.put(&quot;name&quot;, parsedDoc.get(&quot;name&quot;));
+            item.put(&quot;type&quot;, parsedDoc.get(&quot;type&quot;));
+
+
+            items.add(item);
+        }
+        request.setAttribute(&quot;items&quot;, items);
+
+        request.getRequestDispatcher(&quot;/WEB-INF/breweries/all.jsp&quot;)
+                .forward(request, response);</code></pre></noscript></div>
+
+
+<p>The result of the query is set into the HttpRequest and the all.jsp page is executed. The JSP uses JSTL to print the information using the following code:</p>
+
+<div><script src='https://gist.github.com/c163f57778d663632e87.js'></script>
+<noscript><pre><code>        &lt;table id=&quot;brewery-table&quot; class=&quot;table table-striped&quot;&gt;
+            &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;Name&lt;/th&gt;
+                &lt;th&gt;&lt;/th&gt;
+                &lt;th&gt;&lt;/th&gt;
+            &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+            &lt;c:forEach items=&quot;${items}&quot; var=&quot;item&quot;&gt;
+                &lt;c:if test=&quot;${ item.type == &#39;brewery&#39; }&quot;&gt;
+                    &lt;tr&gt;
+                        &lt;td colspan=&quot;2&quot;&gt;&lt;strong&gt;&lt;a href=&quot;/breweries/show/${item.id}&quot;&gt;${item.name}&lt;/a&gt;&lt;/strong&gt;&lt;/td&gt;
+                        &lt;td&gt;&lt;a class=&quot;btn btn-small btn-danger&quot; href=&quot;/breweries/delete/${item.id}&quot;&gt;Delete&lt;/a&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                &lt;/c:if&gt;
+                &lt;c:if test=&quot;${ item.type == &#39;beer&#39; }&quot;&gt;
+                    &lt;tr&gt;
+                        &lt;td&gt;&lt;/td&gt;
+                        &lt;td&gt;&lt;a href=&quot;/beers/show/${item.id}&quot;&gt;${item.name}&lt;/a&gt;&lt;/td&gt;
+                        &lt;td&gt;
+                            &lt;a class=&quot;btn btn-small btn-danger&quot; href=&quot;/beers/delete/${item.id}&quot;&gt;Delete&lt;/a&gt;
+                            &lt;a class=&quot;btn btn-small btn-warning&quot; href=&quot;/beers/edit/${item.id}&quot;&gt;Edit&lt;/a&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                &lt;/c:if&gt;
+            &lt;/c:forEach&gt;
+            &lt;/tbody&gt;
+        &lt;/table&gt;</code></pre></noscript></div>
+
+
+<p>The JSP gets the items from the HTTP Request and loops on each items, then based on the type of the item the information is printed. The final result looks like :</p>
+
+<p><img src="http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png"></p>
+
+<p>This extension to the Beer Sample application is available here :<a href="https://github.com/tgrall/beersample-java/tree/BreweriesAndBeers">https://github.com/tgrall/beersample-java/tree/BreweriesAndBeers</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/">Getting Started With Couchbase and node.js on Windows</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-01-04T19:54:43+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>7:54 pm</span></time>
+        
+           | <a href="/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In a previous post I have explained how to use Couchbase and Node.js on OS X. Since it is quite different on Windows here another article about it.</p>
+
+<h3>Install Couchbase Server 2.0</h3>
+
+<p>If you have not installed Couchbase Server already, do the following :</p>
+
+<ol>
+<li>Download Couchbase Server from <a href="http://www.couchbase.com/download">here</a></li>
+<li>Run the installer</li>
+<li>Configure the database at <a href="http://localhost:8091/">http://localhost:8091</a> (if you have issue take a look to <a href="http://tugdualgrall.blogspot.fr/2012/12/what-to-do-if-your-couchbase-server.html">this article</a>)</li>
+</ol>
+
+
+<p>These steps are documented in the <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-getting-started-install-win.html">Couchbase Server Manual</a>.</p>
+
+<h3>Install Node</h3>
+
+<p><strong>Install latest version of node</strong></p>
+
+<p>It is quite easy to install Node.js using the Windows installer provided at <a href="http://nodejs.org/">http://nodejs.org</a>.</p>
+
+<p>Once you have installed node, you can test is using the command line interface:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>node
+</span><span class='line'><span class="p">&amp;</span>gt<span class="p">;</span> console.log<span class="o">(</span>process.version<span class="o">)</span><span class="p">;</span>
+</span><span class='line'>v0.8.16
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Node is installed. So far so good !</p>
+
+<h3>Install Couchnode</h3>
+
+<p>Couchnode, the Couchbase Client Library for Node.js, is a native module. The tool used to install native modules is <code>node-gyp</code>.  So to install couchnode you need to install :</p>
+
+<ul>
+<li>node-gyp</li>
+<li>python</li>
+<li>Visual Studio to have access to a C/C++ compiler</li>
+</ul>
+
+
+<h4>Install node-gyp</h4>
+
+<p>The node-gyp module is easy to install and you can install it using npm using the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>npm install -g node-gyp
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <em>-g</em> parameter indicates that this module will be installed globally and added to your <code>%PATH%</code>.</p>
+
+<h4>Install Python</h4>
+
+<p>GYP uses Python to generate the project, so you need to install it on your environment. I have installed <a href="http://www.python.org/download/releases/2.7.3/">Python 2.7.3</a> using the Windows installer.</p>
+
+<p><strong>Install Visual Studio</strong></p>
+
+<p>Finally you need a C/C++ compiler, the best way to get it is to install Visual Studio. As you probably know I am not a Windows expert and I do not know a lot about Microsoft development tools. I have downloaded Visual Studio Express the free development tools from <a href="http://www.microsoft.com/visualstudio/eng/downloads">here</a>; it was sufficient.</p>
+
+<p><strong>Install Libcouchbase for Windows</strong></p>
+
+<p>Couchnode uses libcouchbase the C client library, so before running the npm install for Couchbase, you need to install libcouchbase itself.</p>
+
+<p>You can download it from <a href="http://www.couchbase.com/develop/c/current">Couchbase site</a>. The Windows versions are located in the left menu of the page. Download the zip file, that matches your environment. I have downloaded the &ldquo;Windows, 64-bit MSVC 10&rdquo;.</p>
+
+<p>Node-gyp will look for all the dependencies (DLL, library headers) into <code>c:\couchbase</code> directory, so you need to unzip the file in this folder. This location comes from the <a href="https://github.com/couchbase/couchnode/blob/master/binding.gyp#L7">binding.gyp</a> file of the couchnode project.</p>
+
+<p><strong>Install and Test Couchnode itself!</strong></p>
+
+<p>Let&rsquo;s check what we have done so far; we have installed:</p>
+
+<ul>
+<li>Node</li>
+<li>node-gyp</li>
+<li>Python</li>
+<li>Visual Studio</li>
+<li>Libcouchbase</li>
+</ul>
+
+
+<p>We are now ready to install and use couchnode itself. For this we can create a new node project.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir my-app
+</span><span class='line'><span class="nb">cd </span>my-app
+</span><span class='line'>npm install couchbase
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The install command will:</p>
+
+<ul>
+<li>Create a node_modules folder and put couchbase client library in it</li>
+<li>When installing/building couchnode on Windows I had the following warning :</li>
+</ul>
+
+
+<p>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1138,5): warning MSB8012: TargetExt(.dll) does not match the Linker&rsquo;s Output
+File property value (.node). This may cause your project to build incorrectly.
+To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+[C:\Users\tgrall\node\node_modules\couchbase\build\couchbase_impl.vcxproj]</p>
+
+<p>This is only a warning and as far as I know, it is not a blocker. At the end of the log you should see:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>couchbase@0.0.10 node_modules<span class="se">\c</span>ouchbase
+</span><span class='line'>├── bindings@1.0.0
+</span><span class='line'>└── request@2.11.4
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You have successfully installed couchnode.</p>
+
+<p>Let&rsquo;s now write a small test. Create a <code>test.js</code> file with the following content:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span>  <span class="nx">driver</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;couchbase&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">driver</span><span class="p">.</span><span class="nx">connect</span><span class="p">({</span>
+</span><span class='line'>  <span class="s2">&quot;username&quot;</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;password&quot;</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;hostname&quot;</span><span class="o">:</span> <span class="s2">&quot;localhost:8091&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;bucket&quot;</span><span class="o">:</span> <span class="s2">&quot;default&quot;</span><span class="p">},</span>
+</span><span class='line'>  <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">throw</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">cb</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="s1">&#39;{&quot;server&quot; : &quot;couchbase&quot;, &quot;version&quot; : 2 }&#39;</span> <span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span> <span class="p">}</span>
+</span><span class='line'>      <span class="nx">cb</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">){</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);}</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">doc</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Run this with the command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>node test.js
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should see the following text in your console :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">{</span> server: <span class="s1">&#39;couchbase&#39;</span>, version: <span class="m">2</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>In this article you have learned how to:</p>
+
+<ul>
+<li>Install Couchbase</li>
+<li>Install Node</li>
+<li>Install and configure node-gyp</li>
+<li>Install and use Couchbase and Node</li>
+</ul>
+
+
+<p>all this on Windows 7.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/">Couchbase 101: Create Views (MapReduce) From Your Java Application</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-12-30T10:42:24+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>10:42 am</span></time>
+        
+           | <a href="/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When you are developing a new applications with Couchbase 2.0, you sometimes need to create view dynamically from your code. For example you may need this when you are installing your application, writing some test, or you can also use that when you are building frameworks, and wants to dynamically create views to query data. This post shows how to do it.</p>
+
+<h3>Prerequisites</h3>
+
+<ul>
+<li><a href="http://www.couchbase.com/download">Couchbase Server 2.0</a></li>
+<li><a href="http://www.couchbase.com/develop/java/current">Couchbase Jave Client Library 1.1.x</a></li>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-sampledata-beer.html">Beer Sample dataset</a></li>
+</ul>
+
+
+<p>If you are using Maven you can use the following information in your <code>pom.xml</code> to add the Java Client library:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;repository&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;id&gt;</span>couchbase<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>Couchbase Maven Repository<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;layout&gt;</span>default<span class="nt">&lt;/layout&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;url&gt;</span>http://files.couchbase.com/maven2/<span class="nt">&lt;/url&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;snapshots&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;enabled&gt;</span>false<span class="nt">&lt;/enabled&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/snapshots&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/repository&gt;</span>
+</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupid&gt;</span>couchbase<span class="nt">&lt;/groupid&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactid&gt;</span>couchbase-client<span class="nt">&lt;/artifactid&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>1.1.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;type&gt;</span>jar<span class="nt">&lt;/type&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependencies&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>See online at <a href="https://gist.github.com/4337172">https://gist.github.com/4337172</a></p>
+
+<h3>Create and Manage Views From Java</h3>
+
+<p>The full Maven project is available on <a href="https://github.com/tgrall/couchbase-java-101/tree/master/java-document-design/">Github</a>.</p>
+
+<h4>Connect to Couchbase Cluster</h4>
+
+<p>The first thing to do when you want to create a view from Java is obviously to connect to the cluster.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">com.couchbase.client.CouchbaseClient</span><span class="o">;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">List</span><span class="o">&lt;</span><span class="n">uri</span><span class="o">&gt;</span> <span class="n">uris</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">uri</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="n">uris</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">URI</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">&quot;http://127.0.0.1:8091/pools&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">CouchbaseClient</span> <span class="n">client</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">CouchbaseClient</span><span class="o">(</span><span class="n">uris</span><span class="o">,</span> <span class="s">&quot;beer-sample&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// put your code here</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">client</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">err</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Error connecting to Couchbase: &quot;</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">exit</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>Create a list of URIs to different nodes of the cluster - lines 5-6. (In this example I am working on a single node)</li>
+<li>Connect to the bucket, in our case <code>beer-sample</code> -line 9. You can include the password if the bucket is protected ( this is not the case here so I am sending an empty string)</li>
+</ol>
+
+
+<p>If you are looking for more information about Couchbase and Java, you can read this article from DZone : <a href="http://architects.dzone.com/articles/hello-world-couchbase-and-java">Hello World with Couchbase and Java</a>.</p>
+
+<p>Let&rsquo;s now talk about Couchbase views. You use views/map-reduce functions to index and query data from Couchbase Server based on the content of the JSON document you store inside Couchbase. For more information about views you can look at the <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-basics.html">&ldquo;view basics&rdquo; chapter</a> of the Couchbase Server Manual.</p>
+
+<h4>Create Views from Java</h4>
+
+<p>Creating a view from Java is really easy : the Java Client Library contains all the classes and methods to do it. As a concrete use case we will use the Application that is described in the <a href="http://www.couchbase.com/docs/couchbase-sdk-java-1.1/tutorial.html">Couchbase Java Tutorial</a>.</p>
+
+<p>When you follow this tutorial, you need to manually create some views, as you can see <a href="http://www.couchbase.com/docs/couchbase-sdk-java-1.1/preps-views.html">here</a>. In this example, we will create our map function and directly in our Java code and then store it to Couchbase Server. The tutorial asks you to create the following artifacts:</p>
+
+<ul>
+<li>a view named &ldquo;by_name&rdquo;</li>
+<li>in the design document named <code>"dev_beer"</code> (development mode)</li>
+<li>and the map function which looks like the following :</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span> <span class="o">&amp;&amp;</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s2">&quot;beer&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following code allows you to do it from Java:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">com.couchbase.client.protocol.views.DesignDocument</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">com.couchbase.client.protocol.views.ViewDesign</span><span class="o">;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">DesignDocument</span> <span class="n">designDoc</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">DesignDocument</span><span class="o">(</span><span class="s">&quot;dev_beer&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">String</span> <span class="n">viewName</span> <span class="o">=</span> <span class="s">&quot;by_name&quot;</span><span class="o">;</span>
+</span><span class='line'><span class="n">String</span> <span class="n">mapFunction</span> <span class="o">=</span>
+</span><span class='line'><span class="s">&quot;function (doc, meta) {\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;  if(doc.type &amp;&amp; doc.type == \&quot;beer\&quot;) {\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;    emit(doc.name);\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;  }\n&quot;</span> <span class="o">+</span>
+</span><span class='line'><span class="s">&quot;}&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ViewDesign</span> <span class="n">viewDesign</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ViewDesign</span><span class="o">(</span><span class="n">viewName</span><span class="o">,</span><span class="n">mapFunction</span><span class="o">);</span>
+</span><span class='line'><span class="n">designDoc</span><span class="o">.</span><span class="na">getViews</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">viewDesign</span><span class="o">);</span>
+</span><span class='line'><span class="n">client</span><span class="o">.</span><span class="na">createDesignDoc</span><span class="o">(</span> <span class="n">designDoc</span> <span class="o">);</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Create a design document using the <code>com.couchbase.client.protocol.views.DesignDocument</code> class - line 4.</li>
+<li>Create a view using <code>com.couchbase.client.protocol.views.ViewDesign</code> class with a name and the map function - line 14.</li>
+<li>You can add this view to a design document - line 15</li>
+<li>Finally save the document into the cluster using the <code>CouchbaseClient.createDesignDoc</code> method.</li>
+</ul>
+
+
+<p>If you need to use a reduce function (built-in or custom) you just need to pass to the ViewDesign constructor as 3rd parameter.</p>
+
+<p>When developing view, from Java or from any other tool/language be sure you understand what are the best practices, and the life cycle of the index. This is why I am inviting you to take a look to the following chapters in the Couchbase documentation:</p>
+
+<ul>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-writing-bestpractice.html">View Writing Best Practice</a> : for example in the map function, I do not emit any value. I only emit a key (the beer name).</li>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-datastore.html">Views and Stored Data</a></li>
+<li><a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-types.html">Development and Production Views</a> : in the view above, I have created the view in the development environment (<span style="font-family: Courier New, Courier, monospace;">dev_</span> prefix) allowing me to test and use it on a subset of the data (cluster/index)</li>
+</ul>
+
+
+<h4>Using the view</h4>
+
+<p>First of all, the view that you just created is in &ldquo;development mode&rdquo;, and by default the Java client SDK will only access the view when it is in &ldquo;production mode&rdquo;. This means that when you are calling a view from your application it will search it into the production environment. So before connecting to Couchbase cluster you need to setup the <code>viewmode</code> to development.</p>
+
+<p>This is done using the <code>viewmode</code> environment variable from the Java SDK, that could be set using the following methods:</p>
+
+<ul>
+<li>In your code, add this line <strong>before</strong> the client connects to the cluster : <code>System.setProperty("viewmode", "development");</code></li>
+<li>At the command line <code>-Dviewmode=development</code></li>
+<li>In a properties file <code>viewmode=development</code></li>
+</ul>
+
+
+<p>Once it is done you can call the view using the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">import</span> <span class="n">com</span><span class="o">.</span><span class="na">couchbase</span><span class="o">.</span><span class="na">client</span><span class="o">.</span><span class="na">protocol</span><span class="o">.</span><span class="na">views</span><span class="o">.*;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;viewmode&quot;</span><span class="o">,</span> <span class="s">&quot;development&quot;</span><span class="o">);</span> <span class="c1">// before the connection to Couchbase</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">View</span> <span class="n">view</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">getView</span><span class="o">(</span><span class="s">&quot;beer&quot;</span><span class="o">,</span> <span class="s">&quot;by_name&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Query</span><span class="o">();</span>
+</span><span class='line'><span class="n">query</span><span class="o">.</span><span class="na">setIncludeDocs</span><span class="o">(</span><span class="kc">true</span><span class="o">).</span><span class="na">setLimit</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span>
+</span><span class='line'><span class="n">query</span><span class="o">.</span><span class="na">setStale</span><span class="o">(</span> <span class="n">Stale</span><span class="o">.</span><span class="na">FALSE</span> <span class="o">);</span>
+</span><span class='line'><span class="n">ViewResponse</span> <span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">view</span><span class="o">,</span> <span class="n">query</span><span class="o">);</span>
+</span><span class='line'><span class="k">for</span><span class="o">(</span><span class="n">ViewRow</span> <span class="n">row</span> <span class="o">:</span> <span class="n">result</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">row</span><span class="o">.</span><span class="na">getDocument</span><span class="o">();</span> <span class="c1">// deal with the document/data</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code queries the view you just created. This means Couchbase Server will generate an index based on your map function, will query the server for results. In this case, we specifically want to set a limit of 20 results and also get the most current results by setting Stale.FALSE.</p>
+
+<ul>
+<li>Set the <code>viewmode</code> to <code>development</code> - line 4</li>
+<li>Get the view using the <code>CouchbaseClient.getView()</code> method -line 6-. As you can see I just use the name beer for the design document (and not dev_beer, Couchbase will know where to search since I am in development mode)</li>
+<li>Create a query and set a limit (20) and ask the SDK to return the document itself
+<code>setIncludeDocs(true)</code> -line 8- The document will be returned from Couchbase server in the most efficient way</li>
+<li>Ask the system to update the index before returning the result using query.setStale( Stale.FALSE <code>);</code>-line 9-. Once again be careful when you use setStale method. Just to be sure here is the documentation about it : <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-writing-stale.html">Index Updates and the stale Parameter</a></li>
+<li>Execute the query - line 10</li>
+<li>And use the result - lines 11-13</li>
+</ul>
+
+
+<h3>Conclusion</h3>
+
+<p>In this article, you have learned:</p>
+
+<ul>
+<li>How to create Couchbase views from Java</li>
+<li>Call this view from Java</li>
+<li>Configure development/production mode views from Couchbase Java Client Library</li>
+</ul>
+
+
+<p>This example is limited to the creation of a view, you can take a look to the other methods related to design documents and views if you want to manage your design documents : <code>getDesignDocument()</code>, <code>deleteDesignDocument()</code>, &hellip;</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/">What to Do if Your Couchbase Server Does Not Start?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-12-26T11:08:37+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>11:08 am</span></time>
+        
+           | <a href="/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Working with the Couchbase 2.0.0 release you may have issues when trying to access the Web Admin Console or simply starting the server. This is due to the way Couchbase Server uses the IP address/hostname during the installation process. So when you have one of the following errors :</p>
+
+<ul>
+<li>On Windows, Server is not working at all, even after installation. You can access the sever on port 8092 (Couchbase API port), but cannot on port 8091</li>
+<li>You have the following error when accessing the console <code>"[10:02:02] IP address seems to have changed. Unable to listen on 'ns_1@10.0.2.15'"</code></li>
+</ul>
+
+
+<p><img src="http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png"></p>
+
+<ul>
+<li>When you try to restart the server it does not start and you have the following error message in the error log :
+<code>"Configured address '10.0.2.15' seems to be invalid. Will refuse to start for safety reasons"</code></li>
+</ul>
+
+
+<p>Some of these issues are related to a known issue on Windows ( see <a href="http://www.couchbase.com/issues/browse/MB-7417">MB-7417</a> that will be fixed in 2.0.1) or the fact that Couchbase server does not support change of the IP address after installation.  This is documented in the section “<a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-bestpractice-cloud-ip.html">Using Couchbase in the Cloud: Handling Changes in IP Addresses</a>” of the Couchbase Server Manual. This article explains what should be done when configuring Couchbase Server on Windows, but you can do equivalent steps on any platform using the shell scripts available on Linux and/or Mac OS X.</p>
+
+<p>Once you have installed Couchbase, you can see in the console that the IP address of your server is used :
+  <img src="http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png"></p>
+
+<p>Typically the address 192.168.0.97 is stored in the configuration of Couchbase. If your server receives a new address from the DHCP server, Couchbase will not work anymore. In this article you will see how you can configure Couchbase to use another IP address or Hostname.</p>
+
+<p><strong>Important:</strong> The steps that follow will completely destroy any data and configuration from the node, so it is best to start with a fresh Couchbase install. If you can not, you should backup your data using the file based backup-restore documented <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-backup-restore.html">here</a>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/01/new-adventure-dot-dot-dot/">New Adventure&#8230;</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-12-01T02:25:00+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>2:25 am</span></time>
+        
+           | <a href="/blog/2012/12/01/new-adventure-dot-dot-dot/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/12/01/new-adventure-dot-dot-dot/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Yesterday was my last day at eXo&hellip; I have been working at eXo since 2008, and we have achieved many exciting things such as building <a href="http://www.exoplatform.com/">eXo Platform</a>, the open source social platform, and the <a href="http://www.cloud-ide.com/">Cloud-IDE</a> allowing developers to build, test, and deploy applications online.</p>
+
+<p>It was a great experience for me, but it is time for me to jump into a new adventure&hellip;</p>
+
+<p>I am joining <a href="http://www.couchbase.com/">Couchbase</a>&nbsp;as a Technical Evangelist for the EMEA Region. When I have started to work with NoSQL engines (starting with Google BigTable for <a href="http://www.resultri.com/">Resultri</a>) I really enjoyed the experience and the flexibility that it gives to the developers. Then I choose to work on a documented oriented database because it looks very natural to me, and evaluate the clustering capabilities.&nbsp;This is how I discovered&nbsp;<a href="http://www.couchbase.com/">Couchbase</a>&nbsp;and its community.</p>
+
+<p>This new job is a great opportunity for me to do the things that I really like about software:</p>
+
+<ul>
+<li>Coding applications using different languages and frameworks</li>
+<li>Understanding the sysops/devops related challenges when using a new product/technology</li>
+<li>And finally probably the most important part; sharing it with others!</li>
+</ul>
+
+
+<p>I look forward to sharing what I like about NoSQL and Couchbase and discuss with others about their experience or needs around NoSQL.&nbsp;</p>
+
+<p>See you soon online and in real life during conferences and meetups!</p>
+
+<p><img src="http://4.bp.blogspot.com/-jxz50giRSQM/ULnaWxkHkyI/AAAAAAAAAZM/s0y7CFw4jUk/s320/couch-logo-company-page.png" title="&#34;Couchbase Logo&#34;" alt="&#34;Couchbase Logo&#34;"></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/">Couchbase : Create a Large Dataset Using Twitter and Java</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-11-05T21:11:00+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>9:11 pm</span></time>
+        
+           | <a href="/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>An easy way to create large dataset when playing/demonstrating Couchbase -or any other NoSQL engine- is to inject Twitter feed into your database.</p>
+
+<p>For this small application I am using:</p>
+
+<ul>
+<li><a href="http://www.couchbase.com/downloads-all#couchbase-server-2-0">Couchbase Server 2.0 Server</a></li>
+<li><a href="http://www.couchbase.com/develop/java/next">Couchbase Java SDK</a> (will be installed by Maven)</li>
+<li><a href="http://twitter4j.org/">Twitter4J</a> (will be installed by Maven)</li>
+<li><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a> called using Twitter4J</li>
+</ul>
+
+
+<p>In this example I am using Java to inject Tweets into Couchbase, you can obviously use another langage if you want to.</p>
+
+<p>The sources of this project are available on my Github repository <a href="https://github.com/tgrall/couchbase-twitter-injector"> Twitter Injector for Couchbase</a> you can also download the Binary version <a href="https://github.com/downloads/tgrall/couchbase-twitter-injector/CouchbaseTwitterInjector.jar">here</a>, and execute the application from the command line, see <a href="http://www.blogger.com/blogger.g?blogID=785895453418216075#runTheApp">Run The Application paragraph</a>. Do not forget to create your Twitter oAuth keys (see next paragraph)</p>
+
+<h4>Create oAuth Keys</span></h4>
+
+<p>The first thing to do to be able to use the Twitter API is to create a set of keys. If you want to learn more about all these keys/tokens take a look to the oAuth protocol : <a href="http://oauth.net/">http://oauth.net/</a></p>
+
+<p>1- Log in into the Twitter Development Portal : <a href="https://dev.twitter.com/">https://dev.twitter.com/</a></p>
+
+<p>2- Create a new Application</p>
+
+<p>Click on the &ldquo;Create an App&rdquo; link or go into the &ldquo;User Menu &gt; My Applications &gt; Create a new application&rdquo;</p>
+
+<p>3- Enter the Application Details information</p>
+
+<p><img src="http://4.bp.blogspot.com/-zxOaF_YLaO0/UJhoZOhjoJI/AAAAAAAAAVk/7HnRfFRSKxs/s320/couchbase-twitter-001.png"></p>
+
+<p>4- Click &ldquo;Create Your Twitter Application&rdquo; button</p>
+
+<p>Your application&rsquo;s OAuth settings are now available :</p>
+
+<p><img src="http://3.bp.blogspot.com/-ZdaST7c-HdY/UJhqi8WJMGI/AAAAAAAAAVs/ndeXQwc4F0k/s320/couchbase-twitter-002.png"></p>
+
+<p>5- Go down on the Application Settings page and click on the &ldquo;Create My Access Token&rdquo; button</p>
+
+<p><img src="http://4.bp.blogspot.com/-WIW2AN93n6k/UJhrfZV1AVI/AAAAAAAAAV0/OseQ1EOpg9k/s320/couchbase-twitter-003.png"></p>
+
+<p>You have now all the necessary information to create your application:</p>
+
+<ul>
+<li>Consumer key</li>
+<li>Consumer secret</li>
+<li>Access token</li>
+<li>Access token secret</li>
+</ul>
+
+
+<p>These keys will be uses in the <code>twitter4j.properties</code> file when running the Java application from the command line</p>
+
+<h4>Create the Java Application</h4>
+
+<p>The following code is the main code of the application:</p>
+
+<div><script src='https://gist.github.com/4022377.js'></script>
+<noscript><pre><code>package com.couchbase.demo;
+
+import com.couchbase.client.CouchbaseClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+import twitter4j.*;
+import twitter4j.json.DataObjectFactory;
+
+
+import java.io.InputStream;
+import java.net.URI;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+public class TwitterInjector {
+
+    public final static String COUCHBASE_URIS = &quot;couchbase.uri.list&quot;;
+    public final static String COUCHBASE_BUCKET = &quot;couchbase.bucket&quot;;
+    public final static String COUCHBASE_PASSWORD = &quot;couchbase.password&quot;;
+
+    private List&lt;URI&gt; couchbaseServerUris = new ArrayList&lt;URI&gt;();
+    private String couchbaseBucket = &quot;default&quot;;
+    private String couchbasePassword = &quot;&quot;;
+
+
+    public static void main(String[] args) {
+        TwitterInjector twitterInjector = new TwitterInjector();
+        twitterInjector.setUp();
+        twitterInjector.injectTweets();
+    }
+
+    private void setUp() {
+        try {
+            Properties prop = new Properties();
+            InputStream in = TwitterInjector.class.getClassLoader().getResourceAsStream(&quot;twitter4j.properties&quot;);
+            if (in == null) {
+                throw new Exception(&quot;File twitter4j.properties not found&quot;);
+            }
+            prop.load(in);
+            in.close();
+
+            if (prop.containsKey(COUCHBASE_URIS)) {
+                String[] uriStrings =  prop.getProperty(COUCHBASE_URIS).split(&quot;,&quot;);
+                for (int i=0; i&lt;uriStrings.length; i++) {
+                    couchbaseServerUris.add( new URI( uriStrings[i] ) );
+                }
+
+            } else {
+                couchbaseServerUris.add( new URI(&quot;http://127.0.0.1:8091/pools&quot;) );
+            }
+
+            if (prop.containsKey(COUCHBASE_BUCKET)) {
+                couchbaseBucket = prop.getProperty(COUCHBASE_BUCKET);
+            }
+
+            if (prop.containsKey(COUCHBASE_PASSWORD)) {
+                couchbasePassword = prop.getProperty(COUCHBASE_PASSWORD);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println( e.getMessage() );
+            System.exit(0);
+        }
+
+
+    }
+
+
+
+    private void injectTweets() {
+        TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+        try {
+            final CouchbaseClient cbClient = new CouchbaseClient( couchbaseServerUris , couchbaseBucket , couchbasePassword );
+            System.out.println(&quot;Send data to : &quot;+  couchbaseServerUris +&quot;/&quot;+ couchbaseBucket );
+            StatusListener listener = new StatusListener() {
+
+                @Override
+                public void onStatus(Status status) {
+                    String twitterMessage = DataObjectFactory.getRawJSON(status);
+
+                    // extract the id_str from the JSON document
+                    // see : https://dev.twitter.com/docs/twitter-ids-json-and-snowflake
+                    try {
+                        JSONObject statusAsJson = new JSONObject(twitterMessage);
+                        String idStr = statusAsJson.getString(&quot;id_str&quot;);
+                        cbClient.add( idStr ,0, twitterMessage  );
+                        System.out.print(&quot;.&quot;);
+                    } catch (JSONException e) {
+                        e.printStackTrace(); 
+                    }
+                }
+
+                @Override
+                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+                }
+
+                @Override
+                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+                }
+
+                @Override
+                public void onScrubGeo(long userId, long upToStatusId) {
+                }
+
+                @Override
+                public void onException(Exception ex) {
+                    ex.printStackTrace();
+                }
+            };
+
+        twitterStream.addListener(listener);
+        twitterStream.sample();
+
+        } catch (Exception e) {
+            e.printStackTrace();  
+        }
+    }
+
+
+
+}
+</code></pre></noscript></div>
+
+
+<p>Some basic explanation:</p>
+
+<ul>
+<li>The <code>setUp()</code> method simply reads the <code>twitter4j.properties</code> file from the classpath to build the Couchbase connection string.</li>
+<li>The <code>injectTweets</code> opens the Couchbase connection -line 76- and calls the TwitterStream API.</li>
+<li>A Listener is created and will receive all the <code>onStatus(Status status)</code> from Twitter. The most important method is onStatus() that receive the message and save it into Couchbase.</li>
+<li>One interesting thing : since Couchbase is a JSON Document database it allows your to just take the JSON String and save it directly. <code>cbClient.add(idStr,0 ,twitterMessage);</code></li>
+</ul>
+
+
+<h4>Packaging</h4>
+
+<p>To be able to execute the application directly from the Jar file, I am using the assembly plugin with the following informations from the pom.xml:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>  ...
+</span><span class='line'><span class="nt">&lt;archive&gt;</span>
+</span><span class='line'><span class="nt">&lt;manifest&gt;</span>
+</span><span class='line'><span class="nt">&lt;mainclass&gt;</span>com.couchbase.demo.TwitterInjector<span class="nt">&lt;/mainclass&gt;</span>
+</span><span class='line'><span class="nt">&lt;/manifest&gt;</span>
+</span><span class='line'><span class="nt">&lt;manifestentries&gt;</span>
+</span><span class='line'><span class="nt">&lt;class-path&gt;</span>.<span class="nt">&lt;/class-path&gt;</span>
+</span><span class='line'><span class="nt">&lt;/manifestentries&gt;</span>
+</span><span class='line'><span class="nt">&lt;/archive&gt;</span>
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Some information:</p>
+
+<ul>
+<li>The mainClass</span> entry allows you to set which class to execute when running java -jar</span> command.</li>
+<li>The Class-Path</span> entry allows you to set the current directory as part of the classpath where the program will search for the twitter4j.properties</span> file.</li>
+<li>The assembly file is also configure to include all the dependencies (Twitter4J, Couchbase client  SDK, &hellip;)</li>
+</ul>
+
+
+<p>If you do want to build it from the sources, simply run :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mvn clean package
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will create the following Jar file ./target/CouchbaseTwitterInjector.jar</span></p>
+
+<h4>Run the Java Application</span></h4>
+
+<p>Before running the application you must create a twitter4j.properties file with the following information :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>twitter4j.jsonStoreEnabled<span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>
+</span><span class='line'>oauth.consumerKey<span class="o">=[</span>YOUR CONSUMER KEY<span class="o">]</span>
+</span><span class='line'>oauth.consumerSecret<span class="o">=[</span>YOUR CONSUMER SECRET KEY<span class="o">]</span>
+</span><span class='line'>oauth.accessToken<span class="o">=[</span>YOUR ACCESS TOKEN<span class="o">]</span>
+</span><span class='line'>oauth.accessTokenSecret<span class="o">=[</span>YOUR ACCESS TOKEN SECRET<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>couchbase.uri.list<span class="o">=</span>http://127.0.0.1:8091/pools
+</span><span class='line'>couchbase.bucket<span class="o">=</span>default
+</span><span class='line'>couchbase.password<span class="o">=</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Save the properties file and from the same location run:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>jar -jar <span class="o">[</span>path-to-jar<span class="o">]</span>/CouchbaseTwitterInjector.jar
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will inject Tweets into your Couchbase Server. Enjoy !</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/24/create-a-simple-node-dot-js-and-couchbase-application-dot-dot-dot-on-os-x/">Create a Simple Node.js and Couchbase Application&#8230; On OS X</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-09-24T20:13:14+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>8:13 pm</span></time>
+        
+           | <a href="/blog/2012/09/24/create-a-simple-node-dot-js-and-couchbase-application-dot-dot-dot-on-os-x/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/09/24/create-a-simple-node-dot-js-and-couchbase-application-dot-dot-dot-on-os-x/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><blockquote><p><strong>NOTE:</strong> The Couchbase Node.js Client Library is currently changing. I will update this article and source code once the API is stable.</p></blockquote>
+
+<p>I am currently playing a little bit with Node.js . It is quite fun! In this article I won&rsquo;t go in a a very complex application but just give you the basic steps to create your first Node.js+Couchbase application&hellip; on Mac OS X.</p>
+
+<h3>Installation</h3>
+
+<p><strong>Couchbase 2.0 Beta:</strong></p>
+
+<p>You can take a look the first steps of my <a href="http://tugdualgrall.blogspot.fr/2012/07/couchbase-101-install-store-and-query.html">previous article</a> to install Couchbase. The basics steps are:</p>
+
+<ul>
+<li>Download <a href="http://www.couchbase.com/couchbase-server/beta">Couchbase 2. 0 Beta</a></li>
+<li>Start the server (Run the &ldquo;Couchbase Server&rdquo; application)</li>
+<li>Configure the server</li>
+</ul>
+
+
+<p><strong>Other Components :</strong></p>
+
+<ul>
+<li>Node.js</li>
+<li>Couchbase Client Library (C version)</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/09/24/create-a-simple-node-dot-js-and-couchbase-application-dot-dot-dot-on-os-x/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/06/couchbase-101-install-store-and-query-data/">Couchbase 101 : Install, Store and Query Data</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-07-06T09:31:00+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>9:31 am</span></time>
+        
+           | <a href="/blog/2012/07/06/couchbase-101-install-store-and-query-data/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/07/06/couchbase-101-install-store-and-query-data/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Introduction</h2>
+
+<p>In this post I just want to show how easily is to get
+started with Couchbase, and also explain how to “query” the data. The basic
+steps of this tutorial are:</p>
+
+<ol>
+<li>Install Couchbase</li>
+<li>Create Data</li>
+<li>Query Data</li>
+</ol>
+
+
+<p>I will try to post more articles, if I have time to show how to use Couchbase from your applications (starting with Java).</p>
+
+<p>Prerequisites :</p>
+
+<ul>
+<li>Could not be simpler : Couchbase 2.0 available <a href="http://www.couchbase.com/downloads-all">here</a>. (Currently in Developer Preview)</li>
+</ul>
+
+
+<h2>Couchbase 101 : Insert and Query data</h2>
+
+<h3>Installation</h3>
+
+<p>I am using Couchbase on Mac OS X, so let me describe the installation in this environment. If you are using other operating system just take a look to the Couchbase documentation.</p>
+
+<p>Couchbase installation is very (very!) fast:</p>
+
+<ol>
+<li>Download the Mac OS X Zip file.</li>
+<li>Double-click the downloaded Zip installation file to extract the contents. This will create a single file, the Couchbase.app application.</li>
+<li>Drag and Drop the Couchbase.app to your chosen installation folder, such as the system Applications folder.</li>
+</ol>
+
+
+<h3>Start and Configure Couchbase Server</h3>
+
+<p>To start Couchbase Server, just double click on the Couchbase Server. Once the server is started, a new icon is added in the OS X Menu to indicate that the Server is up and running.</p>
+
+<p>You can now configure your Couchbase instance, for this you just need to access the Admin Console, available at the following location <a href="http://127.0.0.1:8091/">http://127.0.0.1:8091</a> (change the IP address if needed) or simply by going in the Couchbase menu and click on Open Admin Console entry.</p>
+
+<p><img src="http://4.bp.blogspot.com/-UokiHs1DlFw/T_VpJHmn8KI/AAAAAAAAAUo/oy7bh5w9nOw/s1600/couchbase-menu.png"></p>
+
+<ol>
+<li>Welcome Screen : Click Setup</li>
+<li>Set the disk and cluster configuration. On my instance I keep the default location for the on disk storage. Just configure the size of the memory usage for your instance, for example 800Mb. So far, we have a single instance, so no need to join a cluster.</li>
+<li>Choose to generate sample data. This will be interesting to learn more about data and views.</li>
+<li>Create <code>the default</code> bucket (use for testing only). A bucket is used by Couchbase to store data. It could be compared to a “database” in RDBMS world.</li>
+<li>Configure update notifications to be alerted when new version of Couchbase is released</li>
+<li>Configure the server with a final step with the administrator username and password</li>
+<li>When this is done you are automatically redirected to the Admin Console.</li>
+</ol>
+
+
+<p><img src="http://2.bp.blogspot.com/-_a1iynqdk8w/T_VpTwa5qEI/AAAAAAAAAUw/ZGBHZsC6x_8/s320/install-step8.png"></p>
+
+<p>This is it! You are ready to use your Couchbase server.</p>
+
+<p>Couchbase has many interesting features, especially around scalability and elasticity but for not in this article let&rsquo;s focus on the basics :</p>
+
+<ul>
+<li>Insert some data and query them</li>
+</ul>
+
+
+<h3>Insert Data</h3>
+
+<p>Couchbase has many ways to manipulate data from you favorite programming language using the different client libraries : Java, Python, PHP, Ruby, .Net, C. For now let&rsquo;s use the Admin Console to create and query data.</p>
+
+<p>Couchbase can store any type of data, but when you need to manipulate some data with a structure the best way is to use JSON Documents. So let&rsquo;s use the console and create documents.</p>
+
+<p>To create new documents in your database, click on the &ldquo;Data Buckets&rdquo; tab. If you have installed the sample you see 2 buckets: <code>default</code> and <code>gamesim-sample</code>.</p>
+
+<p>Let&rsquo;s create a new documents in the <code>default</code> bucket:</p>
+
+<ol>
+<li>Click on Documents button</li>
+<li>Click on Create Document</li>
+<li>Since each document must have an id for example 100.</li>
+<li>Couchbase save the document and add some metadata such as &#95;rev, $flags, expiration</li>
+<li>Add new attributes to the document that describe an employee : Name, Departement and Salary, then save it. You just need to update the JSON object with values</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;_id&quot;</span><span class="p">:</span> <span class="s2">&quot;100&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Thomas&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;dept&quot;</span><span class="p">:</span> <span class="s2">&quot;Sales&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;salary&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Repeat the operation with some other employees :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>  <span class="mi">200</span><span class="o">,</span><span class="n">Jason</span><span class="o">,</span><span class="n">Technology</span><span class="o">,</span><span class="mi">5500</span>
+</span><span class='line'>  <span class="mi">300</span><span class="o">,</span><span class="n">Mayla</span><span class="o">,</span><span class="n">Technology</span><span class="o">,</span><span class="mi">7000</span>
+</span><span class='line'>  <span class="mi">400</span><span class="o">,</span><span class="n">Nisha</span><span class="o">,</span><span class="n">Marketing</span><span class="o">,</span><span class="mi">9500</span>
+</span><span class='line'>  <span class="mi">500</span><span class="o">,</span><span class="n">Randy</span><span class="o">,</span><span class="n">Technology</span><span class="o">,</span><span class="mi">6000</span>
+</span><span class='line'>  <span class="mi">501</span><span class="o">,</span><span class="n">Ritu</span><span class="o">,</span><span class="n">Accounting</span><span class="o">,</span><span class="mi">5400</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You have now a list of employees in your database. That was easy isn&rsquo;t? Let&rsquo;s now query them.</p>
+
+<h3>Query Data</h3>
+
+<p>Access document directly from its ID</p>
+
+<p>First of all you can quickly access a document using a simple HTTP request using its id. For example to access the Mayla with the id 300 just enter the following URL:</p>
+
+<ul>
+<li><code>http://127.0.0.1:8092/default/300</code></li>
+</ul>
+
+
+<p>In this URL you have :</p>
+
+<ul>
+<li><code>8092</code> is the Couch API REST port used to access data (where 8091 is the port for the Admin console)</li>
+<li><code>default</code> is the bucket in which the document is stored</li>
+<li><code>300</code> is the id of the document</li>
+</ul>
+
+
+<h4>Search your data with queries</h4>
+
+<p>So we have seen how you can access one document. But what if my need is :</p>
+
+<ul>
+<li>&ldquo;Give me all the employee of the Technology department&rdquo;</li>
+</ul>
+
+
+<p>To achieve such query it is necessary to create views. The views are used by Couchbase server to index and search your data. A view is a Map function written in JavaScript, that will generate a key value list that is compliant with logic you put in the Map function. Note that this key,value is now indexed and sorted by key. This is important when you query your data.</p>
+
+<p>So let&rsquo;s create a new view from the Admin Console:</p>
+
+<ol>
+<li>Click on the Views tab (be sure you are on the default bucket)</li>
+<li>Click on the &ldquo;Create Development View&rdquo;</li>
+<li>Enter the Document and View name:</li>
+<li>  Document Name : _design/dev_dept</li>
+<li>  View Name : dept</li>
+<li>Cick Save</li>
+<li>Click on your View to edit it</li>
+</ol>
+
+
+<p>Since we need to provide the list of employees that are part of a the Technology department, we need to create a view that use the <u>department as key</u>, so the map function looks like :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">dept</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Save the view</p>
+
+<p>This function takes the document and create a list that contains the &ldquo;dept&rdquo; as key and null as value. The value itself is not that important in our case. A simple rule will be : do not put too much data in the value since at the end Couchbase server creates an index with this map. Will see that Couchbase allows developer to easily get the document information when accessing a view.</p>
+
+<p>Click on the &ldquo;Show Results&rdquo; button, the result will look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span><span class="nt">&quot;total_rows&quot;</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="nt">&quot;rows&quot;</span><span class="p">:[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;501&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Accounting&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;400&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Marketing&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;100&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Sales&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;200&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;300&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;500&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As we have seen in earlier it is possible to access the document using a single URL, it is the same for views. You can for example access the view we have just created using the following URL:</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_dept/_view/dept">http://127.0.0.1:8092/default/<em>design/dev_dept/</em>view/dept
+</a></li>
+</ul>
+
+
+<p>Now it is possible to use query parameter to filter the results using the key parameter with the value entered using a JSON String :</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_dept/_view/dept?key=%22Technology%22">http://127.0.0.1:8092/default/<em>design/dev_dept/</em>view/dept?key=&ldquo;Technology&rdquo;</a></li>
+</ul>
+
+
+<p>The result of this query is now :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span><span class="nt">&quot;total_rows&quot;</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="nt">&quot;rows&quot;</span><span class="p">:[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;200&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;300&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;500&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You have many other parameters you can use when accessing a view to control the size, the time out, &hellip;. One of them is quite interesting is include_docs that ask Couchbase to include the full content of the document in the result. So if you call :</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_dept/_view/dept?key=%22Technology%22&amp;amp;include_docs=true">http://127.0.0.1:8092/default/<em>design/dev_dept/</em>view/dept?key=&ldquo;Technology&rdquo;&amp;include_docs=true</a></li>
+</ul>
+
+
+<p>The result is :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span><span class="nt">&quot;total_rows&quot;</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="nt">&quot;rows&quot;</span><span class="p">:[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;200&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;doc&quot;</span><span class="p">:</span>  <span class="p">{</span><span class="nt">&quot;_id&quot;</span><span class="p">:</span><span class="s2">&quot;200&quot;</span><span class="p">,</span><span class="nt">&quot;_rev&quot;</span><span class="p">:</span><span class="s2">&quot;1-1de6e6751608eada0000003200000000&quot;</span><span class="p">,</span><span class="nt">&quot;$flags&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;$expiration&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Jason&quot;</span><span class="p">,</span><span class="nt">&quot;dept&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;salary&quot;</span><span class="p">:</span><span class="mi">5500</span><span class="p">}},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;300&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;doc&quot;</span><span class="p">:{</span><span class="nt">&quot;_id&quot;</span><span class="p">:</span><span class="s2">&quot;300&quot;</span><span class="p">,</span><span class="nt">&quot;_rev&quot;</span><span class="p">:</span><span class="s2">&quot;1-f3e44cee742bfae10000003200000000&quot;</span><span class="p">,</span><span class="nt">&quot;$flags&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;$expiration&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Mayla&quot;</span><span class="p">,</span><span class="nt">&quot;dept&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;salary&quot;</span><span class="p">:</span><span class="mi">7000</span><span class="p">}},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;500&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;doc&quot;</span><span class="p">:</span>  <span class="p">{</span><span class="nt">&quot;_id&quot;</span><span class="p">:</span><span class="s2">&quot;500&quot;</span><span class="p">,</span><span class="nt">&quot;_rev&quot;</span><span class="p">:</span><span class="s2">&quot;1-05780359aac8f3790000003200000000&quot;</span><span class="p">,</span><span class="nt">&quot;$flags&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;$expiration&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Randy&quot;</span><span class="p">,</span><span class="nt">&quot;dept&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;salary&quot;</span><span class="p">:</span><span class="mi">6000</span><span class="p">}}</span>
+</span><span class='line'><span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s now create a little more complicated view to answer the following business requirement:</p>
+
+<ul>
+<li>&ldquo;Give me all the employee with a salary between 5000 and 6000&rdquo;</li>
+</ul>
+
+
+<p>So now you know that you need to create a new view with the salary as key let&rsquo;s with the following Map function:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">salary</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Couchbase is automatically sorting the key when creating/updating the index so, let&rsquo;s use the <code>startkey</code>  and  <code>endkey</code> parameter when calling the view. So let&rsquo;s call the view with from the following URL:</p>
+
+<ul>
+<li><a href="http://127.0.0.1:8092/default/_design/dev_salary/_view/salary?startkey=5000&amp;amp;endkey=6000&amp;amp;include_docs=true">http://127.0.0.1:8092/default/<em>design/dev_salary/</em>view/salary?startkey=5000&amp;endkey=6000&amp;include_docs=true</a></li>
+</ul>
+
+
+<p>The result is :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span><span class="nt">&quot;total_rows&quot;</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="nt">&quot;rows&quot;</span><span class="p">:[</span>
+</span><span class='line'> <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;100&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;doc&quot;</span><span class="p">:{</span><span class="nt">&quot;_id&quot;</span><span class="p">:</span><span class="s2">&quot;100&quot;</span><span class="p">,</span><span class="nt">&quot;_rev&quot;</span><span class="p">:</span><span class="s2">&quot;1-0f33580d780014060000002e00000000&quot;</span><span class="p">,</span><span class="nt">&quot;$flags&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;$expiration&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Thomas&quot;</span><span class="p">,</span><span class="nt">&quot;dept&quot;</span><span class="p">:</span><span class="s2">&quot;Sales&quot;</span><span class="p">,</span><span class="nt">&quot;salary&quot;</span><span class="p">:</span><span class="mi">5000</span><span class="p">}},</span>
+</span><span class='line'> <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;501&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="mi">5400</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;doc&quot;</span><span class="p">:{</span><span class="nt">&quot;_id&quot;</span><span class="p">:</span><span class="s2">&quot;501&quot;</span><span class="p">,</span><span class="nt">&quot;_rev&quot;</span><span class="p">:</span><span class="s2">&quot;1-b1fe5bc79637720e0000003100000000&quot;</span><span class="p">,</span><span class="nt">&quot;$flags&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;$expiration&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Ritu&quot;</span><span class="p">,</span><span class="nt">&quot;dept&quot;</span><span class="p">:</span><span class="s2">&quot;Accounting&quot;</span><span class="p">,</span><span class="nt">&quot;salary&quot;</span><span class="p">:</span><span class="mi">5400</span><span class="p">}},</span>
+</span><span class='line'> <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;200&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="mi">5500</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;doc&quot;</span><span class="p">:{</span><span class="nt">&quot;_id&quot;</span><span class="p">:</span><span class="s2">&quot;200&quot;</span><span class="p">,</span><span class="nt">&quot;_rev&quot;</span><span class="p">:</span><span class="s2">&quot;1-1de6e6751608eada0000003200000000&quot;</span><span class="p">,</span><span class="nt">&quot;$flags&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;$expiration&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Jason&quot;</span><span class="p">,</span><span class="nt">&quot;dept&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;salary&quot;</span><span class="p">:</span><span class="mi">5500</span><span class="p">}},</span>
+</span><span class='line'> <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;500&quot;</span><span class="p">,</span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="mi">6000</span><span class="p">,</span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;doc&quot;</span><span class="p">:{</span><span class="nt">&quot;_id&quot;</span><span class="p">:</span><span class="s2">&quot;500&quot;</span><span class="p">,</span><span class="nt">&quot;_rev&quot;</span><span class="p">:</span><span class="s2">&quot;1-05780359aac8f3790000003200000000&quot;</span><span class="p">,</span><span class="nt">&quot;$flags&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;$expiration&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Randy&quot;</span><span class="p">,</span><span class="nt">&quot;dept&quot;</span><span class="p">:</span><span class="s2">&quot;Technology&quot;</span><span class="p">,</span><span class="nt">&quot;salary&quot;</span><span class="p">:</span><span class="mi">6000</span><span class="p">}}</span>
+</span><span class='line'><span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>In this short article you have learn how to:</p>
+
+<ul>
+<li>Install Couchbase*   Create data using the Admin Console</li>
+<li>Query data with views</li>
+</ul>
+
+
+<p>When I get more time I will write another article that do the same from Java, and other languages.</p>
+
+<hr />
+
+<p>Note from @ingenthr</p>
+
+<blockquote><p>Nice blog! Note that while querying the REST interface directly is okay, we&rsquo;ve really tried to make it easy by having high-level language support for queries in each of the official client libraries. They&rsquo;re all listed over at <a href="http://www.couchbase.com/develop">http://www.couchbase.com/develop</a></p></blockquote>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/posts/5">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/3">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

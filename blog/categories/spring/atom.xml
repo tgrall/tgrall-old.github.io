@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Spring | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/spring/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle Development Kit for Spring]]></title>
+    <link href="http://tgrall.github.io/blog/2007/05/21/oracle-development-kit-for-spring/"/>
+    <updated>2007-05-21T07:46:25+02:00</updated>
+    <id>http://tgrall.github.io/blog/2007/05/21/oracle-development-kit-for-spring</id>
+    <content type="html"><![CDATA[<p>To help you better understand the support Oracle offers to Spring developers, everything you need to get started with Spring on Oracle Containers for Java EE is now available in the Oracle Development Kit for Spring. Whether you&rsquo;re new to Spring or an old hand, you&rsquo;re sure to benefit from the contents of the Development Kit:</p>
+
+<ul>
+<li>A comprehensive set of How-To examples illustrating Spring-OC4J integration</li>
+<li>The Oracle Developer Depot Web application, which enables you to deploy and run the How-To projects on OC4J</li>
+<li>A Spring extension to JDeveloper, Oracle&rsquo;s free Java IDE</li>
+<li>Supporting documentation and white papers</li>
+</ul>
+
+
+<p>The Kit is available as <a href="http://download-hq.oracle.com/otn/esd/other/ODK4Spring.zip">a self-extracting ZIP archive</a>. Note that you will need Oracle Containers for Java EE (10.1.3.2) or higher to use all of the How-To projects provided.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Spring and Oracle: I21 Blog Entry About Oracle Contribution to Spring]]></title>
+    <link href="http://tgrall.github.io/blog/2007/02/27/spring-and-oracle-i21-blog-entry-about-oracle-contribution-to-spring/"/>
+    <updated>2007-02-27T07:09:23+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/02/27/spring-and-oracle-i21-blog-entry-about-oracle-contribution-to-spring</id>
+    <content type="html"><![CDATA[<p>Rod Johnson in the Interface21 team blog entry named &ldquo;<a href="http://blog.interface21.com/main/2007/02/27/oracle-contributing-oracle-application-server-integration-code-to-spring-framework/">Oracle Contributing Oracle Application Server Integration Code to Spring Framework</a>&rdquo; described the contribution of Oracle to Spring framework.</p>
+
+<p>This contribution allows Spring applications to leverage the OracleAS transaction manager and its features. In addition to this contribution and some previous investments of Oracle in Spring, see the <a href="http://www.oracle.com/technology/tech/java/spring.html">Oracle and Spring</a> page of OTN; Oracle continues to invest more and more in Spring, as contributor or as user since, as stated by Rod, Spring has an important roles in  <a href="http://www.oracle.com/products/middleware/index.html">Oracle Fusion Middleware</a>, and its upcoming <a href="http://www.osoa.org/">Services Component Architecture</a> offering.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Come to Oracle Open World and Watch Mr Spring and Mr Apache Speak]]></title>
+    <link href="http://tgrall.github.io/blog/2006/10/12/come-to-oracle-open-world-and-watch-mr-spring-and-mr-apache-speak/"/>
+    <updated>2006-10-12T21:41:48+02:00</updated>
+    <id>http://tgrall.github.io/blog/2006/10/12/come-to-oracle-open-world-and-watch-mr-spring-and-mr-apache-speak</id>
+    <content type="html"><![CDATA[<p>Oracle Open World is getting very close&hellip; And I am very excited to go to lot of sessions, two of them looks very interesting in the Oracle Develop track:</p>
+
+<ul>
+<li>Rod Johnson - Spring Update: What&rsquo;s New and Cool in Spring 2.0 (Monday 10/23/2006, 12:45 PM - 1:45 PM in the Hilton Hotel Grand Ballroom A)</li>
+<li>Brian Behlendorf - Bringing Open Source Software Development Practices and Principles Into Your Company (Tuesday 10/24/2006, 1:15 PM - 2:15 PM in the Hilton Hotel Grand Ballroom A)</li>
+</ul>
+
+
+<p>This is quite exciting to have Open Source gurus coming to present to the Oracle conference, and explain how to use the new Spring in their projects or leverage Open Source practices to improve development in house&hellip; Take a look to the full program of Oracle Develop.</p>
+
+<p>Start to use the Oracle OpenWorld Schedule Builder to organize your week in SF, if you have not registered yet for OOW click here.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SourceLabs SASH Certified on Oracle Fusion Middleware]]></title>
+    <link href="http://tgrall.github.io/blog/2006/02/10/sourcelabs-sash-certified-on-oracle-fusion-middleware/"/>
+    <updated>2006-02-10T20:26:11+01:00</updated>
+    <id>http://tgrall.github.io/blog/2006/02/10/sourcelabs-sash-certified-on-oracle-fusion-middleware</id>
+    <content type="html"><![CDATA[<p>Oracle Fusion Middleware is now a certified platform for the SourceLabs &ldquo;SASH&rdquo; stack: Apache Struts, Apache Axis, the Spring Framework, and Hibernate. <a href="http://www.oracle.com/technology/tech/java/sash.html">Visit this page to download free SASH software</a>!</p>
+
+<p>SASH is a distribution from SourceLabs that:</p>
+
+<ol>
+<li>Reconciles library versions and dependencies across the entire stack.</li>
+<li>Includes dependability fixes for the baseline open source projects</li>
+<li>Is rigorously tested according to the CERT7 method.</li>
+<li>Is commercially supported.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle Toplink and Spring Framework Integration]]></title>
+    <link href="http://tgrall.github.io/blog/2004/12/10/oracle-toplink-and-spring-framework-integration/"/>
+    <updated>2004-12-10T19:28:34+01:00</updated>
+    <id>http://tgrall.github.io/blog/2004/12/10/oracle-toplink-and-spring-framework-integration</id>
+    <content type="html"><![CDATA[<p>You can now find a preview of the Oracle Toplink &amp; framework integration. This allows you to easily use Toplink features in your Spring application.</p>
+
+<p>You can download it from <a href="http://www.oracle.com/technology/products/ias/toplink/preview/spring/index.html">OTN Web site</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

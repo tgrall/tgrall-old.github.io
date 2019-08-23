@@ -1,0 +1,710 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Introduction to MongoDB Geospatial Feature - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="This post is a quick and simple introduction to Geospatial feature of MongoDB 2.6 using simple dataset and queries. Storing Geospatial Informations &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Introduction to MongoDB Geospatial Feature</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-08-21T15:30:02+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>3:30 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>This post is a quick and simple introduction to Geospatial feature of MongoDB 2.6 using simple dataset and queries.</p>
+
+<h3>Storing Geospatial Informations</h3>
+
+<p>As you know you can store any type of data, but if you want to query them you need to use some coordinates, and create index on them. MongoDB supports three types of indexes for GeoSpatial queries:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/core/2d/">2d Index</a> : uses simple coordinate (longitude, latitude). As stated in the documentation: <em>The 2d index is intended for legacy coordinate pairs used in MongoDB 2.2 and earlier</em>. For this reason, I won&rsquo;t detail anything about this in this post. Just for the record 2d Index are used to query data stored as points on a two-dimensional plane</li>
+<li><a href="http://docs.mongodb.org/manual/core/2dsphere/">2d Sphere Index</a> : support queries of any geometries on an-earth-like sphere, the data can be stored as GeoJSON and legacy coordinate pairs (longitude, latitude). For the rest of the article I will use this type of index and focusing on GeoJSON.</li>
+<li><a href="http://docs.mongodb.org/manual/core/geohaystack/">Geo Haystack</a> : that are used to query on very small area. It is today less used by applications and I will not describe it in this post.
+So this article will focus now on the 2d Sphere index with GeoJSON format to store and query documents.</li>
+</ul>
+
+
+<p><em>So what is GeoJSON?</em></p>
+
+<p>You can look at the <a href="http://geojson.org/">http://geojson.org/</a> site, let&rsquo;s do a very short explanation. GeoJSON is a format for encoding, in JSON, a variety of geographic data structures, and support the following types:  Point , LineString , Polygon , MultiPoint , MultiLineString , MultiPolygon and Geometry.</p>
+
+<p>The GeoJSON format  is quite straightforward based, for the simple geometries, on two attributes: type and coordinates. Let&rsquo;s take some examples:</p>
+
+<p>The city where I spend all my childhood, Pleneuf Val-André, France, has the following coordinates (from Wikipedia)</p>
+
+<p><code>48° 35′ 30.12″ N, 2° 32′ 48.84″ W</code></p>
+
+<p>This notation is a point, based on a latitude &amp; longitude using the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Degrees, Minutes, Seconds) system. Not very easy to use by application/code, this is why it is also possible to represent the exact same point using the following values for latitude &amp; longitude:</p>
+
+<p><code>48.5917, -2.5469</code></p>
+
+<p>This one uses the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Decimal Degrees) system. This is the coordinates you see use in most of the application/API you are using as developer (eg: Google Maps/Earth for example)</p>
+
+<p>By default GeoJSON, and MongoDB use these values but <strong>the coordinates must be stored in the longitude, latitude order</strong>, so this point in GeoJSON will look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="mf">-2.5469</span><span class="p">,</span>
+</span><span class='line'>  <span class="mf">48.5917</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png"></p>
+
+<p>This is a simple &ldquo;Point&rdquo;, let&rsquo;s now for example look at a line, a very nice walk on the beach :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;LineString&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.551082</span><span class="p">,</span><span class="mf">48.5955632</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.551229</span><span class="p">,</span><span class="mf">48.594312</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.551550</span><span class="p">,</span><span class="mf">48.593312</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.552400</span><span class="p">,</span><span class="mf">48.592312</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.553677</span><span class="p">,</span> <span class="mf">48.590898</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png"></p>
+
+<p>So using the same approach you will be able to create MultiPoint, MultiLineString, Polygon, MultiPolygon. It is also possible to mix all these in a single document using a GeometryCollection. The following example is a Geometry Collection of MultiLineString and Polygon over Central Park:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;GeometryCollection&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;geometries&quot;</span> <span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;Polygon&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;coordinates&quot;</span> <span class="p">:</span> <span class="p">[</span>
+</span><span class='line'><span class="p">[</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9580</span><span class="p">,</span> <span class="mf">40.8003</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9498</span><span class="p">,</span> <span class="mf">40.7968</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9737</span><span class="p">,</span> <span class="mf">40.7648</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9814</span><span class="p">,</span> <span class="mf">40.7681</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9580</span><span class="p">,</span> <span class="mf">40.8003</span>  <span class="p">]</span>
+</span><span class='line'><span class="p">]</span>
+</span><span class='line'>      <span class="p">]</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;MultiLineString&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;coordinates&quot;</span> <span class="p">:</span> <span class="p">[</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.96943</span><span class="p">,</span> <span class="mf">40.78519</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.96082</span><span class="p">,</span> <span class="mf">40.78095</span> <span class="p">]</span> <span class="p">],</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.96415</span><span class="p">,</span> <span class="mf">40.79229</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.95544</span><span class="p">,</span> <span class="mf">40.78854</span> <span class="p">]</span> <span class="p">],</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.97162</span><span class="p">,</span> <span class="mf">40.78205</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.96374</span><span class="p">,</span> <span class="mf">40.77715</span> <span class="p">]</span> <span class="p">],</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.97880</span><span class="p">,</span> <span class="mf">40.77247</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.97036</span><span class="p">,</span> <span class="mf">40.76811</span> <span class="p">]</span> <span class="p">]</span>
+</span><span class='line'>      <span class="p">]</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png"></p>
+
+<p>Note: You can if you want test/visualize these JSON documents using the <a href="http://geojsonlint.com/">http://geojsonlint.com/</a> service.</p>
+
+<h5>Now what? Let&rsquo;s store data!</h5>
+
+<p>Once you have a GeoJSON document you just need to store it into your document. For example if you want to store a document about JFK Airport with its location you can run the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;John F Kennedy Intl&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;code&quot;</span> <span class="o">:</span> <span class="s2">&quot;JFK&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;coordinates&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">73.778889</span><span class="p">,</span> <span class="mf">40.639722</span> <span class="p">]</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yes this is that simple! You just save the GeoJSON as one of the attribute of the document, <code>loc</code> in this example)</p>
+
+<h3>Querying Geospatial Informations</h3>
+
+<p>Now that we have the data stored in MongoDB, it is now possible to use the geospatial information to do some interesting queries.</p>
+
+<p>For this we need a sample dataset. I have created one using some open data found in various places. This dataset contains the following informations:</p>
+
+<ul>
+<li>airports collection with the list of US airport (Point)</li>
+<li>states collection with the list of US states (MultiPolygon)</li>
+</ul>
+
+
+<p>I have created this dataset from various OpenData sources ( <a href="http://geocommons.com/">http://geocommons.com/</a> , <a href="http://catalog.data.gov/dataset">http://catalog.data.gov/dataset</a> ) and use <a href="https://github.com/mapbox/togeojson">toGeoJSON</a> to convert them into the proper format.</p>
+
+<p>Let&rsquo;s install the dataset:</p>
+
+<ol>
+<li>Download it from <a href="https://www.dropbox.com/s/yui7shcud2xbxt7/geo.zip">here</a></li>
+<li>Unzip geo.zip file</li>
+<li>Restore the data into your mongoDB instance, using the following command</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">mongorestore</span> <span class="nx">geo</span><span class="p">.</span><span class="nx">zip</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>MongoDB allows applications to do the following types of query on geospatial data:</p>
+
+<ul>
+<li>inclusion</li>
+<li>intersection</li>
+<li>proximity</li>
+</ul>
+
+
+<p>Obviously, you will be able to use all the other operator in addition to the geospatial ones. Let&rsquo;s now look at some concrete examples.</p>
+
+<h4>Inclusion</h4>
+
+<p>Find all the airports in California. For this you need to get the California location (Polygon) and use the command $geoWithin in the query. From the shell it will look like :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">use</span> <span class="nx">geo</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">cal</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span>  <span class="p">{</span><span class="nx">code</span> <span class="o">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">}</span>  <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geoWithin</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geometry</span> <span class="o">:</span> <span class="nx">cal</span><span class="p">.</span><span class="nx">loc</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">type</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Result:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Modesto City - County&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;MOD&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="err">...</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Francisco Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SFO&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Jose International&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SJC&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="err">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So the query is using the &ldquo;California MultiPolygon&rdquo; and looks in the airports collection to find all the airports that are in these polygons. This looks like the following image on a map:</p>
+
+<p><img src="http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png"></p>
+
+<p>You can use any other query features or criteria, for example you can limit the query to international airport only sorted by name :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geoWithin</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geometry</span> <span class="o">:</span> <span class="nx">cal</span><span class="p">.</span><span class="nx">loc</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class='line'>  <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;International&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">type</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="p">).</span><span class="nx">sort</span><span class="p">({</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Result:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Los Angeles Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;LAX&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Metropolitan Oakland Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;OAK&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Ontario Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;ONT&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Diego Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SAN&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Francisco Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SFO&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Jose International&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SJC&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Southern California International&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;VCV&quot;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I do not know if you have looked in detail, but we are querying these documents with no index. You can run a query with the <code>explain()</code> to see what&rsquo;s going on. The <code>$geoWithin</code> operator does not need index but your queries will be more efficient with one so let&rsquo;s create the index:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="s2">&quot;2dsphere&quot;</span> <span class="p">}</span> <span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Run the explain and you will se the difference.</p>
+
+<h4>Intersection</h4>
+
+<p>Suppose you want to know what are all the adjacent states to California, for this we just need to search for all the states that have coordinates that &ldquo;intersects&rdquo; with California. This is done with the following query:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">cal</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span>  <span class="p">{</span><span class="nx">code</span> <span class="o">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">}</span>  <span class="p">);</span>
+</span><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geoIntersects</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geometry</span> <span class="o">:</span> <span class="nx">cal</span><span class="p">.</span><span class="nx">loc</span>  <span class="p">}</span>  <span class="p">}</span> <span class="p">,</span>
+</span><span class='line'>  <span class="nx">code</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$ne</span> <span class="o">:</span> <span class="s2">&quot;CA&quot;</span>  <span class="p">}</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Result:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Oregon&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;OR&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Nevada&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;NV&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Arizona&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;AZ&quot;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://3.bp.blogspot.com/--Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png"></p>
+
+<p>Same as before <code>$geoIntersect</code> operator does not need an index to work, but it will be more efficient with the following index:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">loc</span> <span class="o">:</span> <span class="s2">&quot;2dsphere&quot;</span> <span class="p">}</span> <span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Proximity</h4>
+
+<p>The last feature that I want to highlight in this post is related to query with proximity criteria. Let&rsquo;s find all the international airports that are located at less than 20km from the reservoir in NYC Central Park. For this you will be using the <code>$near</code> operator.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$near</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$geometry</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;Point&quot;</span> <span class="p">,</span>
+</span><span class='line'>        <span class="nx">coordinates</span> <span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">73.965355</span><span class="p">,</span><span class="mf">40.782865</span><span class="p">]</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">$maxDistance</span> <span class="o">:</span> <span class="mi">20000</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;International&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Results:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;La Guardia&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;LGA&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Newark Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;EWR&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So this query returns 2 airports, the closest being La Guardia, since the <code>$near</code> operator sorts the results by distance. Also it is important to raise here that the <code>$near</code> operator requires an index.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this first post about geospatial feature you have learned:</p>
+
+<ul>
+<li>the basic of GeoJSON</li>
+<li>how to query documents with inclusion, intersection and proximity criteria.</li>
+</ul>
+
+
+<p>You can now play more with this for example integrate this into an application that expose data into some UI, or see how you can use the geospatial operators into a aggregation pipeline.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-08-21T15:30:02+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>3:30 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/geo/'>geo</a>, <a class='category' href='/blog/categories/json/'>json</a>, <a class='category' href='/blog/categories/mongodb/'>mongodb</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/03/28/dbpersonfind-role-dba/" title="Previous Post: db.person.find( { 'role' : 'DBA' } )">&laquo; db.person.find( { &#8216;role&#8217; : &#8216;DBA&#8217; } )</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/" title="Next Post: Big Data... Is Hadoop the good way to start?">Big Data&#8230; Is Hadoop the good way to start? &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/';
+        var disqus_url = 'http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

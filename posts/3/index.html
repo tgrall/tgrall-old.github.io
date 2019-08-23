@@ -1,0 +1,1707 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="In the past 2 years, I have met many developers, architects that are working on “big data” projects. This sounds amazing, but quite often the truth &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/posts/3/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/">Big Data&#8230; Is Hadoop the Good Way to Start?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-11-25T07:27:36+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:27 am</span></time>
+        
+           | <a href="/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In the past 2 years, I have met many developers, architects that are working on “big data” projects. This sounds amazing, but quite often the truth is not that amazing.</p>
+
+<h4>TL;TR</h4>
+
+<p>You believe that you have a big data project?</p>
+
+<ul>
+<li>Do not start with the installation of an Hadoop Cluster &ndash; the &ldquo;<em>how</em>&rdquo;</li>
+<li>Start to talk to business people to understand their problem &ndash; the &ldquo;<em>why</em>&rdquo;</li>
+<li>Understand the data you must process</li>
+<li>Look at the volume &ndash; very often it is not &ldquo;that&rdquo; big</li>
+<li>Then implement it, and take a simple approach, for example start with MongoDB + Apache Spark</li>
+</ul>
+
+
+<p><img class="center center" src="http://cdn.meme.am/instances/500x/47510205.jpg" width="320" title="'Big Data'" ></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/11/25/big-data-dot-dot-dot-is-hadoop-the-good-way-to-start/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/">Introduction to MongoDB Geospatial Feature</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-08-21T15:30:02+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>3:30 pm</span></time>
+        
+           | <a href="/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This post is a quick and simple introduction to Geospatial feature of MongoDB 2.6 using simple dataset and queries.</p>
+
+<h3>Storing Geospatial Informations</h3>
+
+<p>As you know you can store any type of data, but if you want to query them you need to use some coordinates, and create index on them. MongoDB supports three types of indexes for GeoSpatial queries:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/core/2d/">2d Index</a> : uses simple coordinate (longitude, latitude). As stated in the documentation: <em>The 2d index is intended for legacy coordinate pairs used in MongoDB 2.2 and earlier</em>. For this reason, I won&rsquo;t detail anything about this in this post. Just for the record 2d Index are used to query data stored as points on a two-dimensional plane</li>
+<li><a href="http://docs.mongodb.org/manual/core/2dsphere/">2d Sphere Index</a> : support queries of any geometries on an-earth-like sphere, the data can be stored as GeoJSON and legacy coordinate pairs (longitude, latitude). For the rest of the article I will use this type of index and focusing on GeoJSON.</li>
+<li><a href="http://docs.mongodb.org/manual/core/geohaystack/">Geo Haystack</a> : that are used to query on very small area. It is today less used by applications and I will not describe it in this post.
+So this article will focus now on the 2d Sphere index with GeoJSON format to store and query documents.</li>
+</ul>
+
+
+<p><em>So what is GeoJSON?</em></p>
+
+<p>You can look at the <a href="http://geojson.org/">http://geojson.org/</a> site, let&rsquo;s do a very short explanation. GeoJSON is a format for encoding, in JSON, a variety of geographic data structures, and support the following types:  Point , LineString , Polygon , MultiPoint , MultiLineString , MultiPolygon and Geometry.</p>
+
+<p>The GeoJSON format  is quite straightforward based, for the simple geometries, on two attributes: type and coordinates. Let&rsquo;s take some examples:</p>
+
+<p>The city where I spend all my childhood, Pleneuf Val-André, France, has the following coordinates (from Wikipedia)</p>
+
+<p><code>48° 35′ 30.12″ N, 2° 32′ 48.84″ W</code></p>
+
+<p>This notation is a point, based on a latitude &amp; longitude using the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Degrees, Minutes, Seconds) system. Not very easy to use by application/code, this is why it is also possible to represent the exact same point using the following values for latitude &amp; longitude:</p>
+
+<p><code>48.5917, -2.5469</code></p>
+
+<p>This one uses the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Decimal Degrees) system. This is the coordinates you see use in most of the application/API you are using as developer (eg: Google Maps/Earth for example)</p>
+
+<p>By default GeoJSON, and MongoDB use these values but <strong>the coordinates must be stored in the longitude, latitude order</strong>, so this point in GeoJSON will look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="mf">-2.5469</span><span class="p">,</span>
+</span><span class='line'>  <span class="mf">48.5917</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png"></p>
+
+<p>This is a simple &ldquo;Point&rdquo;, let&rsquo;s now for example look at a line, a very nice walk on the beach :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;LineString&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.551082</span><span class="p">,</span><span class="mf">48.5955632</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.551229</span><span class="p">,</span><span class="mf">48.594312</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.551550</span><span class="p">,</span><span class="mf">48.593312</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.552400</span><span class="p">,</span><span class="mf">48.592312</span><span class="p">],</span>
+</span><span class='line'>    <span class="p">[</span><span class="mf">-2.553677</span><span class="p">,</span> <span class="mf">48.590898</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png"></p>
+
+<p>So using the same approach you will be able to create MultiPoint, MultiLineString, Polygon, MultiPolygon. It is also possible to mix all these in a single document using a GeometryCollection. The following example is a Geometry Collection of MultiLineString and Polygon over Central Park:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;GeometryCollection&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;geometries&quot;</span> <span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;Polygon&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;coordinates&quot;</span> <span class="p">:</span> <span class="p">[</span>
+</span><span class='line'><span class="p">[</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9580</span><span class="p">,</span> <span class="mf">40.8003</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9498</span><span class="p">,</span> <span class="mf">40.7968</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9737</span><span class="p">,</span> <span class="mf">40.7648</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9814</span><span class="p">,</span> <span class="mf">40.7681</span> <span class="p">],</span>
+</span><span class='line'>  <span class="p">[</span> <span class="mf">-73.9580</span><span class="p">,</span> <span class="mf">40.8003</span>  <span class="p">]</span>
+</span><span class='line'><span class="p">]</span>
+</span><span class='line'>      <span class="p">]</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;MultiLineString&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;coordinates&quot;</span> <span class="p">:</span> <span class="p">[</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.96943</span><span class="p">,</span> <span class="mf">40.78519</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.96082</span><span class="p">,</span> <span class="mf">40.78095</span> <span class="p">]</span> <span class="p">],</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.96415</span><span class="p">,</span> <span class="mf">40.79229</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.95544</span><span class="p">,</span> <span class="mf">40.78854</span> <span class="p">]</span> <span class="p">],</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.97162</span><span class="p">,</span> <span class="mf">40.78205</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.96374</span><span class="p">,</span> <span class="mf">40.77715</span> <span class="p">]</span> <span class="p">],</span>
+</span><span class='line'><span class="p">[</span> <span class="p">[</span> <span class="mf">-73.97880</span><span class="p">,</span> <span class="mf">40.77247</span> <span class="p">],</span> <span class="p">[</span> <span class="mf">-73.97036</span><span class="p">,</span> <span class="mf">40.76811</span> <span class="p">]</span> <span class="p">]</span>
+</span><span class='line'>      <span class="p">]</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png"></p>
+
+<p>Note: You can if you want test/visualize these JSON documents using the <a href="http://geojsonlint.com/">http://geojsonlint.com/</a> service.</p>
+
+<h5>Now what? Let&rsquo;s store data!</h5>
+
+<p>Once you have a GeoJSON document you just need to store it into your document. For example if you want to store a document about JFK Airport with its location you can run the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;John F Kennedy Intl&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;code&quot;</span> <span class="o">:</span> <span class="s2">&quot;JFK&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;coordinates&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mf">73.778889</span><span class="p">,</span> <span class="mf">40.639722</span> <span class="p">]</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yes this is that simple! You just save the GeoJSON as one of the attribute of the document, <code>loc</code> in this example)</p>
+
+<h3>Querying Geospatial Informations</h3>
+
+<p>Now that we have the data stored in MongoDB, it is now possible to use the geospatial information to do some interesting queries.</p>
+
+<p>For this we need a sample dataset. I have created one using some open data found in various places. This dataset contains the following informations:</p>
+
+<ul>
+<li>airports collection with the list of US airport (Point)</li>
+<li>states collection with the list of US states (MultiPolygon)</li>
+</ul>
+
+
+<p>I have created this dataset from various OpenData sources ( <a href="http://geocommons.com/">http://geocommons.com/</a> , <a href="http://catalog.data.gov/dataset">http://catalog.data.gov/dataset</a> ) and use <a href="https://github.com/mapbox/togeojson">toGeoJSON</a> to convert them into the proper format.</p>
+
+<p>Let&rsquo;s install the dataset:</p>
+
+<ol>
+<li>Download it from <a href="https://www.dropbox.com/s/yui7shcud2xbxt7/geo.zip">here</a></li>
+<li>Unzip geo.zip file</li>
+<li>Restore the data into your mongoDB instance, using the following command</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">mongorestore</span> <span class="nx">geo</span><span class="p">.</span><span class="nx">zip</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>MongoDB allows applications to do the following types of query on geospatial data:</p>
+
+<ul>
+<li>inclusion</li>
+<li>intersection</li>
+<li>proximity</li>
+</ul>
+
+
+<p>Obviously, you will be able to use all the other operator in addition to the geospatial ones. Let&rsquo;s now look at some concrete examples.</p>
+
+<h4>Inclusion</h4>
+
+<p>Find all the airports in California. For this you need to get the California location (Polygon) and use the command $geoWithin in the query. From the shell it will look like :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">use</span> <span class="nx">geo</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">cal</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span>  <span class="p">{</span><span class="nx">code</span> <span class="o">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">}</span>  <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geoWithin</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geometry</span> <span class="o">:</span> <span class="nx">cal</span><span class="p">.</span><span class="nx">loc</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">type</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Result:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Modesto City - County&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;MOD&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="err">...</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Francisco Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SFO&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Jose International&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SJC&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="err">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So the query is using the &ldquo;California MultiPolygon&rdquo; and looks in the airports collection to find all the airports that are in these polygons. This looks like the following image on a map:</p>
+
+<p><img src="http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png"></p>
+
+<p>You can use any other query features or criteria, for example you can limit the query to international airport only sorted by name :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geoWithin</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geometry</span> <span class="o">:</span> <span class="nx">cal</span><span class="p">.</span><span class="nx">loc</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class='line'>  <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;International&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">type</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="p">).</span><span class="nx">sort</span><span class="p">({</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Result:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Los Angeles Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;LAX&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Metropolitan Oakland Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;OAK&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Ontario Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;ONT&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Diego Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SAN&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Francisco Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SFO&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Jose International&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;SJC&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Southern California International&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;International&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;VCV&quot;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I do not know if you have looked in detail, but we are querying these documents with no index. You can run a query with the <code>explain()</code> to see what&rsquo;s going on. The <code>$geoWithin</code> operator does not need index but your queries will be more efficient with one so let&rsquo;s create the index:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="s2">&quot;2dsphere&quot;</span> <span class="p">}</span> <span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Run the explain and you will se the difference.</p>
+
+<h4>Intersection</h4>
+
+<p>Suppose you want to know what are all the adjacent states to California, for this we just need to search for all the states that have coordinates that &ldquo;intersects&rdquo; with California. This is done with the following query:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">cal</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span>  <span class="p">{</span><span class="nx">code</span> <span class="o">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">}</span>  <span class="p">);</span>
+</span><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geoIntersects</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$geometry</span> <span class="o">:</span> <span class="nx">cal</span><span class="p">.</span><span class="nx">loc</span>  <span class="p">}</span>  <span class="p">}</span> <span class="p">,</span>
+</span><span class='line'>  <span class="nx">code</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$ne</span> <span class="o">:</span> <span class="s2">&quot;CA&quot;</span>  <span class="p">}</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Result:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Oregon&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;OR&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Nevada&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;NV&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Arizona&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;AZ&quot;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="http://3.bp.blogspot.com/--Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png"></p>
+
+<p>Same as before <code>$geoIntersect</code> operator does not need an index to work, but it will be more efficient with the following index:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">loc</span> <span class="o">:</span> <span class="s2">&quot;2dsphere&quot;</span> <span class="p">}</span> <span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Proximity</h4>
+
+<p>The last feature that I want to highlight in this post is related to query with proximity criteria. Let&rsquo;s find all the international airports that are located at less than 20km from the reservoir in NYC Central Park. For this you will be using the <code>$near</code> operator.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">airports</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$near</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$geometry</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;Point&quot;</span> <span class="p">,</span>
+</span><span class='line'>        <span class="nx">coordinates</span> <span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">73.965355</span><span class="p">,</span><span class="mf">40.782865</span><span class="p">]</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">$maxDistance</span> <span class="o">:</span> <span class="mi">20000</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;International&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">code</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Results:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;La Guardia&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;LGA&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">{</span> <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Newark Intl&quot;</span><span class="p">,</span> <span class="nt">&quot;code&quot;</span> <span class="p">:</span> <span class="s2">&quot;EWR&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So this query returns 2 airports, the closest being La Guardia, since the <code>$near</code> operator sorts the results by distance. Also it is important to raise here that the <code>$near</code> operator requires an index.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this first post about geospatial feature you have learned:</p>
+
+<ul>
+<li>the basic of GeoJSON</li>
+<li>how to query documents with inclusion, intersection and proximity criteria.</li>
+</ul>
+
+
+<p>You can now play more with this for example integrate this into an application that expose data into some UI, or see how you can use the geospatial operators into a aggregation pipeline.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/28/dbpersonfind-role-dba/">db.person.find( { &#8216;Role&#8217; : &#8216;DBA&#8217; } )</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-03-28T07:00:32+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>7:00 am</span></time>
+        
+           | <a href="/blog/2014/03/28/dbpersonfind-role-dba/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2014/03/28/dbpersonfind-role-dba/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Wow! it has been a while since I posted something on my blog post. I have been very busy, moving to MongoDB, learning, learning, learning…finally I can breath a little and answer some questions.</p>
+
+<p>Last week I have been helping my colleague Norberto to deliver a MongoDB Essentials Training in Paris. This was a very nice experience, and I am impatient to deliver it on my own. I was happy to see that the audience was well balanced between developers and operations, mostly DBA.</p>
+
+<h3>What! I still need DBA?</h3>
+
+<p><img src="http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg"></p>
+
+<p>This is a good opportunity to raise a point, or comment a wrong idea: the fact that you are using MongoDB, or any other NoSQL datastore does not mean that you do not need a DBA… Like any project, an administrator is not mandatory, but if you have one it is better. So even when MongoDB is pushed by development team it is very important to understand the way the database works, and how to administer, monitor it.</p>
+
+<p>If you are lucky enough to have real operations teams, with good system and database administrators use them! They are very important for your application.</p>
+
+<p>Most DBA/System Administrators have been maintaining systems in production for many years. They know how to keep your application up and running. They also most of the time experienced many “disasters”, and then recover (I hope).</p>
+
+<p>Who knows, you may encounter big issues with your application and you will be happy to have them on your side at this moment.</p>
+
+<h3>&ldquo;Great, but the DBA is slowing down my development!&rdquo;</h3>
+
+<p>I hear this, sometimes, and I had this feeling in the past to as developer in large organization. Is it true?</p>
+
+<p>Developers and DBA are today, not living in the same worlds:</p>
+
+<ul>
+<li>Developers want to integrate new technologies as soon as possible, not only because it is fun and they can brag about it during meetups/conferences; but because these technologies, most of the time, are making them more productive, and offer better service/experience to the consumer</li>
+<li>DBA, are here to keep the applications up and running! So every time they do not feel confident about a technology they will push back. I think this is natural and I would be probably the same in their position. Like all geeks, they would love to adopt new technologies but they need to understand and trust it before.</li>
+</ul>
+
+
+<p>System administrators, DBAS look at the technology with a different angle than developers.</p>
+
+<p>Based on this assumption, it is important to bring the operation team as early as possible when  the development team wants to integrate MongoDB or any new data store. Having the operation team in the loop early will ease the global adoption of MongoDB in the company.</p>
+
+<p>Personally, and this will show my age, I have seen a big change in the way developers and DBAs are working together.</p>
+
+<p>Back in the 90&rsquo;s, when the main architecture was based on client/server architecture  developers and DBAs where working pretty well togethers; probably because they were speaking the same language: SQL was everywhere.  I had regular meetings wit</p>
+
+<p>Then, since mid 2000, mots of applications have moved to a web based architecture , with for example Java middleware, and the developers stopped working with DBAs. Probably because the abstraction data layer provided by the ORM exposed the database as a &ldquo;commodity&rdquo; service that is supposed to work: &ldquo;Hey Mr DBA, my application has been written with the best middleware technology on the market, so now deal with the performance and scalability! I am done!&rdquo;</p>
+
+<p>Yes it is a cliché, but I am sure that some of you will recognize that.</p>
+
+<p>Nevertheless each time I can, I have been pushing developers to talk more to administrators and look closely to their database!</p>
+
+<h3>A new era for operations and development teams</h3>
+
+<p>The fast adoption of MongoDB by developers, is a great opportunity to fix what we have broken 10 years ago in large information systems:</p>
+
+<ul>
+<li>Let&rsquo;s talk again!</li>
+</ul>
+
+
+<p>MongoDB has been built first for developers. The document oriented approach gives lot of flexibility to quickly adapt to change. So anytime your business users need a new feature you can implement it, even if this change impact the data structure. Your data model is now driven and controlled by the application, not the database engine.</p>
+
+<p>However, the applications still need to be available 24x7, and performs well. These topics are managed - and shared- by administrator and developers! This has been always the case but, as I described it earlier, it looks like some of us have forgotten that.</p>
+
+<p>Schemas design, change velocity, are driven by the application, so the business and development teams, but all this impacts the database, for example:</p>
+
+<ul>
+<li>How storage will grow ?</li>
+<li>Which indexes must be created to speed up my application?</li>
+<li>How to organize my cluster to leverage the infrastructure properly:
+
+<ul>
+<li>Replica-Set organization (and related write concerns, managed by developer)</li>
+<li>Sharding options</li>
+</ul>
+</li>
+<li>And the most important of them : backup/recovery strategies</li>
+</ul>
+
+
+<p>So many things that could be managed by the project team, but if you have an operation team with you, it will be better to do that as a single team.</p>
+
+<p>You, the developer, are convinced that MongoDB is the best database for your projects! Now it is time to work with the ops team and convince them too.  So you should for sure explain why MongoDB is good for you as developer, but also you should highlight all the benefits for the operations, starting with built-in high-availability with replica sets, and easy scalability with sharding. MongoDB is also here to make the life of the administrator easier! I have shared in the next paragraph a lit of resources that are interesting for operations people.</p>
+
+<p>Let’s repeat it another time, try to involve the operation team as soon as possible, and use that as an opportunity to build/rebuild the relationship between developers and system administrators!</p>
+
+<h3>Resources</h3>
+
+<p>You can find many good resources on the Site to helps operations or learn about this:</p>
+
+<ul>
+<li>Documentation : <a href="http://docs.mongodb.org/manual/administration/">Operations</a></li>
+<li>Online Training :
+
+<ul>
+<li><a href="https://education.mongodb.com/courses/10gen/M102/2014_May/about">M102: MongoDB for DBAs</a></li>
+<li><a href="https://education.mongodb.com/courses/10gen/M202/2014_April/about">M202: MongoDB Advanced Deployment and Operations</a></li>
+</ul>
+</li>
+<li>And many others such as White Papers and <a href="http://www.mongodb.com/webinars">Webinars</a>.</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/10/01/pagination-with-couchbase/">Pagination With Couchbase</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-10-01T02:00:00+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>2:00 am</span></time>
+        
+           | <a href="/blog/2013/10/01/pagination-with-couchbase/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you have to deal with a large number of documents when doing queries against a Couchbase cluster it is important to use pagination to get rows by page. You can find some information in the documentation in the chapter &ldquo;<a href="http://docs.couchbase.com/couchbase-manual-2.2/#pagination">Pagination</a>&rdquo;, but I want to go in more details and sample code in this article.</p>
+
+<p>For this example I will start by creating a simple view based on the <code>beer-sample</code> dataset, the view is used to find brewery by country:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s2">&quot;brewery&quot;</span> <span class="o">&amp;</span><span class="nx">amp</span><span class="p">;</span><span class="o">&amp;</span><span class="nx">amp</span><span class="p">;</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">country</span><span class="p">){</span>
+</span><span class='line'>    <span class="nx">emit</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">country</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This view list all the breweries by country, the index looks like:</p>
+
+<table>
+<tbody>
+<tr><th>Doc id</th><th>Key</th><th>Value</th></tr>
+<tr><td>bersaglier</td><td>Argentina</td><td>null</td></tr>
+<tr><td>cervecera_jerome</td><td>Argentina</td><td>null</td></tr>
+<tr><td>brouwerij_nacional_balashi</td><td>Aruba</td><td>null</td></tr>
+<tr><td>australian_brewing_corporation</td><td>Australia</td><td>null</td></tr>
+<tr><td>carlton_and_united_breweries</td><td>Australia</td><td>null</td></tr>
+<tr><td>coopers_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>foster_s_australia_ltd</td><td>Australia</td><td>null</td></tr>
+<tr><td>gold_coast_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>lion_nathan_australia_hunter_street</td><td>Australia</td><td>null</td></tr>
+<tr><td>little_creatures_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>malt_shovel_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>matilda_bay_brewing</td><td>Australia</td><td>null</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>yellowstone_valley_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>yuengling_son_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>zea_rotisserie_and_brewery</td><td>United States</td><td>null</td></tr>
+<tr><td>fosters_tien_gang</td><td>Viet Nam</td><td>null</td></tr>
+<tr><td>hue_brewery</td><td>Viet Nam</td><td>null</td></tr>
+</tbody></table>
+
+
+<p>So now you want to navigate in this index with a page size of 5 rows.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/10/01/pagination-with-couchbase/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/18/how-to-implement-document-versioning-with-couchbase/">How to Implement Document Versioning With Couchbase</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-07-18T08:59:50+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>8:59 am</span></time>
+        
+           | <a href="/blog/2013/07/18/how-to-implement-document-versioning-with-couchbase/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/07/18/how-to-implement-document-versioning-with-couchbase/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Introduction</h3>
+
+<p>Developers are often asking me how to &ldquo;version&rdquo; documents with Couchbase 2.0. The short answer is: the clients and server do not expose such feature, but it is quite easy to implement.</p>
+
+<p>In this article I will use a basic approach, and you will be able to extend it depending of your business requirements.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/18/how-to-implement-document-versioning-with-couchbase/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/">Deploy Your Node/Couchbase Application to the Cloud With Clever Cloud</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-07-11T06:47:51+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>6:47 am</span></time>
+        
+           | <a href="/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Introduction</h3>
+
+<p><a href="http://www.clever-cloud.com/en/">Clever Cloud</a> is the first PaaS to provide Couchbase as a service allowing developers to run applications in a fully managed environment. This article shows how to deploy an existing application to Clever Cloud.</p>
+
+<p><img src="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png"></p>
+
+<p>I am using a very simple Node application that I have documented in a previous article: “<a href="http://tugdualgrall.blogspot.fr/2013/03/easy-application-development-with.html">Easy application development with Couchbase, Angular and Node</a>”.</p>
+
+<p>Clever Cloud provides support for various databases MySQL, PostgreSQL, but also and this is most important for me <a href="http://www.clever-cloud.com/en/services/couchbase.html">Couchbase</a>. No only Clever Cloud allows you to use database services but also you can deploy and host your application that could be developed in the language/technology of your choice : Java, Node, Scala, Python, PHP, … and all this in a secure, scalable and managed environment.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase/">SQL to NoSQL : Copy Your Data From MySQL to Couchbase</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-07-03T11:52:56+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2013</span></span> <span class='time'>11:52 am</span></time>
+        
+           | <a href="/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>TL;DR:</strong> Look at the <a href="https://github.com/tgrall/couchbase-sql-importer">project on Github</a>.</p>
+
+<h3>Introduction</h3>
+
+<p>During my last interactions with the Couchbase community, I had the question how can I easily import my data from my current database into Couchbase. And my answer was always the same:</p>
+
+<ul>
+<li>Take an ETL such as Talend to do it</li>
+<li>Just write a small program to copy the data from your RDBMS to Couchbase&hellip;</li>
+</ul>
+
+
+<p>So I have written this small program that allows you to import the content of a RDBMS into Couchbase. This tools could be used as it is, or you can look at the code to adapt it to your application.</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/xzqBjhYKCLY?color=white&theme=light"></iframe>
+
+
+<h3>The Tool: Couchbase SQL Importer</h3>
+
+<p>The Couchbase SQL Importer, available <a href="http://github.com/tgrall/couchbase-sql-importer">here</a>, allows you with a simple command line to copy all -or part of- your SQL schema into Couchbase. Before explaining how to run this command, let&rsquo;s see how the data are stored into Couchbase when they are imported:</p>
+
+<ul>
+<li>Each table row is imported a single JSON document
+
+<ul>
+<li>where each table column becomes a JSON attribute</li>
+</ul>
+</li>
+<li>Each document as a key made of the name of the table and a counter (increment)</li>
+</ul>
+
+
+<p>The following concrete example, based on the <a href="http://dev.mysql.com/doc/world-setup/en/index.html">MySQL World sample database</a>, will help you to understand how it works. This database contains 3 tables : City, Country, CountryLanguage. The City table looks like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+-------------+----------+------+-----+---------+----------------+
+</span><span class='line'>| Field       | Type     | Null | Key | Default | Extra          |
+</span><span class='line'>+-------------+----------+------+-----+---------+----------------+
+</span><span class='line'>| ID          | int(11)  | NO   | PRI | NULL    | auto_increment |
+</span><span class='line'>| Name        | char(35) | NO   |     |         |                |
+</span><span class='line'>| CountryCode | char(3)  | NO   |     |         |                |
+</span><span class='line'>| District    | char(20) | NO   |     |         |                |
+</span><span class='line'>| Population  | int(11)  | NO   |     | 0       |                |
+</span><span class='line'>+-------------+----------+------+-----+---------+----------------+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The JSON document that matches this table looks like the following:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">city:</span><span class="mi">3805</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;San Francisco&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;District&quot;</span><span class="p">:</span> <span class="s2">&quot;California&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;ID&quot;</span><span class="p">:</span> <span class="mi">3805</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;Population&quot;</span><span class="p">:</span> <span class="mi">776733</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;CountryCode&quot;</span><span class="p">:</span> <span class="s2">&quot;USA&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You see that here I am simply taking all the rows and &ldquo;moving&rdquo; them into Couchbase. This is a good first step to play with your dataset into Couchbase, but it is probably not the final model you want to use for your application; most of the time you will have to see when to use embedded documents, list of values, .. into your JSON documents.</p>
+
+<p>In addition to the JSON document the tool create views based on the following logic:</p>
+
+<ul>
+<li>a view that list all imported documents with the name of the &ldquo;table&rdquo; (aka type) as key</li>
+<li>a view for each table with the primary key columns</li>
+</ul>
+
+
+<p>View: all/by_type</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;rows&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">4079</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">239</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage&quot;</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">984</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see this view allows you to get with a single Couchbase query the number of document by type.</p>
+
+<p>Also for each table/document type, a view is created where the key of the index is built from the table primary key. Let&rsquo;s for example query the &ldquo;City&rdquo; documents.</p>
+
+<p>View: city/by_pk?reduce=false&amp;limit=5</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;total_rows&quot;</span><span class="p">:</span> <span class="mi">4079</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;rows&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:1&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:2&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:3&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:4&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:5&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The index key matches the value of the <code>City.ID</code> column.  When the primary key is made of multiple columns the key looks like:</p>
+
+<p>View: CountryLanguage/by_pk?reduce=false&amp;limit=5</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;total_rows&quot;</span><span class="p">:</span> <span class="mi">984</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;rows&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:1&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;Dutch&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:2&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;English&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:3&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;Papiamento&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:4&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;Spanish&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:5&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;AFG&quot;</span><span class="p">,</span> <span class="s2">&quot;Balochi&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This view is built from the CountryLanguage table primary key made of <code>CountryLanguage.CountryCode and </code>CountryLanguage.Language` columns.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">+-------------+---------------+------+-----+---------+-------+</span>
+</span><span class='line'><span class="err">|</span> <span class="err">Field</span>       <span class="err">|</span> <span class="err">Type</span>          <span class="err">|</span> <span class="err">Null</span> <span class="err">|</span> <span class="err">Key</span> <span class="err">|</span> <span class="err">Default</span> <span class="err">|</span> <span class="err">Extra</span> <span class="err">|</span>
+</span><span class='line'><span class="err">+-------------+---------------+------+-----+---------+-------+</span>
+</span><span class='line'><span class="err">|</span> <span class="err">CountryCode</span> <span class="err">|</span> <span class="err">char(</span><span class="mi">3</span><span class="err">)</span>       <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span> <span class="err">PRI</span> <span class="err">|</span>         <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">|</span> <span class="err">Language</span>    <span class="err">|</span> <span class="err">char(</span><span class="mi">30</span><span class="err">)</span>      <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span> <span class="err">PRI</span> <span class="err">|</span>         <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">|</span> <span class="err">IsOfficial</span>  <span class="err">|</span> <span class="err">enum(&#39;T&#39;,&#39;F&#39;)</span> <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span>     <span class="err">|</span> <span class="err">F</span>       <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">|</span> <span class="err">Percentage</span>  <span class="err">|</span> <span class="err">float(</span><span class="mi">4</span><span class="err">,</span><span class="mi">1</span><span class="err">)</span>    <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span>     <span class="err">|</span> <span class="mf">0.0</span>     <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">+-------------+---------------+------+-----+---------+-------+</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>How to use Couchbase SQL Importer tool? </strong></p>
+
+<p>The importer is a simple Java based command line utility, quite simple to use:</p>
+
+<p>1- Download the <a href="http://goo.gl/IF89e">CouchbaseSqlImporter.jar file from here</a>. This file is contains all the dependencies to work with Couchbase: the Java Couchbase Client, and GSON.
+2- Download the JDBC driver for the database you are using as data source. For this example I am using MySQL and I have download the driver for MySQL Site.
+3- Configure the import using a properties file.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">##</span> <span class="err">SQL</span> <span class="err">Information</span> <span class="err">##</span>
+</span><span class='line'><span class="err">sql.connection=jdbc:mysql://</span><span class="mf">192.168</span><span class="err">.</span><span class="mf">99.19</span><span class="err">:</span><span class="mi">3306</span><span class="err">/world</span>
+</span><span class='line'><span class="err">sql.username=root</span>
+</span><span class='line'><span class="err">sql.password=password</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">##</span> <span class="err">Couchbase</span> <span class="err">Information</span> <span class="err">##</span>
+</span><span class='line'><span class="err">cb.uris=http://localhost:</span><span class="mi">8091</span><span class="err">/pools</span>
+</span><span class='line'><span class="err">cb.bucket=default</span>
+</span><span class='line'><span class="err">cb.password=</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">##</span> <span class="err">Import</span> <span class="err">information</span>
+</span><span class='line'><span class="err">import.tables=ALL</span>
+</span><span class='line'><span class="err">import.createViews=</span><span class="kc">true</span>
+</span><span class='line'><span class="err">import.typefield=type</span>
+</span><span class='line'><span class="err">import.fieldcase=lower</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This sample properties file contains three sections :</p>
+
+<ul>
+<li>The two first sections are used to configure the connections to your SQL database and Couchbase cluster (note that the bucket must be created first)</li>
+<li>The third section allow you to configure the import itself</li>
+</ul>
+
+
+<p>4- Run the tool !</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">java</span> <span class="err">-cp</span> <span class="s2">&quot;./CouchbaseSqlImporter.jar:./mysql-connector-java-5.1.25-bin.jar&quot;</span> <span class="err">com.couchbase.util.SqlImporter</span> <span class="err">import.properties</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So you run the Java command with the proper classpath (-cp parameter).</p>
+
+<p>And you are done, you can get your data from your SQL database into Couchbase.</p>
+
+<p>If you are interested to see how it is working internally, you can take a look to the next paragraph.</p>
+
+<h3>The Code: How it works?</h3>
+
+<p>The main class of the tool is really simple  <a href="https://github.com/tgrall/couchbase-sql-importer/blob/master/sql-importer-lib/src/main/java/com/couchbase/util/SqlImporter.java">com.couchbase.util.SqlImporter</a>, the process is:</p>
+
+<ol>
+<li>Connect to the SQL database</li>
+<li>Connect to Couchbase</li>
+<li>Get the list of tables</li>
+<li>For each tables execute a &ldquo;select * from table&rdquo;
+ 4.1. Analyze the ResultSetMetadata to get the list of columns
+ 4.2. Create a Java map for each rows where the key is the name of the columns and the value…is the value
+ 4.3. Serialize this Map into a GSON document and save it into Couchbase</li>
+</ol>
+
+
+<p>The code is available in the <a href="https://github.com/tgrall/couchbase-sql-importer/blob/master/sql-importer-lib/src/main/java/com/couchbase/util/SqlImporter.java#L212">ImportTable(String table)</a> Java method.</p>
+
+<p>One interesting point is that you can use and extend the code to deal with your application.</p>
+
+<h3>Conclusion</h3>
+
+<p>I have created this tool quickly to help some people in the community, if you are using it and need new features, let me know, using comment or pull request.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/31/create-a-couchbase-cluster-in-less-than-a-minute-with-ansible/">Create a Couchbase Cluster in Less Than a Minute With Ansible</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-05-31T14:07:00+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2013</span></span> <span class='time'>2:07 pm</span></time>
+        
+           | <a href="/blog/2013/05/31/create-a-couchbase-cluster-in-less-than-a-minute-with-ansible/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/05/31/create-a-couchbase-cluster-in-less-than-a-minute-with-ansible/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>TL;DR:</strong> Look at the Couchbase Ansible Playbook on my <a href="https://github.com/tgrall/couchbase-ansible-playbook">Github</a>.</p>
+
+<h3>Introduction</h3>
+
+<p>When I was looking for a more effective way to create my cluster I asked some sysadmins which tools I should use to do it. The answer I got during <a href="http://www.netways.de/osdc">OSDC</a> was not <a href="https://puppetlabs.com/">Puppet</a>, nor <a href="http://www.opscode.com/chef/">Chef</a>, but was <a href="http://ansible.cc/">Ansible</a>.</p>
+
+<p>This article shows you how you can easily configure and create a Couchbase cluster deployed and many linux boxes&hellip;and the only thing you need on these boxes is an SSH Server!</p>
+
+<p>Thanks to <a href="http://jpmens.net/">Jan-Piet Mens</a> that was one of the person that convinced me to use Ansible and answered questions I had about Ansible.</p>
+
+<p>You can watch the demonstration below, and/or look at all the details in the next paragraph.</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/COb6y89xcYY?color=white&theme=light"></iframe>
+
+
+<h3>Ansible</h3>
+
+<h4>Ansible is an open-source software that allows administrator to configure and manage many computers over SSH.</h4>
+
+<p>I won&rsquo;t go in all the details about the installation, just follow the steps documented in the <a href="http://ansible.cc/docs/gettingstarted.html">Getting Started Guide</a>. As you can see from this guide, you just need Python and few other libraries and clone Ansible project from Github. So I am expecting that you have Ansible working with your various servers on which you want to deploy Couchbase.</p>
+
+<p>Also for this first scripts I am using <strong>root</strong> on my server to do all the operations. So be sure you have register the root ssh keys to your administration server, from where you are running the Ansible scripts.</p>
+
+<h3>Create a Couchbase Cluster</h3>
+
+<p>So before going into the details of the Ansible script it is interesting to explain how you create a Couchbase Cluster. So here are the 5 steps to create and configure a cluster:</p>
+
+<ol>
+<li>Install Couchbase on each nodes of the cluster, as documented <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-getting-started-install-ubuntu.html">here</a>.</li>
+<li>Take one of the node and &ldquo;initialize&rdquo; the cluster,  using <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-cli-other-examples.html">cluster-init command</a>.</li>
+<li>Add the other nodes to the cluster, using <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-cli-other-examples.html">server-add command</a>.</li>
+<li>Rebalance, using <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-cli-other-examples.html">rebalance command</a>.</li>
+<li>Create a Bucket, using <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-cli-other-examples.html">bucket-create command</a>.</li>
+</ol>
+
+
+<p>So the goal now is to create an Ansible Playbook that does these steps for you.</p>
+
+<h4>Ansible Playbook for Couchbase</h4>
+
+<p>The first think you need is to have the list of hosts you want to target, so I have create a <a href="https://github.com/tgrall/couchbase-ansible-playbook/blob/master/hosts">hosts file</a> that contains all my server organized in 2 groups:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[couchbase-main]
+</span><span class='line'>vm1.grallandco.com
+</span><span class='line'>
+</span><span class='line'>[couchbase-nodes]
+</span><span class='line'>vm2.grallandco.com
+</span><span class='line'>vm3.grallandco.com</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The group [couchbase-main] group is just one of the node that will drive the installation and configuration, as you probably already know, Couchbase does not have any master&hellip; All nodes in the cluster are identical.</p>
+
+<p>To ease the configuration of the cluster, I have create another file that contains all parameters that must be sent to all the various commands. This file is located in the <a href="https://github.com/tgrall/couchbase-ansible-playbook/blob/master/group_vars/all">group_vars/all</a> see the section <a href="http://ansible.cc/docs/patterns.html#splitting-out-host-and-group-specific-data">Splitting Out Host and Group Specific Data</a> in the documentation.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># Adminisrator user and password
+</span><span class='line'>admin_user: Administrator
+</span><span class='line'>admin_password: password
+</span><span class='line'>
+</span><span class='line'># ram quota for the cluster
+</span><span class='line'>cluster_ram_quota: 1024
+</span><span class='line'>
+</span><span class='line'># bucket and replicas
+</span><span class='line'>bucket_name: ansible
+</span><span class='line'>bucket_ram_quota: 512
+</span><span class='line'>num_replicas: 2</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Use this file to configure your cluster.</p>
+
+<p>Let&rsquo;s describe the <a href="https://github.com/tgrall/couchbase-ansible-playbook/blob/master/couchbase.yml">playbook file</a> :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- name: Couchbase Installation
+</span><span class='line'>hosts: all
+</span><span class='line'>user: root
+</span><span class='line'>
+</span><span class='line'>tasks:
+</span><span class='line'>
+</span><span class='line'>- name: download Couchbase package
+</span><span class='line'>get_url: url=http://packages.couchbase.com/releases/2.0.1/couchbase-server-enterprise_x86_64_2.0.1.deb dest=~/.
+</span><span class='line'>
+</span><span class='line'>- name: Install dependencies
+</span><span class='line'>apt: pkg=libssl0.9.8 state=present
+</span><span class='line'>
+</span><span class='line'>- name: Install Couchbase .deb file on all machines
+</span><span class='line'>shell: dpkg -i ~/couchbase-server-enterprise_x86_64_2.0.1.deb</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As expected, the installation has to be done on <strong>all</strong> servers as <strong>root</strong> then we need to execute 3 tasks:</p>
+
+<ol>
+<li>Download the product, the get_url command will only download the file if not already present</li>
+<li>Install the dependencies with the apt command, the state=present allows the system to only install this package if not already present</li>
+<li>Install Couchbase with a simple shell command. (here I am not checking if Couchbase is already installed)</li>
+</ol>
+
+
+<p>So we have now installed Couchbase on all the nodes. Let&rsquo;s now configure the first node and add the others:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- name: Initialize the cluster and add the nodes to the cluster
+</span><span class='line'>hosts: couchbase-main
+</span><span class='line'>user: root
+</span><span class='line'>
+</span><span class='line'>tasks:
+</span><span class='line'>- name: Configure main node
+</span><span class='line'>shell: /opt/couchbase/bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-init-username=${admin_user} --cluster-init-password=${admin_password} --cluster-init-port=8091 --cluster-init-ramsize=${cluster_ram_quota}
+</span><span class='line'>
+</span><span class='line'>- name: Create shell script for configuring main node
+</span><span class='line'>action: template src=couchbase-add-node.j2 dest=/tmp/addnodes.sh mode=750
+</span><span class='line'>
+</span><span class='line'>- name: Launch config script
+</span><span class='line'>action: shell /tmp/addnodes.sh
+</span><span class='line'>
+</span><span class='line'>- name: Rebalance the cluster
+</span><span class='line'>shell: /opt/couchbase/bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u ${admin_user} -p ${admin_password}
+</span><span class='line'>
+</span><span class='line'>- name: create bucket ${bucket_name} with ${num_replicas} replicas
+</span><span class='line'>shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=${bucket_name} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize=${bucket_ram_quota}  --bucket-replica=${num_replicas} -u ${admin_user} -p ${admin_password}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we need to execute specific taks on the &ldquo;main&rdquo; server:</p>
+
+<ul>
+<li>Initialization of the cluster using the Couchbase CLI, on line 06 and 07</li>
+</ul>
+
+
+<p>Then the system needs to ask all other server to join the cluster. For this the system needs to get the various IP and for each IP address execute the add-server command with the IP address. As far as I know it is not possible to get the IP address from the main playbook YAML file, so I ask the system to generate a shell script to add each node and execute the script.</p>
+
+<p>This is done from the line 09 to 13.</p>
+
+<p>To generate the shell script, I use <a href="http://ansible.cc/docs/modules.html#template">Ansible Template</a>, the template is available in the <a href="https://github.com/tgrall/couchbase-ansible-playbook/blob/master/couchbase-add-node.j2">couchbase-add-node.j2</a> file.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'></span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see this script loop on each server in the [couchbase-nodes] group and use its IP address to add the node to the cluster.</p>
+
+<p>Finally the script rebalance the cluster (line 16) and add a new bucket (line 19).</p>
+
+<p>You are now ready to execute the playbook using the following command :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./bin/ansible-playbook -i ./couchbase/hosts ./couchbase/couchbase.yml -vv</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I am adding the -vv parameter to allow you to see more information about what&rsquo;s happening during the execution of the script.</p>
+
+<p>This will execute all the commands described in the playbook, and after few seconds you will have a new cluster ready to be used! You can for example open a browser and go to the Couchase Administration Console and check that your cluster is configured as expected.</p>
+
+<p> <img src="http://1.bp.blogspot.com/-L-3yeJZECwY/Uaj_PA_aVUI/AAAAAAAAAcg/fKBZ47Nhd4M/s320/Screen+Shot+2013-05-31+at+9.50.44+PM.png"></p>
+
+<p>As you can see it is really easy and fast to create a new cluster using Ansible.</p>
+
+<p>I have also create a script to uninstall properly the cluster.. just launch</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>./bin/ansible-playbook -i ./couchbase/hosts ./couchbase/couchbase-uninstall.yml</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/28/six-months-as-technical-evangelist-at-couchbase/">Six Months as Technical Evangelist at Couchbase</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-05-28T08:36:07+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>8:36 am</span></time>
+        
+           | <a href="/blog/2013/05/28/six-months-as-technical-evangelist-at-couchbase/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/05/28/six-months-as-technical-evangelist-at-couchbase/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Already 6 months! Already 6 months that I have joined Couchbase as Technical Evangelist. This is a good opportunity to take some time to look back.</p>
+
+<p>So first of all what is a Developer/Technical Evangelist?</p>
+
+<p>Hmm it depends of each company/product, but let me tell you what it is for me, inside Couchbase. This is one of the most exciting job I ever had. And I think it is the best job you can have when you are passionate about technology, and you like to share this passion with others. So my role as Technical Evangelist is to help the developers to adopt NoSQL technologies in general, and as you can guess Couchbase in particular.</p>
+
+<p>Let&rsquo;s now see in more details what I have done during these past six months and why I am so happy about it. I have organized the different activities in three types:</p>
+
+<ul>
+<li>Outbound activities : meet the developers</li>
+<li>Online activities : reach even more developers</li>
+<li>Inbound Activities : make the product better !</li>
+</ul>
+
+
+<h3>Outbound activities : meet the developers !</h3>
+
+<p>A large part of my activities for this first semester was made of conferences and meetups. All these events are great opportunities for me to talk about NoSQL and get more people to use Couchbase Server 2.0, here a short list of what I have done:</p>
+
+<ul>
+<li>participated to many Couchbase Developer Days in various cities (Portland, Seattle, Vancouver, Oslo, Copenhagen, Stockholm, Munich, Amsterdam, Barcelona, Paris, &hellip;), these are one day workshops where I am helping developers to get their hands dirty on Couchbase</li>
+<li>participated to Couchconf Berlin and Couchbase [UK] our main European events where I met many Customer and key members of the community</li>
+<li>submitted talks to conferences and adapt them to the conference, then spoken in various conferences about NoSQL and Couchbase (<a href="http://33degree.org/">33Degree Warsaw,</a>  <a href="http://www.johnbryce.co.il/events/nosql-big-data">NoSQL &amp; Big Data Israel</a>, <a href="http://devoxx.fr/">Devoxx France</a>, <a href="http://nosql-matters.org/">NoSQL Matters</a>, and many others).</li>
+<li>met many developers during user groups and meetups. I have to say that I have been very active there, and quite happy to see that NoSQL is a very hot topic for developers, and this in all languages.</li>
+<li>delivered <a href="http://en.wikipedia.org/wiki/Brown_bag_seminar">BrowBagLunch</a>es to various technical teams in companies.</li>
+</ul>
+
+
+<p>Yes! Be a Technical Evangelist means, at least for me, be on the road. It is very nice to meet developers from various countries, different cultures, languages, and… this also means tasting many different types of food!</p>
+
+<p>Another interesting thing when you work on a database/infrastructure layer is the fact that it is <em>technology agnostic</em>; you can access Couchbase with multiple programming languages: Java, .Net,Javascript/Node, Ruby, PHP, Python, C, … and even Go. So with this job I met developers with different backgrounds and views about application development. So yes when I am at a conference or meetup, I am suppose to &ldquo;teach&rdquo; something to people, but I have also learned a lot of things, and still doing it.</p>
+
+<h3>Online activities : reach even more developers!</h3>
+
+<p>Meeting developers during conferences is great but it, it is also very important to produce content to reach even more people, so I have :</p>
+
+<ul>
+<li>written blog post about Couchbase usage, most of them based on feedback/questions from the community</li>
+<li>created sample code to show how it works</li>
+<li>monitored and answered questions on various sites and mailing lists, from Couchbase discussion forums, mailing lists, Stack Overflow, Quora and others&hellip;</li>
+</ul>
+
+
+<p>This task is quite interesting because it is the moment where you can reach many developers and also get feedback from users, and understand how they are using the product. I have to say that I was not as productive as I was expected, mainly because I was traveling a lot during this period.</p>
+
+<p>Another important thing about online activities, is the &ldquo;Couchbase Community&rdquo; itself, many users of Couchbase are creating content : blog posts, samples, new applications, or features - for example I am talking with a person that is developing a <a href="http://blog.rikulo.org/posts/2013/May/General/couchclient/">Dart Client for Couchbase</a>, so as Technical Evangelist I am also working closely with the most active contributor.</p>
+
+<h3>Inbound Activities : make the product better !</h3>
+
+<p>So the ultimate goal of a Technical Evangelist at Couchbase is to &ldquo;convert&rdquo; developers to NoSQL/Couchbase and get them to talk about Couchbase. Meeting them online or during events is a way of achieving this; but it is also great to do it directly <em>with</em> the product. This means participating to the &ldquo;development&rdquo; of the product or its ecosystem. Here some of the things that I have done on this topic:</p>
+
+<ul>
+<li>talked a lot with the development team, core developers, product managers, architects, … Quite exciting to work with so much smart people and have access to them. During this discussions I was able to comment the roadmap, influence features, but also it is all the time an opportunity to learn new things about Couchbase - and many other things around architecture, programming languages, take a look for example to <a href="http://damienkatz.net/2013/01/the_unreasonable_effectiveness_of_c.html">this nice post from Damien Katz</a> .</li>
+<li>contributed some code, yes remember Couchbase is an open source project and it is quite easy to participate to the development. Obviously based on my skills I have only help a little bit with the Java and the Javascript SDK. So if like me you are interested to contribute to the project, take a look to this page: &ldquo;<a href="http://www.couchbase.com/wiki/display/couchbase/Contributing+Changes">Contributing Changes</a>&rdquo;</li>
+<li>but the biggest contributions to the products are such like doc reviews, testing and writing bug reports, and this is very important and interesting, since once again it helps a lot with the product adoption by the developers.</li>
+</ul>
+
+
+<h3>So what?</h3>
+
+<p>As you can see the Technical Evangelist job is a quite exciting job, and one of the reason I really love it, it is simply because it allows me to do many different things, that are all related to the technology. Six months is still a very short period, I still have many things to learn and to with the team to be successful, such as be more present online (blog, sample code, technical article, screencast, ..), be accepted in more conferences, and code a little more (I have to finish for example the Couchbase Data Provider for Hibernate OGM, and many other ideas around application development experience)</p>
+
+<p>Finally, Couchbase needs you ! This is a good opportunity to say that Couchbase is always looking for talents, especially in the Technical/Developer Evangelist team, so do not hesitate to look at <a href="http://www.couchbase.com/careers">the different job openings</a> and join the team !</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/29/screencast-fun-with-couchbase-mapreduce-and-twitter/">Screencast : Fun With Couchbase MapReduce and Twitter</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-04-29T09:51:36+02:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>9:51 am</span></time>
+        
+           | <a href="/blog/2013/04/29/screencast-fun-with-couchbase-mapreduce-and-twitter/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/04/29/screencast-fun-with-couchbase-mapreduce-and-twitter/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I have created this simple screencast to show how you can, using Couchbase do some realtime analysis based on Twitter feed.</p>
+
+<p>The key steps of this demonstration are</p>
+
+<ol>
+<li>Inject Tweets using a simple program available on my Github <a href="https://github.com/tgrall/couchbase-twitter-injector">Couchbase-Twitter-Injector</a></li>
+<li>Create views to index and query the Tweets by
+
+<ul>
+<li>User name</li>
+<li>Tags</li>
+<li>Date</li>
+</ul>
+</li>
+</ol>
+
+
+<p>The views that I used in this demonstration are available at the bottom of this post.</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/X167R0TV5QE?color=white&theme=light"></iframe>
+
+
+<p>Views:</p>
+
+<div><script src='https://gist.github.com/1df10b10c9dd387995cb.js'></script>
+<noscript><pre><code>function (doc, meta) {
+  if (doc.created_at) {
+   emit( dateToArray(doc.created_at));
+  }
+}</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/posts/4">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/2">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

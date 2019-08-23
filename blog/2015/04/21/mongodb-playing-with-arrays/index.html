@@ -1,0 +1,626 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>MongoDB : Playing With Arrays - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="As you know, you have many differences between relational and document databases. The biggest, for the developer, is probably the data model: Row &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2015/04/21/mongodb-playing-with-arrays/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">MongoDB : Playing With Arrays</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-04-21T15:45:39+02:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>3:45 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>As you know,  you have many differences between relational and document databases. The biggest, for the developer, is probably the data model: Row versus Document. This is particularly true when we talk about &ldquo;relations&rdquo; versus &ldquo;embedded documents <em>(or values)</em>&rdquo;. Let&rsquo;s look at some examples, then see what are the various operations provided by MongoDB to help you to deal with this.</p>
+
+<!-- more -->
+
+
+<p>I won&rsquo;t use this post to go in all the details about &ldquo;document design&rdquo;, but I just want to focus on the operations you can to with these arrays/list (so useful operations once you have chosen to embed documents).</p>
+
+<p>Let&rsquo;s use a very simple example based on e-commerce platform, with two document types : <strong><em>user</em></strong> and <strong><em>orders</em></strong>.</p>
+
+<p>The first thing you have, is a simple list of values into a JSON array. Let&rsquo;s look at a user profile where user have a list of interests  (field <code>interested_by</code>) :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">654321</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;first_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;last_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Doe&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;interested_by&quot;</span> <span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;electronics&quot;</span><span class="p">,</span> <span class="s2">&quot;sports&quot;</span><span class="p">,</span> <span class="s2">&quot;music&quot;</span> <span class="p">],</span>
+</span><span class='line'>  <span class="nt">&quot;address&quot;</span> <span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;John Doe&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;company&quot;</span> <span class="p">:</span> <span class="s2">&quot;Resultri&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;street&quot;</span> <span class="p">:</span> <span class="s2">&quot;1015 Mapple Street&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;city&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Francisco&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;state&quot;</span> <span class="p">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;zip_code&quot;</span> <span class="p">:</span> <span class="mi">94105</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Another thing you do with array, is to represent &ldquo;one-to-many&rdquo; relations. These relations in your RDBMS are based on multiple tables and foreign keys.
+In document databases, like MongoDB, these relations are, most of the time, represented using an <em>array of documents</em>, something like (look at the <code>items</code> field):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">45218468309</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;date&quot;</span> <span class="p">:</span> <span class="err">ISODate(</span><span class="s2">&quot;2015-01-28T09:40:50.615Z&quot;</span><span class="err">)</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;customer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">654321</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;John Doe&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nt">&quot;ship_to&quot;</span> <span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;John Doe&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;company&quot;</span> <span class="p">:</span> <span class="s2">&quot;Resultri&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;street&quot;</span> <span class="p">:</span> <span class="s2">&quot;1015 Mapple Street&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;city&quot;</span> <span class="p">:</span> <span class="s2">&quot;San Francisco&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;state&quot;</span> <span class="p">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;zip_code&quot;</span> <span class="p">:</span> <span class="mi">94105</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nt">&quot;items&quot;</span> <span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;sku&quot;</span> <span class="p">:</span> <span class="s2">&quot;WA34R&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;description&quot;</span> <span class="p">:</span> <span class="s2">&quot;Wireless Qwerty Keyboard&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;quantity&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;unit_price&quot;</span> <span class="p">:</span> <span class="mf">41.5</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;price&quot;</span> <span class="p">:</span> <span class="mf">41.5</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;vat&quot;</span> <span class="p">:</span> <span class="mi">20</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;sku&quot;</span> <span class="p">:</span> <span class="s2">&quot;MW003&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;description&quot;</span> <span class="p">:</span> <span class="s2">&quot;MiWatch&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;quantity&quot;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;unit_price&quot;</span> <span class="p">:</span> <span class="mi">245</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;price&quot;</span> <span class="p">:</span> <span class="mi">490</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;vat&quot;</span> <span class="p">:</span> <span class="mi">20</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Documents above are not necessary complete, I just want to focus on the various operations you can do on these arrays.</p>
+
+<p><em>Note: you can add these documents into your MongoDB instance, I will use the collections <code>customers</code> and <code>orders</code>.</em></p>
+
+<h3>Adding new interest to the user</h3>
+
+<p>To achieve this you have 2 operators that you can use in your update: <a href="1"><code>$push</code></a> and <a href="2"><code>$addToSet</code></a>. Since these one a very simple I won&rsquo;t go into too much details.</p>
+
+<p>The <code>$push</code> will add the value at the end of the list, if the value already exits it will be added (many copies), this is why it makes sense to use the <code>$addToSet</code> operator, that only add the value if the value does not already exist in the array.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.customers.update(</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">654321</span>  <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;$addToSet&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;interested_by&quot;</span> <span class="p">:</span>  <span class="s2">&quot;sports&quot;</span><span class="p">}</span>  <span class="p">}</span>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This update command above <strong>will not change</strong> the document since the &ldquo;sports&rdquo; value is already in the list.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.customers.update(</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">654321</span>  <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;$addToSet&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;interested_by&quot;</span> <span class="p">:</span>  <span class="s2">&quot;books&quot;</span><span class="p">}</span>  <span class="p">}</span>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This <strong>will add</strong> the &ldquo;books&rdquo; value at the end of the list.</p>
+
+<p>If the attribute <code>interested_by</code> does not exist in the document, it will be added with one single entry (here the <code>$push</code> is working the same way ).</p>
+
+<p>If the attribute is not an array, the database will not do anything and return the error <a href="3">#16837</a> <em>&ldquo;The field &lsquo;first_name&rsquo; must be an array but is of type String in document&rdquo;</em>.</p>
+
+<p>Here we use <em>interest</em>, but you can imagine doing the same thing for tagging, or any other business use case with a list of values.</p>
+
+<h3>Adding a new item into an order</h3>
+
+<p>The previous case, is very simple since it is a scalar value. Now I need to add a new order line, it is not harder than before:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.orders.update(</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">45218468309</span>   <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;$push&quot;</span> <span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;items&quot;</span> <span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;sku&quot;</span> <span class="p">:</span> <span class="s2">&quot;MO001&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;description&quot;</span> <span class="p">:</span> <span class="s2">&quot;Bluetooth mouse&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;quantity&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;unit_price&quot;</span> <span class="p">:</span> <span class="mf">20.00</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;price&quot;</span> <span class="p">:</span> <span class="mf">20.00</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;vat&quot;</span> <span class="p">:</span> <span class="mf">20.00</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So you can see now that the value is added at the end of the list.</p>
+
+<h3>Updating an item in the order</h3>
+
+<p>Let&rsquo;s look at another requirement. Now I need to update for example the quantity of one of the line. In your relational application it is <em>easy</em> in the sense that you have one single record to update(in reality it is a different story since application are using complex data layer).</p>
+
+<p>You can do the same, meaning you can only update the <em>items</em> directly in the array &ndash; (no need to replace the full document or list like I see too often).</p>
+
+<p>For this, you  just need to use the <code>update</code> and <code>$set</code> and specify the positional operation <code>$</code>.</p>
+
+<p>The <code>$</code> operator is a placeholder for the first entry in the array that match the filter (query document) sent to the update/findAndModify command.</p>
+
+<p>In our example, to update a specific line in the order</p>
+
+<p>The proper way is simply to use the an update and <code>$set</code>,
+ but you have to select the exact entry in the array in your filter. For example in our case we want to update the number of mouses and the price, this will look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.orders.update(</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">45218468309</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;items.sku&quot;</span> <span class="p">:</span> <span class="s2">&quot;MO001&quot;</span>
+</span><span class='line'>  <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;$set&quot;</span> <span class="p">:</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;items.$&quot;</span> <span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nt">&quot;sku&quot;</span> <span class="p">:</span> <span class="s2">&quot;MO001&quot;</span><span class="p">,</span>
+</span><span class='line'>          <span class="nt">&quot;description&quot;</span> <span class="p">:</span> <span class="s2">&quot;Bluetooth mouse&quot;</span><span class="p">,</span>
+</span><span class='line'>          <span class="nt">&quot;quantity&quot;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>          <span class="nt">&quot;unit_price&quot;</span> <span class="p">:</span> <span class="mf">20.00</span><span class="p">,</span>
+</span><span class='line'>          <span class="nt">&quot;price&quot;</span> <span class="p">:</span> <span class="mf">40.00</span><span class="p">,</span>
+</span><span class='line'>          <span class="nt">&quot;vat&quot;</span> <span class="p">:</span> <span class="mf">20.00</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see, the <code>$</code> operator is telling MongoDB to update one specific entry in the array.</p>
+
+<h2>Remove an item from the Array</h2>
+
+<p>You have learned so far that you can easily query and add values into an array; using the same appraoch you can also remove entry in an array. This is done using 3 operators : <code>$pop</code>, <code>$pull</code> and <code>$pullAll</code></p>
+
+<ul>
+<li>The <code>$pop</code> operator removes one element from the end of the array</li>
+<li>The <code>$pull</code> operator removes <em>all</em> elements in the array that match a specified value.</li>
+<li>The <code>$pullAll</code> operator removes <em>all</em> elements in the array that match any of the specified values.</li>
+</ul>
+
+
+<h4>Remove some interests from a customer</h4>
+
+<p>For example, let&rsquo;s remove the &ldquo;electronics&rdquo; interest from the customer id 654321.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.customers.update(</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">654321</span>  <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;$pull&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;interested_by&quot;</span> <span class="p">:</span>  <span class="s2">&quot;electronics&quot;</span><span class="p">}</span>  <span class="p">}</span>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you want to remove sports and music interest from the customer you can use the <code>$pullAll</code> operator as follow:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.customers.update(</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">654321</span>  <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span> <span class="nt">&quot;$pullAll&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;interested_by&quot;</span> <span class="p">:</span>  <span class="p">[</span><span class="s2">&quot;sports&quot;</span><span class="p">,</span><span class="s2">&quot;music&quot;</span><span class="p">]}</span>  <span class="p">}</span>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here we use <em>interest</em>, but you can imagine doing the same thing for tagging, or any other business use case with a list of values.</p>
+
+<h4>Remove item into an order</h4>
+
+<p>Using the same operator you can also remove a line order (item) from an order document, for example let&rsquo;s remove the line with the item MO001 (Bluetooth mouse). For this we can use the <code>$pull</code> operator with the proper sku.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">db.orders.update(</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;_id&quot;</span> <span class="p">:</span> <span class="mi">45218468309</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span><span class="err">,</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;$pull&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;items&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;sku&quot;</span> <span class="p">:</span> <span class="s2">&quot;MO001&quot;</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="err">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>In this article you have learn how to create/edit arrays in JSON documents.</p>
+
+<p>In addition to all the update operators, MongoDB provides many operators for querying arrays such as  <a href="5">$size</a> or <a href="4"><code>$elemMatch</code></a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-04-21T15:45:39+02:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>3:45 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/arrays/'>arrays</a>, <a class='category' href='/blog/categories/json/'>json</a>, <a class='category' href='/blog/categories/lists/'>lists</a>, <a class='category' href='/blog/categories/mongodb/'>mongodb</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2015/04/21/mongodb-playing-with-arrays/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2015/04/21/mongodb-playing-with-arrays/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/02/04/introduction-to-mongodb-security/" title="Previous Post: Introduction to MongoDB Security">&laquo; Introduction to MongoDB Security</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/07/22/apache-drill-how-to-create-a-new-function/" title="Next Post: Apache Drill : How to create a new function?">Apache Drill : How to create a new function? &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2015/04/21/mongodb-playing-with-arrays/';
+        var disqus_url = 'http://tgrall.github.io/blog/2015/04/21/mongodb-playing-with-arrays/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

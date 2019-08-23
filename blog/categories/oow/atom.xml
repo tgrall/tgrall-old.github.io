@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Oow | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/oow/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Come to Oracle Open World and Watch Mr Spring and Mr Apache Speak]]></title>
+    <link href="http://tgrall.github.io/blog/2006/10/12/come-to-oracle-open-world-and-watch-mr-spring-and-mr-apache-speak/"/>
+    <updated>2006-10-12T21:41:48+02:00</updated>
+    <id>http://tgrall.github.io/blog/2006/10/12/come-to-oracle-open-world-and-watch-mr-spring-and-mr-apache-speak</id>
+    <content type="html"><![CDATA[<p>Oracle Open World is getting very close&hellip; And I am very excited to go to lot of sessions, two of them looks very interesting in the Oracle Develop track:</p>
+
+<ul>
+<li>Rod Johnson - Spring Update: What&rsquo;s New and Cool in Spring 2.0 (Monday 10/23/2006, 12:45 PM - 1:45 PM in the Hilton Hotel Grand Ballroom A)</li>
+<li>Brian Behlendorf - Bringing Open Source Software Development Practices and Principles Into Your Company (Tuesday 10/24/2006, 1:15 PM - 2:15 PM in the Hilton Hotel Grand Ballroom A)</li>
+</ul>
+
+
+<p>This is quite exciting to have Open Source gurus coming to present to the Oracle conference, and explain how to use the new Spring in their projects or leverage Open Source practices to improve development in house&hellip; Take a look to the full program of Oracle Develop.</p>
+
+<p>Start to use the Oracle OpenWorld Schedule Builder to organize your week in SF, if you have not registered yet for OOW click here.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle 10g: Oracle Open World Top 10 Presentations]]></title>
+    <link href="http://tgrall.github.io/blog/2005/11/22/oracle-10g-oracle-open-world-top-10-presentations/"/>
+    <updated>2005-11-22T20:23:08+01:00</updated>
+    <id>http://tgrall.github.io/blog/2005/11/22/oracle-10g-oracle-open-world-top-10-presentations</id>
+    <content type="html"><![CDATA[<p>You can find online the <a href="http://www.oracle.com/technology/events/oow2005/ow2005_top10.html">top 10 presentations of Oracle Open World 2005</a>:</p>
+
+<ol>
+<li>Optimizing the Optimizer: Essential SQL Tuning Tips and Techniques</li>
+<li>10 Things We Like About Oracle Database 10g Release 2</li>
+<li>PeopleSoft Enterprise, JD Edwards, and Oracle E-Business Suite Integration with Oracle Fusion Middleware</li>
+<li>The Future of Database and Information Technology</li>
+<li>Understanding Shared Pool Memory Structures: Tips on How to Optimize Usage and Avoid Errors</li>
+<li>Take the Guesswork Out of Database I/O Tuning</li>
+<li>Tuning Oracle SQL in the Real World</li>
+<li>What They Didn&rsquo;t Print in the Doc: High-Availability Best Practices from Oracle Maximum Availability</li>
+<li>Performance Diagnostics Demystified: Best Practices for Oracle Database 10g</li>
+<li>Best Practices for Oracle Database 10g Backup and Recovery</li>
+</ol>
+
+
+<p>Enjoy!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle Open World: Monday]]></title>
+    <link href="http://tgrall.github.io/blog/2005/09/19/oracle-open-world-monday/"/>
+    <updated>2005-09-19T21:17:03+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/09/19/oracle-open-world-monday</id>
+    <content type="html"><![CDATA[<p>Another nice day in San Francisco; I have been in booth duty most of the day and I have finished the day with a first presentation, with George Trujillo about J2EE Deployment strategy. This presentation I hope was interested for the quite big audience, the long Q&amp;A session -1h, it is nice to be the last in the room- was very good since I talk with various Oracle customer about J2EE management in perspective of the database management. The benefits of Oracle Grid Control for Database and AppServer administrators&hellip; I would invite you if you are not familiar with <a href="http://www.oracle.com/technology/products/oem/index.html">Oracle Grid Control to take a look to OTN</a>.</p>
+
+<p>Some of the interesting point is the announcement of the new <a href="http://biz.yahoo.com/prnews/050919/sfm087.html?.v=24">OracleAS 10g R3</a>, that enhanced the Fusion Middleware to deliver SOA, beside the support of J2EE 1.5, Java 5, EJB 30, JSF, I was very pleased to spend my day demonstrating our new UDDI V3 registry that continue to expend our Web Services stack by giving new services in addition to BPEL and Web Services Manager.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle Open World: Sunday]]></title>
+    <link href="http://tgrall.github.io/blog/2005/09/18/oracle-open-world-sunday/"/>
+    <updated>2005-09-18T21:13:21+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/09/18/oracle-open-world-sunday</id>
+    <content type="html"><![CDATA[<p>The first Oracle World Day for me has started with finishing the various demonstrations of the J2EE Core OC4J and Web Services demonstration Pods. Tomorrow Monday, we will be showing some very cool stuff around Web Services development and management, with some good news around Web Services Registry. Also on the J2EE Core, nice demonstrations of the different services but some of the new features of the OracleAS 10.1.3 such as the new clustering framework and the usage of scripting technologies, especially Groovy, to administer and monitor OracleAS, thanks to JMX!</p>
+
+<p>What about the rest of the day, I was invited to the Web Services Special Interest Group, WS-SIG, - no.. this is not a new acronym in the WS-* world-. This new SIG has been created in the beginning of the year and on the behalf of IOUG, please take a look to the <a href="http://wssig.oaug.org/">WSSIG web site</a>. <img src="http://farm1.static.flickr.com/179/388749477_d89cc5e85d_o.jpg" alt="IMG_6718.jpg" />. One of the very interesting things of this SIG is, like the J2EE SIG (Organized by OTUG, IOUG, OAUG and Oracle), developers, architects, and administrators of Fusion Middleware, the Database and Oracle Fusion applications are talking together. This reunion of people is good since we all from development to operations have a different view of systems. So during this panel we have introduced quickly the concepts, and then the audience jumped in for the Q&amp;A session, as you can guess, we add the classical questions around Web Services for the enterprise such as what about security? Management? Life Cycle ?&hellip; and so on. We answered obviously, but I would say if you are lucky enough to be at San Francisco this week, please come to the Demo Ground especially Web Services, Web Services Manager and BPEL where you will see the Oracle products in action and you will be able to find experts to help you to answer your questions.</p>
+
+<p>The main auditorium was packed to see the first keynote/show of Oracle Open World 2005, where Oracle presented some of the numerous charity efforts that it does, and offer some fun to the attendees with a nice show from <a href="http://www.danacarvey.net/">Dana Carvey</a></p>
+
+<h4>What about Oracle Blog dinner?</h4>
+
+<p><a href="http://www.rittman.net/">Mark Rittman</a> is organizing a dinner for the different Oracle bloggers, it will be at the <a href="http://www.paragonrestaurant.com/sfhome.htm">Paragon Restaurant</a> at Second Street on Townsend at 8.00pm on Tuesday 20th. ( I will be there for sure&hellip;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[At Oracle Open World All the Week]]></title>
+    <link href="http://tgrall.github.io/blog/2004/12/07/at-oracle-open-world-all-the-week/"/>
+    <updated>2004-12-07T13:27:00+01:00</updated>
+    <id>http://tgrall.github.io/blog/2004/12/07/at-oracle-open-world-all-the-week</id>
+    <content type="html"><![CDATA[<p>As you may know this is Oracle Open World this week in San Francisco&hellip; I am working there all week mainly on the OC4J and JDeveloper demo pods. Come to see the new version that help you to develop J2EE and Web Services. Also I am presenting Thursday at 4pm a paper about Service Oriented Architecture (SOA) and Event Driven Architecture (EDA)</p>
+
+<p>I invite you to join this feast&hellip; if you can not take a look to the <a href="http://www.orablogs.com/otn_at_openworld/">OTN at Oracle World blog</a>, that highlights important keynotes, session and demoground activities&hellip;</p>
+
+<p>You can also take a look to the official <a href="http://www.oracle.com/openworld/online/index.html">Oracle Open World Web site</a></p>
+]]></content>
+  </entry>
+  
+</feed>

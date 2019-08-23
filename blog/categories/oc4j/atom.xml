@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Oc4j | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/oc4j/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[OracleAS OC4J and Java EE Releases....]]></title>
+    <link href="http://tgrall.github.io/blog/2007/08/02/oracleas-oc4j-and-java-ee-releases-dot-dot-dot/"/>
+    <updated>2007-08-02T07:22:03+02:00</updated>
+    <id>http://tgrall.github.io/blog/2007/08/02/oracleas-oc4j-and-java-ee-releases-dot-dot-dot</id>
+    <content type="html"><![CDATA[<p>This morning I was helping a customer to debug some Web Services deployment issues, when I simply realized that the error was coming from the fact that he was trying to deploy a JAX-RPC service on a OracleAS 10gR2 server; where it is not supported/available.</p>
+
+<p>This give me the opportunity to clarify the different versions of the Oracle Application Server and their related Java Enterprise Edition release support.</p>
+
+<table class="tug" cellpadding="2"
+cellspacing="2"><tbody><tr><td class="tug">
+Oracle AS Release</td>
+<td class="tug">J2EE/Java
+EE Release</td>
+<td class="tug">Comments/Extensions</td>
+<td class="tug">Certification
+Matrix</td>
+</tr><tr><td class="tug">11.1.0.0</td>
+<td class="tug">Java
+EE 5.0</td><td class="tug">
+
+*   Currently
+available as technology preview</td>
+<td class="tug"></td></tr><tr><td
+class="tug">10.1.3.x
+(Oracle
+  AS 10gR3)</td>
+  <td class="tug">J2EE
+  1.4</td><td class="tug">
+
+  *   Support
+  of
+  EJB 3/JPA
+  *   Web Services Annotations
+  *   MTOM
+  support (10.1.3.1)
+  *   Integration of Spring 2.0
+  (10.1.3.2)
+  *   Integrationf of Oracle Coherence
+  (10.1.3.3)</td>
+  <td class="tug">
+  [OTN Certicification Matrix](http://www.oracle.com/technology/software/products/ias/files/oracle_soa_certification_101310.html)</td></tr>
+  <tr><td class="tug">10.1.2.x
+  (Oracle
+    AS 10gR2)</td>
+    <td class="tug">J2EE
+    1.3</td><td class="tug"></td><td class="tug">[OTN Certicification Matrix](http://www.oracle.com/technology/software/products/ias/files/as_certification_r2_101202.html)</td>
+    </tr><tr><td class="tug">9.0.4.x</td>
+    <td class="tug">J2EE
+    1.3</td><td class="tug"></td><td class="tug">[OTN Certicification Matrix](http://www.oracle.com/technology/software/products/ias/files/as-certification-904.html)</td>
+    </tr><tr><td class="tug">9.0.3.x</td>
+    <td class="tug">J2EE
+    1.3</td><td class="tug"></td><td class="tug">[OTN Certicification Matrix](http://www.oracle.com/technology/software/products/ias/files/as_certification_r2_101202.html)</td>
+    </tr></tbody></table>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[OracleAS &amp; JDeveloper: JavaEE 5.0 Technology Preview]]></title>
+    <link href="http://tgrall.github.io/blog/2007/05/16/oracleas-and-jdeveloper-javaee-5-dot-0-technology-preview/"/>
+    <updated>2007-05-16T03:45:19+02:00</updated>
+    <id>http://tgrall.github.io/blog/2007/05/16/oracleas-and-jdeveloper-javaee-5-dot-0-technology-preview</id>
+    <content type="html"><![CDATA[<p>During JavaOne last week Oracle has announced the availability of a the new JavaEE 5.0 Technology Preview of Oracle Containers for JavaEE and JDeveloper (release 11).</p>
+
+<p>Find more information on OTN:</p>
+
+<ul>
+<li><p><a href="http://www.oracle.com/technology/tech/java/oc4j/11/index.html">OC4J 11: Java EE 5 Technology Preview</a></p></li>
+<li><p><a href="http://www.oracle.com/technology/products/jdev/11/index.html">JDeveloper 11 Technology preview</a> includes a Mac release</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaEE 5 Features of OracleAS 10gR3]]></title>
+    <link href="http://tgrall.github.io/blog/2007/03/07/javaee-5-features-of-oracleas-10gr3/"/>
+    <updated>2007-03-07T09:00:12+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/03/07/javaee-5-features-of-oracleas-10gr3</id>
+    <content type="html"><![CDATA[<p><a href="http://otn.oracle.com/products/oc4j">OracleAS 10g R3 (10.1.3.x)</a> is a certified J2EE 1.4 container, but OracleAS provides already support to some of the features of the Java Enterprise Edition 5: JavaEE 5. One of the key driver of the new EE version was simplification of the development and deployment applications. Here is the list of the JavaEE 5 features that are supported in OracleAS 10gR3 that will simplify the development of applications <em>(in comparison to a standard J2EE 1.x development)</em>:</p>
+
+<ul>
+<li><p>Java Persistence API (JPA) and EJB 3.0 (<a href="http://download-uk.oracle.com/docs/cd/B32110_01/web.1013/b28221/toc.htm">documention</a>)</p></li>
+<li><p>Support of shared library at the EAR level (<code>&amp;lt;library-directory&amp;gt; / applib</code>). (<a href="http://download.oracle.com/docs/cd/B31017_01/web.1013/b28952/classload.htm#BABGAABD">documentation</a>). This comes in addition to the OracleAS 10gR3 classloader framework that allows administrators to create, and version shared libraries that can be used into applications by referencing them in the deployment plan.</p></li>
+<li><p>Annotations Based Web Services (JSR181)  that could be used for Java classes and EJB3 Session Beans (<a href="http://download.oracle.com/docs/cd/B32110_01/web.1013/b28974/devannotation.htm#CHDFJBEH">documentation</a>)</p></li>
+<li><p>Referencing resources using annotations in the Web container: <code>@EJB, @Resource, @Resources, @PostConstruct, @PreDestroy, @PersistenceUnit, @PersistenceContext, @WebServiceRef, @DeclaresRoles, @RunAs</code>  (<a href="http://download.oracle.com/docs/cd/B32110_01/web.1013/b28959/annotations.htm#sthref248">documentation</a>)
+Hope that this small summary will give you the opportunity to test some of the features of OracleAS 10g.</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Netbeans : OC4J Support Available]]></title>
+    <link href="http://tgrall.github.io/blog/2007/03/02/netbeans-oc4j-support-available/"/>
+    <updated>2007-03-02T10:21:53+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/03/02/netbeans-oc4j-support-available</id>
+    <content type="html"><![CDATA[<p>It has been a long time that I did not look in the update center and development wiki of Netbeans. And I have been very pleased to see that it is possible now to register OC4J 10g as a server in Netbeans 5.5 (and 6.0). To add it in your environment just do a :</p>
+
+<ul>
+<li>Tools > Update Center</li>
+<li>Select &ldquo;Netbeans Update Center Beta&rdquo;</li>
+<li>Select OC4J 10gYou can then configure a new Server and run/stop the server from your IDE.</li>
+</ul>
+
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png">http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png</a>&#8221;></p>
+
+<p>You can follow the development of this plugin directly in the <a href="http://wiki.netbeans.org/wiki/view/OC4JSupport">Netbeans Wiki OC4J Support</a> page.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[OC4J Tip: Changing the Server Information]]></title>
+    <link href="http://tgrall.github.io/blog/2007/02/26/oc4j-tip-changing-the-server-information/"/>
+    <updated>2007-02-26T13:51:58+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/02/26/oc4j-tip-changing-the-server-information</id>
+    <content type="html"><![CDATA[<p>When you are running OC4J in stand alone mode you are using the HTTP server that is bundle with it. This HTTP server returns by default for the HTTP information the following information: <em>Server: Oracle Containers for J2EE</em></p>
+
+<p>If you want to change that you just need to set the <code>http.server.header</code> property. For example,</p>
+
+<pre><code>java -Dhttp.server.header="My blog on Oracle" -jar oc4j.jar
+</code></pre>
+
+<p>will now look like:</p>
+
+<pre><code>HTTP/1.1 200 OK
+Date: Mon, 26 Feb 2007 21:52:53 GMT
+Server: My blog on Oracle
+Last-Modified: Mon, 09 Oct 2006 19:17:10 GMT
+Accept-Ranges: bytes
+Content-Length: 19882
+Connection: close
+Content-Type: text/html
+</code></pre>
+
+<p>Thanks to James Kirsh for this <em>very useful</em> tip&hellip;</p>
+]]></content>
+  </entry>
+  
+</feed>

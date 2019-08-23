@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Netbeans | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/netbeans/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Netbeans : OC4J Support Available]]></title>
+    <link href="http://tgrall.github.io/blog/2007/03/02/netbeans-oc4j-support-available/"/>
+    <updated>2007-03-02T10:21:53+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/03/02/netbeans-oc4j-support-available</id>
+    <content type="html"><![CDATA[<p>It has been a long time that I did not look in the update center and development wiki of Netbeans. And I have been very pleased to see that it is possible now to register OC4J 10g as a server in Netbeans 5.5 (and 6.0). To add it in your environment just do a :</p>
+
+<ul>
+<li>Tools > Update Center</li>
+<li>Select &ldquo;Netbeans Update Center Beta&rdquo;</li>
+<li>Select OC4J 10gYou can then configure a new Server and run/stop the server from your IDE.</li>
+</ul>
+
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png">http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png</a>&#8221;></p>
+
+<p>You can follow the development of this plugin directly in the <a href="http://wiki.netbeans.org/wiki/view/OC4JSupport">Netbeans Wiki OC4J Support</a> page.</p>
+]]></content>
+  </entry>
+  
+</feed>

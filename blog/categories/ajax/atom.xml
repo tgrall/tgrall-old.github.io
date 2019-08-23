@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ajax | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/ajax/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Prototype Windows: The Best Way to Create 'Web 2.0' Windows]]></title>
+    <link href="http://tgrall.github.io/blog/2007/09/15/prototype-windows-the-best-way-to-create-web-2-dot-0-windows/"/>
+    <updated>2007-09-15T07:57:36+02:00</updated>
+    <id>http://tgrall.github.io/blog/2007/09/15/prototype-windows-the-best-way-to-create-web-2-dot-0-windows</id>
+    <content type="html"><![CDATA[<p>I am sure that most of you already know the &ldquo;<a href="http://prototype-window.xilinus.com/">Prototype Windows</a>&rdquo;  project that provides a very powerful way to create windows and dialogs inside your Web pages. If you do not know it, take a look it&rsquo;s awesome!</p>
+
+<p>Sebastien Gruhier, aka Mr Proto, and others have done a terrific job allowing developers to integrate exciting features with few lines of code. Find more on the <a href="http://prototype-window.xilinus.com/">PWC site</a> or on <a href="http://blog.xilinus.com/pwc">Mr Proto&rsquo;s blog</a>.</p>
+
+<p><img class="<a" src="href="http://3.bp.blogspot.com/_aoQgQ1obiyE/Ruvo6E3lYfI/AAAAAAAAAB0/fk6OCadNOCA/s400/pwcdemo.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/Ruvo6E3lYfI/AAAAAAAAAB0/fk6OCadNOCA/s400/pwcdemo.png</a>&#8221;></p>
+
+<p>In addition to the Windows API, you can also take a look to the Tranparent Message, Prototype Carousel and Prototype Graphics projects</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Google Code: AJAXSLT]]></title>
+    <link href="http://tgrall.github.io/blog/2005/06/24/google-code-ajaxslt/"/>
+    <updated>2005-06-24T20:59:36+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/06/24/google-code-ajaxslt</id>
+    <content type="html"><![CDATA[<p>Google has released via its <a href="http://code.google.com/">Google Code</a> project an implementation of XSLT in javascript&hellip; Quite interesting to improve the development of AJaX based applications, I think this is the only reason to put the term AJaX in the project&hellip; But it is true that everytime you put AJaX in a title of something you are getting people interested&hellip;</p>
+
+<p>The source code is available in <a href="http://sourceforge.net/projects/goog-ajaxslt/">sourceforge</a>.</p>
+
+<p>Feel free to post comments into the <a href="http://groups-beta.google.com/group/google-ajax/">Google group</a> created for this</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pushlets Are Adopting AJaX]]></title>
+    <link href="http://tgrall.github.io/blog/2005/06/13/pushlets-are-adopting-ajax/"/>
+    <updated>2005-06-13T20:58:56+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/06/13/pushlets-are-adopting-ajax</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://www.pushlets.com/assets/pushlet-logo.gif">http://www.pushlets.com/assets/pushlet-logo.gif</a>&#8220;>Back in consulting I did some small projects using the <a href="http://www.pushlets.com">Pushlets framework</a>. A nice and simple solution to create easily Web eventing applications&hellip;</p>
+
+<p>The Pushlet team has created a small demonstration of integration of Pushlet and XMLHttpRequest together&hellip;</p>
+
+<p>If you never used Pushlets, take a look to it it is really nice!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Web UI: What's Behind AJAX? Simple Use Cases Using XMLHttpRequest]]></title>
+    <link href="http://tgrall.github.io/blog/2005/05/09/web-ui-whats-behind-ajax-simple-use-cases-using-xmlhttprequest/"/>
+    <updated>2005-05-09T20:50:03+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/05/09/web-ui-whats-behind-ajax-simple-use-cases-using-xmlhttprequest</id>
+    <content type="html"><![CDATA[<p>I am sure you already heard about AJAX, the &ldquo;new&rdquo; way of building Web
+application where using HTML, Javascript, DOM, and XML you can
+&nbsp;build very interactive Web applications, some examples of
+this interactivity are Google (suggest, local, mail), MSN, Amazon, &hellip;..</p>
+
+<p>If the term &nbsp;Ajax is
+relatively new, the technologies used are quite old now. And you do not
+need anything new to be able to leverage this approach in your current
+development, and since it is mainly a client (browser) based technology
+this can be used whether you develop your application in Java, PHP, or
+or even PL/SQL for the Web. In the same time, you do not want to have
+to develop too much of the client side to handle user interaction, this
+is where new frameworks that provide support of this technologies,
+let&rsquo;s say AJAX based, are very interesting. It is now possible to
+create very interactive Web application without passing 80% of your
+time in the client side development - that could be generated from your
+server obviously.</p>
+
+<p>In the same time, before adopting such framework, it is important to
+understand what is happening. This is why I am creating this quick
+introduction based on 2 simple use cases:</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-2.html">loading message</a>:
+&nbsp;you often want to provide some
+feedback to your user when your browser is processing some data</li>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-3.html">dependent lists</a>:
+how you can easily create dependent lists, in lot of application you
+want to drive a selection list from another</li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Update May 30:</p>
+
+<p>If you have tested my sample on Safari, you can see that the first request works, but following subsequent requests do not, on work around is to modify the HTTP header adding the following value, has to be done before the send, just send a old date&hellip;</p>
+
+<pre><code class="javascript">httpRequest.setRequestHeader('If-Modified-Since','Sun,3 Jun 1973 00:00:00 GMT');
+</code></pre>
+
+<h3>What do you need to know?</h3>
+
+<p>The first interesting part is the object XMLHttpRequest. This object is
+currently supported by most of the browsers. As usual with HTML and
+Javascript the cross browser/platform testing is one of the most
+important part of your project. XMLHttpRequest is not new since
+Microsoft has implemented it in Internet Explorer 5 as an ActiveX
+object. Also it has been later on integrate as a native component into
+Mozzila and Netscape (7.0), and into Apple Safari. If originally this
+object as been created to load data, as XML in the
+background, you can using it to load any data.</p>
+
+<h4>Creating XMLHttpRequest Object</h4>
+
+<p>As usual with Javascript, it begins with interoperability issue ;-),
+since in the MSFT world the XMLHttpRequest is implemented as an ActiveX
+and in the other world(s) it is an native object, you have different
+ways to create the object. The idea is too test if the current browser
+supports or not the object and depending of the result create the
+object.</p>
+
+<pre><code class="javascript">
+if (window.ActiveXObject)
+{
+  // Microsoft Way
+  httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+}
+else if (window.XMLHttpRequest)
+{
+  // Others...
+  httpRequest = new XMLHttpRequest();
+}
+</code></pre>
+
+<p>Note: another way of choosing which code path to use depending of the
+version of the browser is to use <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/script56/html/js56jsconconditionalcompilation.asp">conditional compilation</a>
+for the Javascript engine.</p>
+
+<p>Also I would add that it is probably good to provide a degraded version
+of your application if you can not control which browser will be used
+by your client, or if you want to provide that to mobile people. This
+is for example what Google Mail is doing with its <a href="http://gmail.google.com/support/bin/answer.py?ctx=gmail&amp;amp;hl=en&amp;amp;answer=15049">Basic HTML</a>
+view.</p>
+
+<h4>Retrieving the data</h4>
+
+<p>asynchronously</p>
+
+<p>One of the most interesting features of the XMLHttpRequestObject is the
+fact that you get data from a URL in the background of the user
+activity. This is how you can give lot of interactivity to your
+applications.</p>
+
+<pre><code class="javascript">httpRequest.open("GET", "./getEmployeeList?deptno=10", true);
+httpRequest.onreadystatechange= function () {processRequest(); } ;
+httpRequest.send(null);
+</code></pre>
+
+<p>The <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmmthopenixmlhttprequest.asp">open</a>
+method sets the different values that will be used by your request,
+such as the type of request, the URL, if it is synchronous or not.</p>
+
+<p>The &ldquo;magic&rdquo; comes from the&nbsp;<a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproonreadystatechangehttprequest.asp">onreadystatechange</a>&nbsp;property.
+This propery set an handler that will be called when the property <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproreadystaterequest.asp">readyState</a>
+changes, when the request is sent, loading, or completed&hellip; Meaning,
+this is in this event handler, the processRequest
+method in the sample, that you test if the response has been completed
+correctly, and process the data.</p>
+
+<p>Note: even if it is possible, I do not think that you should use the
+XMLHttpRequest in a synchronous mode since it will freeze the browser
+of the user, for the duration of the request.</p>
+
+<h4>Processing the response</h4>
+
+<p>As I said above the magic happens in the event handler associated with
+the state of the request. Let&rsquo;s see how you manipulate the request and
+response:</p>
+
+<pre><code class="javascript">function processRequest()
+{
+  if (httpRequest.readyState == 4)
+  {
+    if(httpRequest.status == 200)
+    {
+      // process data as XML
+      httpRequest.responseXML;
+
+      // or Text
+      alert(httpRequest.responseText);
+    }
+    else
+    {
+      alert("Error loading page\n"+ httpRequest.status +":"+ httpRequest.statusText);
+    }
+  }
+}
+</code></pre>
+
+<p>The <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproreadystaterequest.asp">readyState</a>
+propery is used to know if all the data of the response have been
+received or not, the different value for the state are:</p>
+
+<ul>
+<li>0 : uninitialized</li>
+<li>1 : loading</li>
+<li>2 :loaded</li>
+<li>3 : interactive</li>
+<li>4 : completed
+Most of the time, you will just test the status 4. In my example I wait
+for status==4 and then I check the status of the response. The <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmprostatusixmlhttprequest.asp">status</a>
+is the status returned by the server, for example 200 for OK, 404 for
+not found.</li>
+</ul>
+
+
+<p>Then you can treat the response as XML using the <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproresponsexmlixmlhttprequest.asp">responseXML</a>,
+in this case you can manipulate the XML using the client DOM API. But
+you can also directly take the content as a string using the <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproresponsetextixmlhttprequest.asp">responseText</a>
+property.</p>
+
+<h4>Manipulating the Data</h4>
+
+<p>You now have the data back from the request, as Text or XML, you just
+need using Javascript manipulate them and copy then into some part of
+your page. So all is based on the client side. Let&rsquo;s do a very simple
+example before moving to the use cases:</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/demo-1.html">Simple XMLHttpRequest sample</a> <em>What is happening?</em></li>
+</ul>
+
+
+<p>Since I have explained the call above, here is the simple code that is
+used to copy the content from the XMLHttpRequest object to the page:</p>
+
+<pre><code class="javascript">.....
+if(httpRequest.status == 200)
+{
+  var contentViewer = document.getElementById("contentViewer");
+  contentViewer.innerHTML = httpRequest.responseText;
+}
+....
+</code></pre>
+
+<p>Most of the time, if you do &nbsp;not use XML you just have to copy
+the content of the result into a section of your page, so to do it you
+use:</p>
+
+<ul>
+<li>create a DIV tag in yourpage with a specific id. (or other&hellip;)</li>
+<li>get the object you want to copy into using the <code>document.getElementById()</code> method, that is the most simple way&hellip;&nbsp;</li>
+<li>then from the object just use the <code>innerHTML</code>
+property that represent the content of this DIV object. (You can also
+use the DOM API, to do the same thing, I am sure puris will say that
+this is the only way to do it correctly&hellip; )
+In most of the frameworks the data are exchanged in XML and some
+generic methods are calls on the client side to propulate data in the
+different components of the page.</li>
+</ul>
+
+
+<h3>Usecase 1: Loading Message</h3>
+
+<p>One common use case is to be able to have some feedback during
+  processing of a request. Using the same approach you can print a
+  message until the response is completely done.</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-2.html">Online Demonstration</a> <em>What is happening?</em></li>
+</ul>
+
+
+<p>The tip here is just to take a zone where you want to print the status
+  (&ldquo;Loading&hellip;&rdquo; for example). When the XMLHttpRequest status is different
+  than 4 (completed) &nbsp;just print the status in this section
+  using for example the innerHTML property. When the request is
+  completed, just move the content of this zone to blank, or in our case
+  the result of the request is printed into it.</p>
+
+<pre><code class="javascript">....
+if (httpRequest.readyState == 4)
+{
+  if(httpRequest.status == 200)
+  {
+    // print the content of the page
+    var contentViewer = document.getElementById("contentViewer");
+    contentViewer.innerHTML = httpRequest.responseText;
+  }
+}
+else
+{
+  // Print the loading message....
+  var contentViewer = document.getElementById("contentViewer");
+  contentViewer.innerHTML = "&lt;b style='color:red;'&gt;Loading....&lt;b&gt;";
+}
+...
+</code></pre>
+
+<h3>Usecase 2: Dependent Lists</h3>
+
+<p>In lot of applications, you have submission form when one drop down list is controlled by another one. You have several way to support that depending of the size of your data set. For example you can download
+  all the records (master and detail) and use some client side
+  programming to refresh the content of the detail list depending of the
+  value selected in the master one; or &nbsp;another solution is to
+  just reload the page.</p>
+
+<p>Using XMLHttpRequest, you can now just call the server to populate the
+  values of the detail list when the user select another value in the
+  master list. (and you can implement a client side cache if you want to
+  avoid a second call with the same parameters, but this is another
+  story&hellip;)</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-3.html">Online Demonstration</a> <em>What is happening?</em></li>
+</ul>
+
+
+<p>Nothing more complex than in the previous examples, on the <code>onChange</code>
+  of the master list (dept in the example) , you call a Javascript method
+  that create the XMLHttRequest, with the correct parameter.</p>
+
+<p>Then in the event handler of this request, you populate the data as XML
+  and add them to the detail list (emp in the example).</p>
+
+<p>In this specific example I used XML, but if you want for simpler code
+  you can write all in HTML and use the innerHTML property, but this is
+  just a choice of implementation isn&rsquo;t?</p>
+
+<h3>Summary</h3>
+
+<p>First of all, you have seen that what we have behind AJAX is not just
+  new technologies. The technologies exists now for a while, they have
+  been exposed to the masse by Google, MSN, and other Web sites. The term
+  itself is definitevely a recent one&hellip;</p>
+
+<p>Also, I have showed you simple examples that can help you for your
+  current developments, but you need to write some code on the client.
+  The real future of AJAX, is when this is bundle into a framework, into
+  the Faces components your are using. So before starting to implement
+  such code in your application you should take a look around to see if
+  any solution exists that can answer your need&hellip;</p>
+
+<p>  You can download the source of the demonstrations <a href="http://www.grallandco.com/blog/archives/ajax/xmlhttprequest-demos.zip">here</a>. I tried to keep the code as simple as possible by providing all the source in each single html file.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[What to Think About All the Ajax Noise?]]></title>
+    <link href="http://tgrall.github.io/blog/2005/03/28/what-to-think-about-all-the-ajax-noise/"/>
+    <updated>2005-03-28T20:39:47+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/03/28/what-to-think-about-all-the-ajax-noise</id>
+    <content type="html"><![CDATA[<p>In the last 2 months the blogosphere has been very verbal about Ajax technology that describe a way of doing Rich UI using DHTML, Javascript and XML over HTTP.  If you are not already familiar with the concept the article &ldquo;<a href="http://www.adaptivepath.com/publications/essays/archives/000385.php">Ajax: A New Approach to Web Applications</a>&rdquo; by Jesse James Garrett is a very good introduction.</p>
+
+<p>For me, it is the first time that finally we have something really new in term of UI that is compliant with most of the modern architectures that are server side Java based. You can argue that Flex, OpenLazlo, &hellip;, are very good and powerful, but first of all they use a proprietary plugin and really integrated with the development approach that most of the Java developers are currently using (MVC based on Struts, JSF or others). What get me very excited about Ajax is the fact that finally we can see Web Development giving an easy and standard/open way of creating rich client.</p>
+
+<p>If you search around Ajax your will see that more and more framework are providing integration of Ajax technologies into their solution. What I see as the biggest move is the adoption of Ajax by JavaServer Faces, and simply because it is the J2EE standard for Java Web Development. I am sure that lot of you will say that Tapestry,ROR and other existing frameworks are providing the integration now, so why bother with JSF&hellip; Hmmm, I will say that all the current solution as still geek oriented and really focus on the core developers&hellip; What I see with JSF/Ajax integration is finally enterprise developers, that are used to 4GL development tools, (where the most important part is to develop business logic not a nice framework or a new set of libraries) will be able to develop Web Applications based on components that are smart enough to give the usability of a desktop application.</p>
+
+<p>To give an idea of what I mean, you can take a look to <a href="http://www.oracle.com/technology/products/jdev/htdocs/partners/addins/exchange/jsf/index.html">Oracle ADF Faces components</a> some of them are really powerful and provide rich interactivity to the user.  One example is the <a href="http://www.oracle.com/technology/products/jdev/htdocs/partners/addins/exchange/jsf/doc/tagdoc/core/table.html">Oracle Table Component</a> that support pagination (next/previous) without refreshing the whole page. As a developer you drop the component on your page, set the properties, and done! You do not have to care about any HTML or Javascript coding. And this using a standard based faces components that you can use in any Web Container and even IDE. I know that the ADF Faces components are not using the sames stack as Ajax (eg: XML over HTTP) but this is just an example of what will be the experience for a developer and a user.</p>
+]]></content>
+  </entry>
+  
+</feed>

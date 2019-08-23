@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Yarn | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/yarn/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Setting Up Spark Dynamic Allocation on MapR]]></title>
+    <link href="http://tgrall.github.io/blog/2016/09/01/setting-up-spark-dynamic-allocation-on-mapr/"/>
+    <updated>2016-09-01T11:15:57+02:00</updated>
+    <id>http://tgrall.github.io/blog/2016/09/01/setting-up-spark-dynamic-allocation-on-mapr</id>
+    <content type="html"><![CDATA[<p>Apache Spark can use various cluster manager to execute application (Stand Alone, YARN, Apache Mesos). When you install Apache Spark on MapR you can submit application in a Stand Alone mode or using YARN.</p>
+
+<p>This article focuses on YARN and Dynamic Allocation, a feature that lets Spark add or remove executors dynamically based on the workload. You can find more information about this feature in this presentation from Databricks:</p>
+
+<ul>
+<li><a href="http://www.slideshare.net/databricks/dynamic-allocation-in-spark">Dynamic Allocation in Spark</a></li>
+</ul>
+
+
+<p>Let’s see how to configure Spark and YARN to use dynamic allocation (that is disabled by default).</p>
+
+<!-- more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>MapR Converged Data Platform Cluster</li>
+<li>Apache Spark for MapR installed</li>
+</ul>
+
+
+<p>This example has been described for MapR 5.2 with Apache Spark 1.6.1, you just need to adapt the version to your environment.</p>
+
+<h3>Enabling Dynamic Allocation in Apache Spark</h3>
+
+<p>The first thing to do is to enable Dynamic Allocation in Spark, for this you need to edit the spark configuration file on each Spark node.</p>
+
+<pre><code>/opt/mapr/spark/spark-1.6.1/conf/spark-defaults.conf
+</code></pre>
+
+<p>and add the following entries:</p>
+
+<pre><code>spark.dynamicAllocation.enabled = true
+spark.shuffle.service.enabled = true
+spark.dynamicAllocation.minExecutors = 5 
+spark.executor.instances = 0
+</code></pre>
+
+<p>You can find additional configuration options in the <a href="http://spark.apache.org/docs/1.6.1/configuration.html#dynamic-allocation">Apache Spark Documentation</a>.</p>
+
+<h3>Enabling Spark External Shuffle for YARN</h3>
+
+<p>You have now to edit YARN configuration to add information about Spark Shuffle Service, edit the following file, on each YARN node:</p>
+
+<pre><code>/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop/yarn-site.xml
+</code></pre>
+
+<p>add these properties:</p>
+
+<pre><code>  &lt;property&gt;
+    &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;
+    &lt;value&gt;mapreduce_shuffle,mapr_direct_shuffle,spark_shuffle&lt;/value&gt;
+  &lt;/property&gt;
+  &lt;property&gt;
+    &lt;name&gt;yarn.nodemanager.aux-services.spark_shuffle.class&lt;/name&gt;
+    &lt;value&gt;org.apache.spark.network.yarn.YarnShuffleService&lt;/value&gt;
+  &lt;/property&gt;
+</code></pre>
+
+<h4>Add Spark Shuffle to YARN classpath</h4>
+
+<p>Spark Shuffle service must be added to the YARN classpath. The jar is located in the spark distribution:</p>
+
+<pre><code>/opt/mapr/spark/spark-1.6.1/lib/spark-1.6.1-mapr-1605-yarn-shuffle.jar
+</code></pre>
+
+<p>To achieve this add the jar in the following folder on each node:</p>
+
+<pre><code>/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/yarn/lib
+</code></pre>
+
+<p>You can either copyy the file or create a symlink:</p>
+
+<pre><code>$ ln -s /opt/mapr/spark/spark-1.6.1/lib/spark-1.6.1-mapr-1605-yarn-shuffle.jar /opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/yarn/lib
+</code></pre>
+
+<h4>Restart YARN</h4>
+
+<p>Since you have changed the YARN configuration <em>you must restart your node managers</em> using the following command:</p>
+
+<pre><code>$ maprcli node services -name nodemanager -action restart -nodes [list of nodes]
+</code></pre>
+
+<h3>Submitting a Spark Job</h3>
+
+<p>Your MapR Cluster is not ready to use Spark dynamic allocation, this means that when you submit a job you do not need to specify any resource configuration, for example:</p>
+
+<pre><code>/opt/mapr/spark/spark-1.6.1/bin/spark-submit \
+  --class com.mapr.demo.WordCountSorted \
+  --master yarn \
+  ~/spark-examples-1.0-SNAPSHOT.jar \
+  /mapr/my.cluster.com/input/4gb_txt_file.txt \
+  /mapr/my.cluster.com/user/mapr/output/
+</code></pre>
+
+<p>note that you can still specify the resources, but in this case the dynamic allocation will not be used for this specific job, for example:</p>
+
+<pre><code>/opt/mapr/spark/spark-1.6.1/bin/spark-submit \
+  --class com.mapr.demo.WordCountSorted \
+  --master yarn \
+  --num-executors 3
+  --executor-memory 1G \
+  ~/spark-examples-1.0-SNAPSHOT.jar \
+  /mapr/my.cluster.com/input/4gb_txt_file.txt \
+  /mapr/my.cluster.com/user/mapr/output/
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

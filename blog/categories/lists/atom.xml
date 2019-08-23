@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Lists | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/lists/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[MongoDB : Playing With Arrays]]></title>
+    <link href="http://tgrall.github.io/blog/2015/04/21/mongodb-playing-with-arrays/"/>
+    <updated>2015-04-21T15:45:39+02:00</updated>
+    <id>http://tgrall.github.io/blog/2015/04/21/mongodb-playing-with-arrays</id>
+    <content type="html"><![CDATA[<p>As you know,  you have many differences between relational and document databases. The biggest, for the developer, is probably the data model: Row versus Document. This is particularly true when we talk about &ldquo;relations&rdquo; versus &ldquo;embedded documents <em>(or values)</em>&rdquo;. Let&rsquo;s look at some examples, then see what are the various operations provided by MongoDB to help you to deal with this.</p>
+
+<!-- more -->
+
+
+<p>I won&rsquo;t use this post to go in all the details about &ldquo;document design&rdquo;, but I just want to focus on the operations you can to with these arrays/list (so useful operations once you have chosen to embed documents).</p>
+
+<p>Let&rsquo;s use a very simple example based on e-commerce platform, with two document types : <strong><em>user</em></strong> and <strong><em>orders</em></strong>.</p>
+
+<p>The first thing you have, is a simple list of values into a JSON array. Let&rsquo;s look at a user profile where user have a list of interests  (field <code>interested_by</code>) :</p>
+
+<pre><code class="json">{
+  "_id" : 654321,
+  "first_name" : "John",
+  "last_name" : "Doe",
+  "interested_by" : [ "electronics", "sports", "music" ],
+  "address" : {
+    "name" : "John Doe",
+    "company" : "Resultri",
+    "street" : "1015 Mapple Street",
+    "city" : "San Francisco",
+    "state" : "CA",
+    "zip_code" : 94105
+  }
+}
+</code></pre>
+
+<p>Another thing you do with array, is to represent &ldquo;one-to-many&rdquo; relations. These relations in your RDBMS are based on multiple tables and foreign keys.
+In document databases, like MongoDB, these relations are, most of the time, represented using an <em>array of documents</em>, something like (look at the <code>items</code> field):</p>
+
+<pre><code class="json">{
+  "_id" : 45218468309,
+  "date" : ISODate("2015-01-28T09:40:50.615Z"),
+  "customer" : {
+    "id" : 654321,
+    "name" : "John Doe"
+  },
+  "ship_to" : {
+    "name" : "John Doe",
+    "company" : "Resultri",
+    "street" : "1015 Mapple Street",
+    "city" : "San Francisco",
+    "state" : "CA",
+    "zip_code" : 94105
+  },
+  "items" : [
+    {
+      "sku" : "WA34R",
+      "description" : "Wireless Qwerty Keyboard",
+      "quantity" : 1,
+      "unit_price" : 41.5,
+      "price" : 41.5,
+      "vat" : 20
+    },
+    {
+      "sku" : "MW003",
+      "description" : "MiWatch",
+      "quantity" : 2,
+      "unit_price" : 245,
+      "price" : 490,
+      "vat" : 20
+    }
+  ]
+}
+</code></pre>
+
+<p>Documents above are not necessary complete, I just want to focus on the various operations you can do on these arrays.</p>
+
+<p><em>Note: you can add these documents into your MongoDB instance, I will use the collections <code>customers</code> and <code>orders</code>.</em></p>
+
+<h3>Adding new interest to the user</h3>
+
+<p>To achieve this you have 2 operators that you can use in your update: <a href="1"><code>$push</code></a> and <a href="2"><code>$addToSet</code></a>. Since these one a very simple I won&rsquo;t go into too much details.</p>
+
+<p>The <code>$push</code> will add the value at the end of the list, if the value already exits it will be added (many copies), this is why it makes sense to use the <code>$addToSet</code> operator, that only add the value if the value does not already exist in the array.</p>
+
+<pre><code>db.customers.update(
+  { "_id" : 654321  },
+  { "$addToSet" : { "interested_by" :  "sports"}  }
+);
+</code></pre>
+
+<p>This update command above <strong>will not change</strong> the document since the &ldquo;sports&rdquo; value is already in the list.</p>
+
+<pre><code>db.customers.update(
+  { "_id" : 654321  },
+  { "$addToSet" : { "interested_by" :  "books"}  }
+);
+</code></pre>
+
+<p>This <strong>will add</strong> the &ldquo;books&rdquo; value at the end of the list.</p>
+
+<p>If the attribute <code>interested_by</code> does not exist in the document, it will be added with one single entry (here the <code>$push</code> is working the same way ).</p>
+
+<p>If the attribute is not an array, the database will not do anything and return the error <a href="3">#16837</a> <em>&ldquo;The field &lsquo;first_name&rsquo; must be an array but is of type String in document&rdquo;</em>.</p>
+
+<p>Here we use <em>interest</em>, but you can imagine doing the same thing for tagging, or any other business use case with a list of values.</p>
+
+<h3>Adding a new item into an order</h3>
+
+<p>The previous case, is very simple since it is a scalar value. Now I need to add a new order line, it is not harder than before:</p>
+
+<pre><code>db.orders.update(
+  { "_id" : 45218468309   },
+  {
+    "$push" : {
+      "items" : {
+        "sku" : "MO001",
+        "description" : "Bluetooth mouse",
+        "quantity" : 1,
+        "unit_price" : 20.00,
+        "price" : 20.00,
+        "vat" : 20.00
+      }
+    }
+  }
+);
+</code></pre>
+
+<p>So you can see now that the value is added at the end of the list.</p>
+
+<h3>Updating an item in the order</h3>
+
+<p>Let&rsquo;s look at another requirement. Now I need to update for example the quantity of one of the line. In your relational application it is <em>easy</em> in the sense that you have one single record to update(in reality it is a different story since application are using complex data layer).</p>
+
+<p>You can do the same, meaning you can only update the <em>items</em> directly in the array &ndash; (no need to replace the full document or list like I see too often).</p>
+
+<p>For this, you  just need to use the <code>update</code> and <code>$set</code> and specify the positional operation <code>$</code>.</p>
+
+<p>The <code>$</code> operator is a placeholder for the first entry in the array that match the filter (query document) sent to the update/findAndModify command.</p>
+
+<p>In our example, to update a specific line in the order</p>
+
+<p>The proper way is simply to use the an update and <code>$set</code>,
+ but you have to select the exact entry in the array in your filter. For example in our case we want to update the number of mouses and the price, this will look like:</p>
+
+<pre><code>db.orders.update(
+  {
+    "_id" : 45218468309,
+    "items.sku" : "MO001"
+  },
+  {
+    "$set" :
+    {
+        "items.$" : {
+          "sku" : "MO001",
+          "description" : "Bluetooth mouse",
+          "quantity" : 2,
+          "unit_price" : 20.00,
+          "price" : 40.00,
+          "vat" : 20.00
+        }
+    }
+  }
+);
+</code></pre>
+
+<p>As you can see, the <code>$</code> operator is telling MongoDB to update one specific entry in the array.</p>
+
+<h2>Remove an item from the Array</h2>
+
+<p>You have learned so far that you can easily query and add values into an array; using the same appraoch you can also remove entry in an array. This is done using 3 operators : <code>$pop</code>, <code>$pull</code> and <code>$pullAll</code></p>
+
+<ul>
+<li>The <code>$pop</code> operator removes one element from the end of the array</li>
+<li>The <code>$pull</code> operator removes <em>all</em> elements in the array that match a specified value.</li>
+<li>The <code>$pullAll</code> operator removes <em>all</em> elements in the array that match any of the specified values.</li>
+</ul>
+
+
+<h4>Remove some interests from a customer</h4>
+
+<p>For example, let&rsquo;s remove the &ldquo;electronics&rdquo; interest from the customer id 654321.</p>
+
+<pre><code>db.customers.update(
+  { "_id" : 654321  },
+  { "$pull" : { "interested_by" :  "electronics"}  }
+);
+</code></pre>
+
+<p>If you want to remove sports and music interest from the customer you can use the <code>$pullAll</code> operator as follow:</p>
+
+<pre><code>db.customers.update(
+  { "_id" : 654321  },
+  { "$pullAll" : { "interested_by" :  ["sports","music"]}  }
+);
+</code></pre>
+
+<p>Here we use <em>interest</em>, but you can imagine doing the same thing for tagging, or any other business use case with a list of values.</p>
+
+<h4>Remove item into an order</h4>
+
+<p>Using the same operator you can also remove a line order (item) from an order document, for example let&rsquo;s remove the line with the item MO001 (Bluetooth mouse). For this we can use the <code>$pull</code> operator with the proper sku.</p>
+
+<pre><code>db.orders.update(
+  {
+    "_id" : 45218468309,
+  },
+  {
+    "$pull" : { "items" : { "sku" : "MO001" } }
+  }
+);
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>In this article you have learn how to create/edit arrays in JSON documents.</p>
+
+<p>In addition to all the update operators, MongoDB provides many operators for querying arrays such as  <a href="5">$size</a> or <a href="4"><code>$elemMatch</code></a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

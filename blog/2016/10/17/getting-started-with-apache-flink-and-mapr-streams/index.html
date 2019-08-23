@@ -1,0 +1,735 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Getting Started With Apache Flink and Mapr Streams - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="Introduction Apache Flink is an open source platform for distributed stream and batch data processing. Flink is a streaming data flow engine with &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Getting Started With Apache Flink and Mapr Streams</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-10-17T10:12:10+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:12 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Introduction</h2>
+
+<p><a href="https://flink.apache.org/">Apache Flink</a> is an open source platform for distributed stream and batch data processing. Flink is a streaming data flow engine with several APIs to create data streams oriented application.</p>
+
+<p>It is very common for Flink applications to use <a href="http://kafka.apache.org/">Apache Kafka</a> for data input and output.</p>
+
+<p>This article will guide you into  the steps to use Apache Flink with <a href="https://www.mapr.com/products/mapr-streams">MapR Streams</a>. MapR Streams is a distributed messaging system for streaming event data at scale, and it’s integrated into the <a href="https://www.mapr.com/products/mapr-converged-data-platform">MapR Converged Data Platform</a>, based on the Apache Kafka API (0.9.0),
+this article use the same code and approach than the <a href="http://tgrall.github.io/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/">Flink and Kafka Getting Started</a>.</p>
+
+<p><img src="http://tgrall.github.io/images/posts/flink-kafka/flink-mapr-streams.png" alt="MapR Streams and Flink" />.</p>
+
+<!-- more -->
+
+
+<h3>Prerequisites</h3>
+
+<ul>
+<li>MapR 5.2
+
+<ul>
+<li>You can use <a href="https://www.mapr.com/products/mapr-sandbox-hadoop">MapR Converged Data Platform Sandbox</a></li>
+</ul>
+</li>
+<li>MapR Client installed on your development host
+
+<ul>
+<li><a href="http://maprdocs.mapr.com/home/AdvancedInstallation/SettingUptheClient-install-mapr-client.html">Installation and Configuration steps</a></li>
+</ul>
+</li>
+<li>Git</li>
+<li>Maven 3.x or later</li>
+</ul>
+
+
+<h2>Create your Flink Streaming Project</h2>
+
+<p>The first step is to create an Java application, the easiest is to use the flink-quickstart-java archetype, that contains the core dependencies and packaging tasks. This article is similar with the <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.1/quickstart/run_example_quickstart.html">Apache Flink Quick Start Example</a>, with a clear focus on data input and output with MapR Streams.</p>
+
+<p>In this application we will create two jobs:</p>
+
+<ul>
+<li><code>WriteToKafka</code> : that generates random string and post them to a MapR Streams Topic using the Kafka Flink Connector and its Producer API.</li>
+<li><code>ReadFromKafka</code> : that reads the same topic and print the messages in the standard output using the Kafka Flink Connector and its Consumer. API.</li>
+</ul>
+
+
+<p>The full project is available on GitHub:</p>
+
+<ul>
+<li><a href="https://github.com/mapr-demos/mapr-streams-flink-demo">MapR Streams Flink Demo</a></li>
+</ul>
+
+
+<p>Let’s create the project using Apache Maven:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mvn archetype:generate \
+</span><span class='line'>      -DarchetypeGroupId=org.apache.flink\
+</span><span class='line'>      -DarchetypeArtifactId=flink-quickstart-java \
+</span><span class='line'>      -DarchetypeVersion=1.1.2 \
+</span><span class='line'>      -DgroupId=com.mapr.demos \
+</span><span class='line'>      -DartifactId=mapr-streams-flink-demo \
+</span><span class='line'>      -Dversion=1.0-SNAPSHOT \
+</span><span class='line'>      -DinteractiveMode=false 
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Maven will create the following structure:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ tree mapr-streams-flink-demo/
+</span><span class='line'>mapr-streams-flink-demo/
+</span><span class='line'>├── pom.xml
+</span><span class='line'>└── src
+</span><span class='line'>    └── main
+</span><span class='line'>        ├── java
+</span><span class='line'>        │   └── com
+</span><span class='line'>        │       └── mapr
+</span><span class='line'>        │           └── demos
+</span><span class='line'>        │               ├── BatchJob.java
+</span><span class='line'>        │               ├── SocketTextStreamWordCount.java
+</span><span class='line'>        │               ├── StreamingJob.java
+</span><span class='line'>        │               └── WordCount.java
+</span><span class='line'>        └── resources
+</span><span class='line'>            └── log4j.properties</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>This project is configured to create a Jar file that contains your flink project code and also includes all dependencies needed to run it.</p>
+
+<p>The project contains some other sample jobs, we do not need them for this article, you can either keep them to educational purposes or simply remove them from the project.</p>
+
+<h2>Add Kafka &amp; MapR Streams Dependencies</h2>
+
+<p>Open the <code>pom.xml</code> and add the following dependencies to your project:</p>
+
+<p><strong>1- Add MapR Maven Repository</strong></p>
+
+<p>In the <code>&lt;repositories&gt;</code> element add :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>   &lt;repository&gt;
+</span><span class='line'>     &lt;id&gt;mapr-releases&lt;/id&gt;
+</span><span class='line'>     &lt;url&gt;http://repository.mapr.com/maven/&lt;/url&gt;
+</span><span class='line'>     &lt;snapshots&gt;&lt;enabled&gt;false&lt;/enabled&gt;&lt;/snapshots&gt;
+</span><span class='line'>     &lt;releases&gt;&lt;enabled&gt;true&lt;/enabled&gt;&lt;/releases&gt;
+</span><span class='line'>   &lt;/repository&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>2- Add MapR Streams libraries</strong></p>
+
+<p>In the <code>&lt;dependencies&gt;</code> element:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> &lt;dependency&gt;
+</span><span class='line'>   &lt;groupId&gt;com.mapr.streams&lt;/groupId&gt;
+</span><span class='line'>   &lt;artifactId&gt;mapr-streams&lt;/artifactId&gt;
+</span><span class='line'>   &lt;version&gt;5.2.0-mapr&lt;/version&gt;
+</span><span class='line'> &lt;/dependency&gt;
+</span><span class='line'> &lt;dependency&gt;
+</span><span class='line'>   &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;
+</span><span class='line'>   &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;
+</span><span class='line'>   &lt;version&gt;0.9.0.0-mapr-1602&lt;/version&gt;
+</span><span class='line'> &lt;/dependency&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>3- Add Flink Kafka Connector libraries</strong></p>
+
+<p>As a first step, we have to add the Flink Kafka connector as a dependency so that we can use the Kafka sink. Add this to the pom.xml file in the dependencies section:</p>
+
+<p>You must add now the Flink Kafka Connector dependency to use the Kafka sink. Add the following entry in the <code>&lt;dependencies&gt;</code> element:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> &lt;dependency&gt;
+</span><span class='line'>      &lt;groupId&gt;org.apache.flink&lt;/groupId&gt;
+</span><span class='line'>      &lt;artifactId&gt;flink-connector-kafka-0.9_2.10&lt;/artifactId&gt;
+</span><span class='line'>      &lt;version&gt;${flink.version}&lt;/version&gt;
+</span><span class='line'> &lt;/dependency&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>4- Exclude Kafka Client to allow use of MapR Streams Client</strong></p>
+
+<p>As you may know, MapR Streams uses the Kafka 0.9.0 API to produce and consume messages. So we need now to remove (exclude) tha Apache Kafka Client API to be sure that Flink use MapR Streams.</p>
+
+<p>In the Flink Kafka Connector dependency add the following exclusion:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  &lt;dependency&gt;
+</span><span class='line'>    &lt;groupId&gt;org.apache.flink&lt;/groupId&gt;
+</span><span class='line'>    &lt;artifactId&gt;flink-connector-kafka-0.9_2.10&lt;/artifactId&gt;
+</span><span class='line'>    &lt;version&gt;${flink.version}&lt;/version&gt;
+</span><span class='line'>      &lt;exclusions&gt;
+</span><span class='line'>        &lt;exclusion&gt;
+</span><span class='line'>          &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;
+</span><span class='line'>          &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;
+</span><span class='line'>        &lt;/exclusion&gt;
+</span><span class='line'>        &lt;exclusion&gt;
+</span><span class='line'>          &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;
+</span><span class='line'>          &lt;artifactId&gt;kafka_2.10&lt;/artifactId&gt;
+</span><span class='line'>        &lt;/exclusion&gt;
+</span><span class='line'>      &lt;/exclusions&gt;
+</span><span class='line'>  &lt;/dependency&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The Flink project is now ready to use the DataStream using the Kafka Connector so you can send and receive messages from MapR Streams.</p>
+
+<p>Let’s now create a Stream in MapR and write some simple Flink code to use it.</p>
+
+<h2>Create the MapR Streams and Topic</h2>
+
+<p>A stream is a collection of topics that you can manage as a group by:</p>
+
+<ol>
+<li>Setting security policies that apply to all topics in that stream</li>
+<li>Setting a default number of partitions for each new topic that is created in the stream</li>
+<li>Set a time-to-live for messages in every topic in the stream</li>
+</ol>
+
+
+<p>You can find more information about MapR Streams concepts in the <a href="http://maprdocs.mapr.com/51/MapR_Streams/concepts.html">documentation</a>.</p>
+
+<p>On your Mapr Cluster or Sandbox run the following commands:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ maprcli stream create -path /apps/application-stream -produceperm p -consumeperm p -topicperm p
+</span><span class='line'>$ maprcli stream topic create -path /apps/application-stream -topic flink-demo </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Install and use MapR Kafka utilities</h3>
+
+<p>Install <code>the mapr-kafka</code> package on your cluster :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>yum install mapr-kafka</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Open two terminal windows and run the producer and consumer kafka utilities using the following commands:</p>
+
+<p>Producer</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-producer.sh --broker-list this.will.be.ignored:9092 --topic /apps/application-stream:flink-demo</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Consumer</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/opt/mapr/kafka/kafka-0.9.0/bin/kafka-console-consumer.sh --new-consumer --bootstrap-server this.will.be.ignored:9092 --topic /apps/application-stream:flink-demo</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the producer window, you can post some messages and see them in the consumer windows. We will use these tools to follow the interactions between MapR Streams and Flink.</p>
+
+<h2>Write your Flink application</h2>
+
+<p>Let’s now use the Flink Kafka Connector to send messages to MapR Streams and consume them.</p>
+
+<h3>Producer</h3>
+
+<p>The producer generates messages using the <code>SimpleStringGenerator()</code> class and send the string to the <code>/apps/application-stream:flink-demo</code> topic.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  public static void main(String[] args) throws Exception {
+</span><span class='line'>    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+</span><span class='line'>
+</span><span class='line'>    Properties properties = new Properties();
+</span><span class='line'>    // properties.setProperty("bootstrap.servers", "&lt;kafka-broker&gt;:9092"); // not used by MapR Streams
+</span><span class='line'>    properties.setProperty("streams.buffer.max.time.ms", "200");
+</span><span class='line'>
+</span><span class='line'>    DataStream&lt;String&gt; stream = env.addSource(new SimpleStringGenerator());
+</span><span class='line'>    stream.addSink(new FlinkKafkaProducer09&lt;&gt;("/apps/application-stream:flink-demo", new SimpleStringSchema(), properties));
+</span><span class='line'>
+</span><span class='line'>    env.execute();
+</span><span class='line'>  }
+</span><span class='line'>    </span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>SimpleStringGenerator()</code> method code is available <a href="https://github.com/mapr-demos/mapr-streams-flink-demo/blob/master/src/main/java/com/mapr/demos/WriteToKafka.java#L46-L61">here</a>.</p>
+
+<p>The main steps are:</p>
+
+<ul>
+<li>create a new <code>StreamExecutionEnvironment</code> the basis of any Flink application</li>
+<li>create a new <code>DataStream</code> in the application environment, the <code>SimpleStringGenerator</code> class implements the <code>[SourceFunction](https://ci.apache.org/projects/flink/flink-docs-release-1.1/api/java/)</code> the base interface for all streams data sources in Flink.</li>
+<li>add the <code>FlinkKafkaProducer09</code> sink to the streams; since MapR Streams is based on Kafka API 0.9, it is possible to use the FlinkKafkaProducer09 class; with 2 small differences:
+
+<ul>
+<li>the broker list (first parameter) is not used since MapR Streams use the cluster location defined in the <code>/opt/mapr/conf/mapr-clusters.conf</code> class.</li>
+<li>the topic name include the path and name of the MapR Stream stream in which the topic is located for example <code>/apps/application-stream:flink-demo</code></li>
+</ul>
+</li>
+</ul>
+
+
+<h3>Consumer</h3>
+
+<p>The consumer simply reads the messages from the <code>/apps/application-stream:flink-demo</code> topic, and print them into the console.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  public static void main(String[] args) throws Exception {
+</span><span class='line'>    // create execution environment
+</span><span class='line'>    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+</span><span class='line'>
+</span><span class='line'>    Properties properties = new Properties();
+</span><span class='line'>    // properties.setProperty("bootstrap.servers", "&lt;kafka-broker&gt;:9092"); // not used by MapR Streams
+</span><span class='line'>    properties.setProperty("group.id", "flink_consumer");
+</span><span class='line'>
+</span><span class='line'>    DataStream&lt;String&gt; stream = env.addSource(new FlinkKafkaConsumer09&lt;&gt;(
+</span><span class='line'>      "/apps/application-stream:flink-demo", new SimpleStringSchema(), properties) );
+</span><span class='line'>
+</span><span class='line'>    stream.map(new MapFunction&lt;String, String&gt;() {
+</span><span class='line'>      private static final long serialVersionUID = -6867736771747690202L;
+</span><span class='line'>
+</span><span class='line'>      @Override
+</span><span class='line'>      public String map(String value) throws Exception {
+</span><span class='line'>        return "Stream Value: " + value;
+</span><span class='line'>      }
+</span><span class='line'>    }).print();
+</span><span class='line'>
+</span><span class='line'>    env.execute();
+</span><span class='line'>  }
+</span><span class='line'>  ```
+</span><span class='line'>  
+</span><span class='line'>The main steps are:
+</span><span class='line'>
+</span><span class='line'>* create a new `StreamExecutionEnvironment` the basis of any Flink application
+</span><span class='line'>* create a set of properties with the consumer information, in this application we can only set the consumer `group.id`. Note that the `bootstrap.servers` property is not used by MapR Streams, so no need to set it.
+</span><span class='line'>* use the `FlinkKafkaConsumer09` to get the message from the MapR Streams topic `/apps/application-stream:flink-demo`
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>## Build and Run the application
+</span><span class='line'>
+</span><span class='line'>Let’s run the application directly from Maven (or from your favorite IDE).
+</span><span class='line'>
+</span><span class='line'>1- Build the project:
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>$ mvn clean package</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>2- Run the Flink Producer Job
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>$ mvn exec:java -Dexec.mainClass=com.mapr.demos.WriteToKafka</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>3- Run the Flink Consumer Job
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>$ mvn exec:java -Dexec.mainClass=com.mapr.demos.ReadFromKafka
+&#8220;`</p>
+
+<p>In the terminal, you should see the messages generated from the producer</p>
+
+<p>You can now deploy and execute this job on your Flink cluster.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to use Flink with MapR Streams to write and read data streams. The key element is the configuration of the Maven Dependencies to configure the project to use MapR Streams libraries instead of Kafka ones.</p>
+
+<p>This was originally published on the <a href="https://www.mapr.com/blog/getting-started-apache-flink-and-mapr-streams">MapR blog here</a>.</p>
+
+<p>Learn about what Apache Flink can do and how it maintains consistency and provides flexibility in the &ldquo;<a href="https://www.mapr.com/introduction-to-apache-flink">Introduction to Apache Flink</a>&rdquo; ebook.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-10-17T10:12:10+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:12 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/flink/'>flink</a>, <a class='category' href='/blog/categories/mapr/'>mapr</a>, <a class='category' href='/blog/categories/streaming/'>streaming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/" title="Previous Post: Getting started with Apache Flink and Kafka">&laquo; Getting started with Apache Flink and Kafka</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2017/01/02/getting-started-with-mqtt/" title="Next Post: Getting Started with MQTT and Java">Getting Started with MQTT and Java &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/';
+        var disqus_url = 'http://tgrall.github.io/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

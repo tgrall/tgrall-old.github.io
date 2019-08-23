@@ -1,0 +1,820 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="You have probably heard about IBM ProjectZero, this &ldquo;incubator"project from IBM pushing a new way of building, assemble and run Web &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/posts/9/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/01/23/ibm-projectzero-a-new-development-model-for-commercial-software/">IBM ProjectZero: A New Development Model for Commercial Software?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2008-01-23T14:57:43+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2008</span></span> <span class='time'>2:57 pm</span></time>
+        
+           | <a href="/blog/2008/01/23/ibm-projectzero-a-new-development-model-for-commercial-software/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2008/01/23/ibm-projectzero-a-new-development-model-for-commercial-software/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>You have probably heard about <a href="http://www.projectzero.org/">IBM ProjectZero</a>, this &ldquo;incubator&#8221;project from IBM pushing a new way of building, assemble and run Web applications. I won&rsquo;t talk about the technology in this post, it will come later, but just comment about the way this project is developped: a <em>Community-Driven Commercial Development</em> process.</p>
+
+<p>The idea behind this &ldquo;process&rdquo; is to apply to a commercial software, ideas that are common  in free software. As you see I am not talking about &ldquo;open source&rdquo; since Project Zero is open source, it is really about the way a &ldquo;commercial&rdquo; software is built&hellip;</p>
+
+<p>If you take a look to the &ldquo;<a href="http://www.projectzero.org/wiki/bin/view/Main/About">About</a>&rdquo; page of ProjectZero you can learn more about this process/ideas. Some key points:</p>
+
+<ul>
+<li>the development team, mainly IBM folks, want  feedback, insight, suggestions, and criticism from the community. So we as the community can really be involved in the product in a stage where it is usually inside IBM labs without any visibility for non IBM employee&hellip; This is quite exciting to see that we can really discuss with the development team as they do the product, and we can see the product evolving based on &ldquo;real&rdquo; customer requirements/comments.</li>
+<li>so as &ldquo;future&rdquo; user of the production release I can discuss the features. As a developer of the &ldquo;current&rdquo; development release I can participate to the future product.<div>So what you may be tempted to say, especially if you are a lot involved in open source and free projects, but you have to admit that it is quite a switch for commercial product.Project Zero is not the only project that is using this approach <a href="https://jazz.net/">Jazz</a> from the rational team is also on this model. </li>
+</ul>
+
+
+<p>In the same time if we consider, GlassFish, we do have more or less an equivalent, that is the JavaEE RI and the Sun Application Server&hellip; but here on Jazz or Project zero it is really happening on a brand new product that is not a reference implementation but new products part of a commercial R&amp;D lab&hellip;</p>
+
+<p>I am still a little confused to see what will be the license when release 1.0 goes out&hellip; Just wait and see.. hmm sorry I should say &ldquo;just participate and see&rdquo;.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/01/22/new-poll-which-web-2-dot-0-tools-are-you-using-for-business/">New Poll: Which &#8216;Web 2.0&#8217; Tools Are You Using for Business?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2008-01-22T10:44:43+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2008</span></span> <span class='time'>10:44 am</span></time>
+        
+           | <a href="/blog/2008/01/22/new-poll-which-web-2-dot-0-tools-are-you-using-for-business/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2008/01/22/new-poll-which-web-2-dot-0-tools-are-you-using-for-business/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://2.bp.blogspot.com/_aoQgQ1obiyE/R5Y9QvPDP0I/AAAAAAAAADE/loju_rH1Ie8/s200/Web+20.png"> I have just created a poll -see leftbar- asking to list the different tools you are using for business. In fact I would like to have some feedback of you use of Wiki, Blogs, Instant Messaging on you daily job.<div> </div><div>Myself I am using all of this for work:</p>
+
+<ul>
+<li>Internal and external communication with Wikis</li>
+<li>My blog that you are currently reading</li>
+<li>Chat, I use probably more the chat than phone these days (thanks to <a href="http://meebo.com">http://meebo.com</a> when I cannot connect with a rich client)</li>
+<li>Social Networking: I am not necessarily  talking about big sites like LinkedIn/Facebook but more internal sites. For example, back at Oracle we had access to an internal Social Network site, that is now exposed at <a href="http://mix.oracle.com,">http://mix.oracle.com,</a> and now at Sogeti, in the Cap Gemini group we do also have internal social networks.The idea behind this post/poll is to be able to discuss, with customers around Web 2.0 tools adoption in the enterprise. So do not hesitate to post a comment describing the tools and how you are using them for business.</li>
+</ul>
+
+
+<p>Thanks for your vote ;)</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/01/18/infoq-news-request-sun-drop-support-for-jruby/">Infoq News: &#8216;Request: Sun Drop Support for JRuby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2008-01-18T06:46:58+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2008</span></span> <span class='time'>6:46 am</span></time>
+        
+           | <a href="/blog/2008/01/18/infoq-news-request-sun-drop-support-for-jruby/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2008/01/18/infoq-news-request-sun-drop-support-for-jruby/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>With the latest big news around Oracle-BEA and SUN-MySQL deals I have missed an interesting article on Infoq with the following title:</p>
+
+<ul>
+<li><a href="http://www.infoq.com/news/2008/01/sun_drop_jruby">Request: Sun, Drop Support for JRuby</a></li>
+</ul>
+
+
+<p>I have to say that I do agree with Craig Wickesser asking Sun to Drop Support for JRuby.</p>
+
+<h3>Syntax Matters?</h3>
+
+<p><em>Yes syntax matters</em>, not only for the &ldquo;beauty&rdquo; of it, but also because of the investment that enterprises have made into it. We should not force people to completely remodel their brain all the time, for no gain. </p>
+
+<p><em>I love <a href="http://groovy.codehaus.org/">Groovy</a> language</em>, and one of the main reason is because it gives me the most bang for my buck. Java people can immediately catchup with the syntax, and step by step leverage powerful features available by dynamic languages and domain specific languages. I was hoping to see a great adoption by SUN&hellip; It is one thing to support scripting with the <a href="http://jcp.org/en/jsr/detail?id=223">JSR-223</a>, but SUN has to &ldquo;endorse&rdquo; a scripting, and from what could be seen today it is not Groovy nor Javascript. When we see all the marketing noise it is Ruby with <a href="http://jruby.codehaus.org/">JRuby</a>&hellip; And I do not think that is necessary good for the Java platform.</p>
+
+<p>Do not get me wrong, I think that is a great idea, and need for Java to be able to execute many languages, for example we see a lot of IBM WAS and BEA WL administrator using Python to administer their application server instance with Jython. But once again the &ldquo;default&rdquo; one should be close to Java and integrate with it as close as possible to reduce the impact on scalability and performances, and I do think that Groovy did a great job on these topics.</p>
+
+<h3>What about RubyOnRails?</h3>
+
+<p>I am not a <a href="http://rubyonrails.com/">RoR</a> expert, far far away from it, but I have learned it, and developed small applications with it, and I have to say that I love this framework.  And I am sure that like many Java developers that used RoR, I was thinking:  &#8221;If only I had the same productivity in my favorite platform: J2EE&hellip;&ldquo;.</p>
+
+<p>I was not expecting to run RoR application as-it-is, but more hoping that JavaEE will learn from RoR to simplify development&hellip;  And&hellip; somebody did it, with <a href="http://grails.codehaus.org/">Grails</a>. <a href="http://grails.codehaus.org/">Grails</a> takes inspiration from RoR, but in a &ldquo;real&rdquo; JavaEE environment, since it leverages key pieces of the current Java applications such as Hibernate and Spring, using the power of Groovy to glue all this together.</p>
+
+<h3>In conclusion&hellip;</h3>
+
+<p>I do not know for you but yes I do think that SUN should drop support for <a href="http://jruby.codehaus.org/">JRuby</a>, and in place push a language more natural for existing Java Developers, I vote for <a href="http://groovy.codehaus.org/">Groovy</a>. In addition to the language itself, I also expect the JavaEE EG to provide a more productive way of developing &ldquo;simple&rdquo; Web applications. This is where I see <a href="http://grails.org/">Grails</a> coming in the picture, but many other framework could do the job, taking advantage of some interesting concepts of RoR&hellip;</p>
+
+<p>As Rick says, I (we?) am not looking for a Revolution but for an Evolution.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/01/04/which-sites-are-you-using-for-business-another-web2-dot-0-list-dot-dot-dot/">Which Sites Are You Using for &#8216;Business&#8217;? Another Web2.0 List&#8230;</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2008-01-04T07:28:50+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2008</span></span> <span class='time'>7:28 am</span></time>
+        
+           | <a href="/blog/2008/01/04/which-sites-are-you-using-for-business-another-web2-dot-0-list-dot-dot-dot/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2008/01/04/which-sites-are-you-using-for-business-another-web2-dot-0-list-dot-dot-dot/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Disclaimer: you do probably already know all these sites if you are like me spending lot of time on the Internet&hellip; (too much time?) But still, some people could be interested, like the customer I have been working with lately&hellip;</p>
+
+<p>During a presentation to a customer around Web 2.0 and Social Networking, which sites do I use myself and why they could be interested for customer and their business&hellip;. So I really quickly write up this list, and just want to share it here&hellip;</p>
+
+<p>Social networking&hellip; and many more. More and more important in business.</p>
+
+<ul>
+<li><a href="http://facebook.com/">http://facebook.com</a></li>
+<li><a href="http://linkedin.com/">http://linkedin.com</a></li>
+</ul>
+
+
+<p>Multimedia site&hellip; I am sure you all use it daily. I have used this to share pics about events (internal or external).</p>
+
+<ul>
+<li><a href="http://flickr.com/">http://flickr.com</a></li>
+<li><a href="http://dailymotion.com/">http://dailymotion.com</a></li>
+<li><a href="http://youtube.com/">http://youtube.com</a></li>
+</ul>
+
+
+<p>Social Bookmarking&hellip;</p>
+
+<ul>
+<li><a href="http://del.icio.us/">http://del.icio.us</a></li>
+</ul>
+
+
+<p>Social links, content is rated by user.</p>
+
+<ul>
+<li><a href="http://www.digg.com/">http://www.digg.com/</a></li>
+<li><a href="http://www.technorati.com/">http://www.technorati.com/</a></li>
+</ul>
+
+
+<p>Project Management tools,</p>
+
+<ul>
+<li><a href="http://www.basecamphq.com/">http://www.basecamphq.com/</a></li>
+<li>you need to look to all the <a href="http://37signals.com/">37signals</a> applications. Very useful</li>
+</ul>
+
+
+<p>Google services are terrific, as user or developer.</p>
+
+<p><a href="http://docs.google.com/">http://docs.google.com</a>
+<a href="http://google.com/apps">http://google.com/apps</a>
+<a href="http://code.google.com/">http://code.google.com</a>
+<a href="http://maps.google.com/">http://maps.google.com</a></p>
+
+<p>Public and free wiki that I used to communicate with customers, coworker and friends.</p>
+
+<ul>
+<li><a href="http://wetpaint.com/">http://wetpaint.com</a></li>
+<li><a href="http://wikidot.com/">http://wikidot.com</a></li>
+</ul>
+
+
+<p>News and content syndication.</p>
+
+<ul>
+<li><a href="http://www.netvibes.com/">http://www.netvibes.com/</a></li>
+<li><a href="http://google.com/reader">http://google.com/reader</a></li>
+</ul>
+
+
+<p>Blogs&hellip;</p>
+
+<p><a href="http://wordpress.org/">http://wordpress.org/</a>
+<a href="http://blogspot.com/">http://blogspot.com</a>
+<a href="http://typepad.com/">http://typepad.com</a></p>
+
+<p>I use these site as consumer, but these services are more and more important in customer business, and will be part of our job as developer/integrator.</p>
+
+<ul>
+<li><a href="http://amazon.com/">http://amazon.com</a></li>
+<li><a href="http://paypal.com/">http://paypal.com</a></li>
+<li><a href="http://ebay.com/">http://ebay.com</a></li>
+<li><a href="http://www.salesforce.com/">http://www.salesforce.com/</a></li>
+</ul>
+
+
+<p>Hmm, when you see this list you can tell that I am a very happy Google user, and I have not talk about the other services that I use from Google: Gmail, GTalk, Analytics, Notebooks, and obviously the search&hellip;</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/12/20/web-services-and-files-exchange/">Web Services and Files Exchange</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-12-20T09:22:32+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>9:22 am</span></time>
+        
+           | <a href="/blog/2007/12/20/web-services-and-files-exchange/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/12/20/web-services-and-files-exchange/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>SOAP based Web Services are now very common in the enterprise architecture, and quite often, applications that consume or publish services would need to send binary content such as images, PDF or Word documents (or anything you have in mind&hellip;). The SOAP and XML provide different way to achieve this. So what are the challenges around binary data exchange using SOAP based Web Services:</p>
+
+<ul>
+<li>The main goal of Web Services is <strong>interoperability</strong>; so when you are offering a service, you need to be careful about the technical choice you are making. SOAP has been one great success in term of interoperability. I am aware that REST is also a very good fit for that but since I talk about SOAP and later WS-* standards, I do not want to talk about REST more in this post, the only thing that you can put in your mind is before choosing to implement SOAP based Web Services, ask the following question to yourself: &ldquo;do I really need SOAP services or REST would be enough?&rdquo;&hellip; That said let&rsquo;s continue on SOAP and binary content exchange. When talking about binary content, the interoperability comes with some trade off around for example performance/message sized or impact on developer. This will be discussed later, but always keep in mind that interoperability is the key point of Web Services. If this is not the case on your project, that means you probably do not need to use SOAP that has an important overhead in general.</li>
+<li><strong>Performance</strong> and <strong>Scalability</strong> is also quite important when you are building a service based application. Especially that often you cannot predict exactly how much a service will be used. We have to keep in mind that often services are build to be reusable, it is one of the basic best practices of development, so if the service is really &ldquo;reused&rdquo; it is important to keep it running with acceptable performances. This is why when talking about binary content, with SOAP it is important to talk about the impact of it on the size of the message and the processing cost.</li>
+<li>When using SOAP <strong>Composability</strong> is also quite important. In the context of binary content exchange with XML/SOAP it is important to support composability of the WS-* standard, and this in a performant manner. An example would be that a services that is  sing WS-Security to sign part of the messages should be able to sign the PDF document using the same standard.</li>
+<li><p><strong>Impact on development</strong>: it is interesting also when choosing the way binary content should be exchanged with SOAP, to see how much impact it has on the development itself. Does a developer must import specific API to be sure that the binary content is properly sent/consumed by the server or client. Note: I will talk about Java here, and particularly about JAX-WS/JAX-RPC since it is the stacks that I know the much, but the remarks would be the same on all technologies.Let&rsquo;s now dive into the different options that are offered to a developer/architect to exchange document using SOAP:</p></li>
+<li><p>XML Base64 encoding</p></li>
+<li>SOAP With Attachment (SwA) using MIME (Multipurpose Internet Mail Extensions)</li>
+<li><del>SOAP With Attachment using DIME (Direct Internet Message Encapsulation)</del></li>
+<li>Message Transmission Optimization Mechanism (MTOM)</li>
+</ul>
+
+
+<p>First of all, I will not talk in detail about the 3rd point around SOAP with Attachment with DIME, for a simple reason: this approach has been pushed by Microsoft around 2003/2004 and it is now deprecated in favor of MTOM.</p>
+
+<h3>Base64 Encoding</h3>
+
+<p>Base64 is part of the core XML capabilities, and when using it to exchange binary content in a SOAP message it has some very good advantages:</p>
+
+<ul>
+<li>Since it is part of XML itself, it has a <strong>great interoperability</strong>, I can say that all stacks will be able to consume or send messaged that contains Base64 data.</li>
+<li>For the same reason it <strong>does not have any impact on development</strong>, most of the Java stacks will automatically use base64 encoding when byte[] paramters will be present.</li>
+<li>Always because of the fact that is it 100% XML based, the <strong>composability</strong> with other XML/WS-* standard <strong>is very good</strong>.</li>
+<li>So far everything looks great for this approach, but the trade off is the following:
+Base64 encoding <strong>is not efficient</strong>, since &ldquo;lot of&rdquo; CPU will be used to encode and decode the binary content. In addition the size of the encoded data would be around 30% bigger than the binary content itself. (It can still be used for small dataset)</li>
+</ul>
+
+
+<h3>SOAP with Attachment (SwA)</h3>
+
+<p>The SOAP with Attachment specification is the first effort of the Web Services industry to solve the problem of binary content with SOAP. The idea is to  In addition to the W3C Note, the WS-Interoperability organization, has extend this recommendation to create a basic attachment profile to enforce the interoperability of it, using the SOAP with Attachment Reference (swaRef).</p>
+
+<ul>
+<li>The good part of SwA and is the fact that it has been noted by the W3C but also adopted by the WS-I organization. But in fact the<span style="font-weight: bold;"> interoperability is not that great</span>, mainly because none of the Microsoft Web Services solution support SwA. It is true that most of the Java stacks, starting with the standard JAX-RPC/JAX-WS is supporting SwA and swaRef but it is not enough to call it a good interoperability.</li>
+<li>The reason why Microsoft refused to implement it, and why it is only a W3C note (and not a recommendation) it is because  <strong>SOAP with Attachment has poor composability</strong>. The reason why it is hard to use WS-* standard with SwA, it is because it breaks some part of the model by ignoring the SOAP/XML processing and just put the document in the MIME header, and a simple reference to it into the SOAP message.</li>
+<li><em>*SOAP with Attachment is efficient</em>, because of the previous point. The SOAP stack does not really deal with the content and just stream it into the MIME header.</li>
+<li>When it is used with JAX-RPC and JAX-WS, <strong>has an impact on the developer</strong>, that must use specific Java API to build it service and put specific data types in the WSDL. The impact on development is not large, but still developper has to think about providing the good method signature or WSDL entry to enforce the use of SwA/swaRef in its service. Where I do believe most developers would expect this to be transparent.</li>
+</ul>
+
+
+<h3>Message Transmission Optimization Mechanism (MTOM)</h3>
+
+<p>The last mechanism is also based on MIME on the wire to exchange the binary content, but the way the message (SOAP+MIME) is build is totally different from the previous SwA approach. MTOM has been based on the &ldquo;experience&rdquo; of the others mechanisms, to be able to support composability without impacting the performance and the development.</p>
+
+<ul>
+<li><strong>Interoperability is virtually great</strong>. It is great because it has been pushed by major vendors such as IBM, Microsoft, BEA, Oracle and it is a <a href="http://www.w3.org/TR/soap12-mtom/">W3C recommendation</a>, so interoperability should be good. I put a &ldquo;virtually&rdquo;, because to be interoperable the various Web Services stack must implement it, and it is not the case yet. Today, most of the latest stacks are supporting MTOM so it should not be an issue if you are starting a project.</li>
+<li><strong>Composability is perfect</strong>, since MTOM does use the SOAP envelop but it provides an automatic and transparent optimization to put the binary content  on the MIME header. During the serialization of the message, the SOAP engine is working with the content with a temporary base64 representation of the content allowing all the WS-* operation needed, for example an XML signature, but without the overhead of dealing with base64 over the wire.</li>
+<li><strong>MTOM appears like the most efficient</strong> way of dealing with large document and SOAP.</li>
+<li>Because MTOM is using the same approach than the pure XML base64 process, <strong>it does not have any impact on development</strong>. In fact this the the Web Service stack that choose to use base64 (embedding the document) or MTOM over the wire. And this could be done in conjunction with a WS-Policy. As you can see in the <a href="http://www.w3.org/Submission/WS-MTOMPolicy/">WS-MTOMPolicy</a> this is not under the control of the developer but more under the control of the administrator and then the applications to choose or not to use MTOM.</li>
+</ul>
+
+
+<h3>But&hellip; Which one I should use?</h3>
+
+<p>Based on the different points described earlier is looks like <strong>MTOM is the way to go</strong>; even if this is true it cannot be summarized to this. First of all MTOM is not supported by all the stacks, so if you cannot control the consumers of your services and cannot impose a modern stack, MTOM may not be the best approach. For me, the second on the list is the Base64 approach, because of high interoperability but it is important to remember that has an impact on performance/processing. I personnally would not push SwA because of its non support in the Microsoft world&hellip; As you know the world is not yet 100% Java based ;).</p>
+
+<p>Let&rsquo;s take a look on which stacks are supporting MTOM today:</p>
+
+<ul>
+<li>JAX-WS reference implementation (and Metro)</li>
+<li>IBM Websphere 6.x with SOA Feature Pack</li>
+<li>BEA Weblogic 10* OracleAS 10gR3 (10.1.3.1) JAX-RPC and FWM 11 preview (JAX-RPC and JAX-WS)</li>
+<li>Axis2</li>
+<li>XFire</li>
+<li>JBossWSYou can find more information on these comparison matrices : <a href="http://wiki.apache.org/ws/StackComparison">Apache WS Stack Comparison</a> and <a href="http://xfire.codehaus.org/Stack+Comparison">Xfire Comparison Matrix</a>. (these two are probably very interesting to keep&hellip; unfortunately they do not contains any MSFT data. I had one in the past, but cannot find it&hellip; if you have such matrix feel free to post it in comment.)</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/">Working on a Large XML or SOA Project: Think About &#8216;Separation of Concerns&#8217;</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-12-10T08:27:41+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>8:27 am</span></time>
+        
+           | <a href="/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>With XML and SOA becoming mainstream in the enterprise XML operation such as Schema validations, XSL transformations are now very common. These specific operations are CPU intensive and could become a performance bottleneck when directly applied on the middleware. It could be even worst now when using SOAP based Web Services and their related WS-* standards. For example with WS-Security, XML encryption and signature is now more and more used in SOA based applications.</p>
+
+<p>This is why many enterprise architects are bow looking for solutions to improve performances of XML centric applications.</p>
+
+<p>One of the think we learn when developing application, and that Aspect Oriented Programming has highlighted is the concept of “separation of concerns”. It is key to keep that in mind also in global architecture in our case by separating the XML processing from the business logic. Hopefully it is most of the time done directly by the various Web Services framework you are using, you do not code the SOAP request/response, it is hidden by the Web Services framework.</p>
+
+<p>However, in the current application server, the full XML treatment is made directly in the container, for example the XML Encryption is made in the same container that the place where the pure business logic is executed. So let’s find a solution to extract the most intensive XML processing into another part of the system.</p>
+
+<p>Vendors have now in their catalog appliances that could do the job. The same way that today we are using SSL accelerators to deal with SSL encryption/decryption, we can put XML appliance to deal with the intensive CPU processing operation: XML validations, transformation, Ws-Security enforcing point,&hellip;</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/12/03/portal-project-time-to-think-about-your-social-networking-enterprise-strategy/">Portal Project: Time to Think About Your Social Networking Enterprise Strategy</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-12-03T03:10:21+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2007</span></span> <span class='time'>3:10 am</span></time>
+        
+           | <a href="/blog/2007/12/03/portal-project-time-to-think-about-your-social-networking-enterprise-strategy/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/12/03/portal-project-time-to-think-about-your-social-networking-enterprise-strategy/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Most of the enterprises these days have already put in place a portal &ndash; with more or less success. These projects have started most of the time, with the goal of providing  personalized information to users and communities. When working in a Portal project you probably
+define many objectives, that are represented from a technical point of view by the following features:</p>
+
+<ul>
+<li>community and group of users</li>
+<li>easy content management, allowing people to communicate and share</li>
+<li>data integration of many types of data related to the information needed by each user/community.I do not see anything special there except that is exactly the same goals that what most of the Web2.0/Social Networking applications do have:</li>
+<li>User management and creation of the community is something that you do on a daily basis with FaceBook and LinkedIn (and any equivalent sites). The key here is the fact that it is the user that define its own community, not an administrator that does not know “my” business that put me in a specific bucket.</li>
+<li>Content Management: Blogs are very good example of communication of a single person (or team) to the rest of the enterprise, (or the rest of the world). Wikis are tools helping you to share content with other people in a very efficient way. If you are working with OpenSource you see that most of them are using a wiki to communicate with user. This is true for the documentation, but also any type of content that is related to a project.</li>
+<li>Data Integration: Web 2.0 is all about RSS feeds and Mashups that are, at least today one of the most efficient way, from a user perspective, to integrate content.This is why I do believe that if today you are thinking about an enterprise portal for your organization, it is probably time to step down a little and think more about:</li>
+<li>the “enterprise social networking strategy”, that is often also related to the “Web 2.0 enterprise strategy”.So some ideas to approach this:</li>
+<li>create a community with some internet tools, for example start by creating a network in Facebook for your enterprise. Some if you will probably think that it is not productive for the enterprise&hellip; Hmm I have to say that it is not directly, but at least it helps people to be familiar with a new way of using the computer and the Internet. Companies I am working in or with do have their network already (Sogeti, CapGemini, IBM, Oracle, &hellip;). An example of this is the way <a href="http://blog.holtz.com/index.php/weblog/fir_interview_jeremy_burton_ceo_serena_software_on_facebook_fridays_novembe/">Serena</a> is using FaceBook as part of their intranet and as a tools to do better business. (and some people reactions to this: <a href="http://valleywag.com/tech/bad-ideas/friday-is-facebook-day-318507.php">FaceBook Friday:Bad Idea</a>)</li>
+<li>if your challenges are around content management start by installing a Wiki in house or using an internet one. I am sure you will be surprised to see the adoption and use in your team. I have many experiences where a regular &ldquo;Portal/CMS&rdquo; failed regarding the &ldquo;community sharing&rdquo; where Wikis have been a great success.</li>
+<li>if your challenges are around data integration, I will encourage you to learn more about Rest/RSS and other technologies that are used in mashups. It is true that this one is probably will need more effort from IT to provide the good content feed, but instead of giving the data already packaged in an HTML view (portlet?) do send only the XML using a proper format (RSS/ATOM) and give correct tools to the user, to see how then will be consuming it.</li>
+</ul>
+
+
+<p>I see this approach more business oriented, this is empowering the business user giving them an infrastructure to select their own tools. Portal the Darwin way kind of approach.</p>
+
+<p>So if you have an existing portal, or more important if you are thinking about starting a Portal project, add the “Web 2.0/Social Networking strategy” question to your plan. And to be honest, asking yourself this question about Web20/Social Network does not cost that much but could probably help yourself to satisfy your end users and customers&hellip;</p>
+
+<p>Note: It is voluntarily that I am mixing up the Web 2.0 (technologies) and the social networking (behavior), since these two are intimately linked. Web 2.0 being the set of tools and technologies facilitating the social networking.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/20/oracle-open-world-2007-presentations-available-online/">Oracle Open World 2007: Presentations Available Online</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-11-20T22:15:56+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>10:15 pm</span></time>
+        
+           | <a href="/blog/2007/11/20/oracle-open-world-2007-presentations-available-online/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/11/20/oracle-open-world-2007-presentations-available-online/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>For the first time since 2001, I was not participating at OOW&hellip; As you may know I have moved back to France and now working for a new company <a href="http://www.sogeti.com/">Sogeti</a>. So I am quite happy to se that once again all the presentations are available for download there:</p>
+
+<ul>
+<li><a href="http://www28.cplan.com/cc176/catalog.jsp">OOW 2007 Content Catalog.</a></li>
+</ul>
+
+
+<p>I personnaly looked at OracleAS and Java presentations, and especially the one regarding SOA, performances, security and web Services:</p>
+
+<ul>
+<li><p><a href="http://cboracle:oraclec6@www28.cplan.com/cbo_export/PS_S291388_291388_176-1_FIN_v3.pdf">New Features of Java EE 5.0 and How to Use Them</a></p></li>
+<li><p><a href="http://cboracle:oraclec6@www28.cplan.com/cbo_export/PS_S292174_292174_176-1_FIN_v2.pdf">Maximizing Your Java Middleware Performance on Multicore Platforms</a></p></li>
+</ul>
+
+
+<p>Some other presentations that I would like to read/see:</p>
+
+<ul>
+<li>Java EE/Java SE/Java Authorization Contract for Containers (JACC) Security in a Nutshell</li>
+<li>A New Approach to Diagnosing Java Application Performance</li>
+<li>Next-Generation Web Services Infrastructure and Interoperability</li>
+<li>Performance Management for SOA Applications</li>
+</ul>
+
+
+<p>And I will take more time do read some others&hellip;</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/">A Groovier ADF With Oracle ADF 11</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-11-08T06:39:38+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>6:39 am</span></time>
+        
+           | <a href="/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png"></p>
+
+<p>Steve Muench has published in Oracle Magazine an article about the use of Groovy in Oracle ADF. In this article you learn how you can do validation and calculation in you business service layer.</p>
+
+<ul>
+<li><a href="http://www.oracle.com/technology/oramag/oracle/07-nov/o67frame.html">Enhanced Calculation and Validation</a></li>
+<li><a href="http://www.oracle.com/technology/products/adf/index.html">Oracle ADF</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/11/03/guillaume-laforge-interview-on-javalobby/">Guillaume Laforge Interview on JavaLobby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-11-03T05:16:19+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2007</span></span> <span class='time'>5:16 am</span></time>
+        
+           | <a href="/blog/2007/11/03/guillaume-laforge-interview-on-javalobby/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/11/03/guillaume-laforge-interview-on-javalobby/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I am sure you have seen it before, but just in case&hellip; Geertjan from JavaLobby has interviewed yesterday Guillaume, in case you do not know.. Guillaume is the Project Leader of the Groovy project and co-founder of the G2One company.</p>
+
+<p>Interview: <a href="http://www.javalobby.org/java/forums/t103036.html">What&rsquo;s so groovy about Groovy?</a>.</p>
+
+<p>In case you have not look at it, <a href="http://www.g2one.com/">G2One</a> is offering many services around Groovy and Grails &hellip; directly from the source since Guillaume, and Graeme Rocher are working there&hellip; So if you need any help on these nice technologies do not hesitate&hellip;.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/posts/10">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/posts/8">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

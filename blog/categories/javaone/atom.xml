@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Javaone | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/javaone/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[More Groovy at Javaone !]]></title>
+    <link href="http://tgrall.github.io/blog/2006/05/11/more-groovy-at-javaone/"/>
+    <updated>2006-05-11T21:37:50+02:00</updated>
+    <id>http://tgrall.github.io/blog/2006/05/11/more-groovy-at-javaone</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://groovy.codehaus.org/images/groovy-logo.png">http://groovy.codehaus.org/images/groovy-logo.png</a>&#8221;>
+If like me you like scripting technologies and in particular Groovy and
+Grails, JavaOne 2006 will be a very good moment to learn more about it.</p>
+
+<p>Beside the official sessions listed below, I would like to inform you
+of various events interesting for the Groovy community:</p>
+
+<ul>
+<li>Informal <strong>&ldquo;Groovy Community Meeting&amp;rdquo&rdquo;</strong>, <strong>Thursday night 5pm</strong> around the Oracle Demobooth where Guillaume, Graeme and Dierk will give you an
+opportunity to learn more about these projects</li>
+<li>Groovy presentations at the Oracle Booth in the pavilion</li>
+</ul>
+
+
+<p>The official sessions about Groovy and Grails are</p>
+
+<table align="center">
+<tbody>
+<tr align="center">
+<td align="center" nowrap="nowrap" width="15%">
+BOF-0554 </td>
+<td align="left" width="45%">
+Dynamic
+Scripting Languages BOF </td>
+<td align="center" width="15%">
+&nbsp;Tuesday
+
+05/16/2006
+
+10:30 PM - 11:20 PM </td>
+<td align="center" width="15%"> Moscone Center
+
+Hall E 133 </td>
+</tr>
+<tr align="center">
+<td align="center" nowrap="nowrap" width="15%">
+BOF-2521 </td>
+<td align="left" width="45%">
+Rapid
+Web Application Development With Grails </td>
+<td align="center" width="15%">
+&nbsp;Thursday
+
+05/18/2006
+
+08:30 PM - 09:20 PM </td>
+<td align="center" width="15%"> Moscone Center
+
+Esplanade 307-310 </td>
+</tr>
+<tr align="center">
+<td align="center" nowrap="nowrap" width="15%">
+TS-1246 </td>
+<td align="left" width="45%">
+Simplify
+Enterprise Development With Scripting </td>
+<td align="center" width="15%">
+&nbsp;Thursday
+
+05/18/2006
+
+11:00 AM - 12:00 PM </td>
+<td align="center" width="15%"> Moscone Center
+
+Hall E 134 </td>
+</tr>
+<tr align="center">
+<td align="center" nowrap="nowrap" width="15%">
+TS-3273 </td>
+<td align="left" width="45%">
+Groovy
+= Java&trade; Technology+ Ruby + Python for the JVM&trade;
+</td>
+<td align="center" width="15%">
+&nbsp;Wednesday
+
+05/17/2006
+
+02:45 PM - 03:45 PM </td>
+<td align="center" width="15%"> Moscone Center
+
+Gateway 104 </td>
+</tr>
+<tr align="center">
+<td align="center" nowrap="nowrap" width="15%">
+TS-3714 </td>
+<td align="left" width="45%">
+Flash-Gridding
+with Java&trade; Technology: Using Project Glassfish<small><sup>SM</sup></small>,
+Jini&trade;/JavaSpaces&trade;, and Groovy as an Environment for
+an Open Source, Self-Assembling Supercomputer </td>
+<td align="center" width="15%">
+&nbsp;Thursday
+
+05/18/2006
+
+02:45 PM - 03:45 PM </td>
+<td align="center" width="15%"> Moscone Center
+
+Gateway 104 </td>
+</tr>
+<tr align="center">
+<td align="center" nowrap="nowrap" width="15%">
+TS-5386 </td>
+<td align="left" width="45%">
+Groovy
+Goes RFID with Smart Sensors for Real-World Control </td>
+<td align="center" width="15%">
+&nbsp;Tuesday
+
+05/16/2006
+
+05:45 PM - 06:45 PM </td>
+<td align="center" width="15%"> Moscone Center
+
+Gateway 104 </td>
+</tr>
+</tbody>
+</table>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaOne Hangover]]></title>
+    <link href="http://tgrall.github.io/blog/2005/07/02/javaone-hangover/"/>
+    <updated>2005-07-02T21:02:26+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/07/02/javaone-hangover</id>
+    <content type="html"><![CDATA[<p>This last 2 weeks have been kind of crazy for me, and for Oracle.. Last week we were present at the Oracle Developer Tools User Group, and immediately jump in for the 10th edition of JavaOne.</p>
+
+<p>I was not able to attend as much sessions as I wanted, but I had the pleasure to work a lot on the Oracle Booth in the JavaOne Pavillion. I  worked on the J2EE, JSF, BPEL and Web Services ones. It was really great, with lot of technical questions around our products; I have to say that this year we had lot of interest around JavaServer Faces and EJB.</p>
+
+<p>And this has been even better after Thomas Kurian&rsquo;s keynote on Tuesday with the following annoucements:</p>
+
+<ul>
+<li><p>Oracle is participating to <a href="http://myfaces.apache.org/">MyFaces</a> project. You can find more information on <a href="http://www.oracle.com/technology/tech/java/jsf.html">JavaServer Faces on OTN</a>.</p></li>
+<li><p>Oracle will lead the development of the JSF extension for Eclipse, as you may know Oracle JDeveloper, now free, has one of the most appealing JSF Designer tool. So we are currently porting this design tools inside Eclipse, to facilitate the adoption of Faces by the developers.</p></li>
+<li><p>Mike Keith, Toplink Architect, will be now co-specification leader of the persistence specification. Also Oracle will develop the Reference Implementation of the persistence engine of the JEE 5 platform. As you  may know you can already start to develop EJB 3.0 within the early implementation available on <a href="http://otn.oracle.com/ejb3">OTN</a>. Note that the next release of Oracle Application Server 10g (10.1.3), EJB 3.0 will be supported.</p></li>
+<li><p>As you may have seen some weeks ago, Oracle is also the lead in the Eclipse project to implement the EJB 3 tool.</p></li>
+<li><p>Also still around Eclipse, Oracle, most successful player around BPEL, will continue the development of the BPEL deigner inside Eclipse and put that officially in the Eclipse Project. If you are not familiar with BPEL, I will invite you <a href="http://otn.oracle.com/bpel">to jump to the OTN Web Site</a>.</p></li>
+<li><p>Last, but not least, <a href="http://otn.oracle.com/products/jdev">Oracle JDeveloper is now free</a>&hellip;</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaOne Day 1: What Do to Today?]]></title>
+    <link href="http://tgrall.github.io/blog/2005/06/27/javaone-day-1-what-do-to-today/"/>
+    <updated>2005-06-27T21:01:25+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/06/27/javaone-day-1-what-do-to-today</id>
+    <content type="html"><![CDATA[<p>Here we go, the first day of Java One is about to start; and here some of the cool stuff to do:</p>
+
+<ul>
+<li>Next-Generation Web Services in the Java™ Platform (TS-7230 / 2:15pm)</li>
+<li>Groovy = Java™ Technology+ Ruby + Python for the JVM™ (TS-3402 / 3:30pm)</li>
+<li>Web Services in the Real World (TS-3999 / 4:45pm)</li>
+<li>Java Web Services Development Using Annotations (TS-7964 / 6:00pm)</li>
+<li>Writing Performant WSDLs to Build Enterprise Web Services Applications (BOF-9213 / 7:30)</li>
+<li><em>OC4J: Meet the Developers</em> (BOF-9024 / 9:30pm)</li>
+<li>Ensuring 100% Application Portability with J2EE (BOF-9030 / 10:30pm)</li>
+</ul>
+
+
+<p>Also I think the opening Sun&rsquo;s Keynote from 8:30 to 11:00 am will be I am sure a good starting point for this week !</p>
+
+<p>Busy day isn&rsquo;t? (I am on duty the morning, will try to go to afternoon sessions&hellip;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaOne: Oracle Activities]]></title>
+    <link href="http://tgrall.github.io/blog/2005/06/26/javaone-oracle-activities/"/>
+    <updated>2005-06-26T21:00:10+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/06/26/javaone-oracle-activities</id>
+    <content type="html"><![CDATA[<p>The 2005 edition of JavaOne will be a very good one, at least based of what Oracle is planning to do.</p>
+
+<h3>Oracle Booth</h3>
+
+<p>I invite you to come on the Oracle booth (<em>booth 625</em>) where Oracle Developers and Product Managers will be pleased to talk, and demonstrate the latest technologies and their integration in our product (J2EE 1.4, EJB 3.0, JSF, BPEL, Web Services, RFID and more&hellip;). Like last year we provide you a chance to <em>win lot of cool stuff</em>. First of all enter a raffle for a chance to win a Sony PlayStation 2, Star Wars PC game packs, and Atari joysticks.</p>
+
+<p>Also the first 500 people to submit an entry survey with a stamp from an Oracle demo pod will receive a ticket to see <a href="http://www.starwars.com/episode-iii/">Star Wars III: Revenge of the Sith</a> the evening of Tuesday, June 28.</p>
+
+<p>I will be present on the J2EE Demo pod on Monday morning and I will be please to stamp you to offer you a ticket for the Stars Wars&hellip; but remember you can get a ticket for the space too -yes you can go to the space-, by participating to the <a href="http://oracle.promotionexpert.com/SpaceSweepstakes/en/index.jsp?&amp;Src=3559501&amp;Act=20">Oracle Space Sweepstakes</a>.</p>
+
+<h3>Meet the Gurus</h3>
+
+<p>The Oracle booth also is a place where you can meet several gurus for a presentation and discussion. Here some of the subjects that will be presented:</p>
+
+<ul>
+<li>J2EE and EJB 3.0</li>
+<li>JSF, and advanced HTML/AJaX features</li>
+<li>SOA, BPEL</li>
+<li>Apache Maven</li>
+</ul>
+
+
+<p>You can find the <a href="http://www.oracle.com/technology/events/javaone05/gurus.html">schedule on OTN</a>.</p>
+
+<h3>Sessions and BOF</h3>
+
+<p>Oracle is also proud to have 16 technical sessions and BOF, you can find the list of them <a href="http://www.oracle.com/technology/events/javaone05/sessions.html">here</a>.  One of them is my favorite:</p>
+
+<ul>
+<li>&ldquo;<em>Oracle Application Server Containers for J2EE (OC4J): Meet the Developers</em>&rdquo;. It will be Monday 27th at 9:30pm, this is the chance for you to meet, and interact with the J2EE and Web Services developers from Oracle.</li>
+</ul>
+
+
+<p>See you there and enjoy JavaOne 2005!</p>
+]]></content>
+  </entry>
+  
+</feed>

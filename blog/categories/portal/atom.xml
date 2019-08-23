@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Portal | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/portal/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[eXo Platform: Internationalization of Content]]></title>
+    <link href="http://tgrall.github.io/blog/2012/05/11/exo-platform-internationalization-of-content/"/>
+    <updated>2012-05-11T10:11:18+02:00</updated>
+    <id>http://tgrall.github.io/blog/2012/05/11/exo-platform-internationalization-of-content</id>
+    <content type="html"><![CDATA[<p>In this screencast I explain the support of multi-lingual content of eXo Platform 3.5. The different features that you can see in this video are:</p>
+
+<ul>
+<li>Support of multiple languages from URL</li>
+<li>Configure the eXo File Explorer to add support for multi-lingual content (new button)</li>
+<li>Content translation</li>
+<li>Add new language to the platform</li>
+</ul>
+
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/huzPX3UPvrY?color=white&theme=light"></iframe></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to Create a New Content List Template for eXo Platform 3]]></title>
+    <link href="http://tgrall.github.io/blog/2011/08/31/how-to-create-a-new-content-list-template-for-exo-platform-3/"/>
+    <updated>2011-08-31T23:50:18+02:00</updated>
+    <id>http://tgrall.github.io/blog/2011/08/31/how-to-create-a-new-content-list-template-for-exo-platform-3</id>
+    <content type="html"><![CDATA[<h3>Introduction</h3>
+
+<p>eXo Platform provide many powerful features to manipulate and expose any type of content on a page. This is due to the fact that eXo stores the all the content in its Java Content Repository (JCR) and render the content on a page using Groovy Templates.</p>
+
+<p>In this how to you will learn how you can create and use template that are used in the &ldquo;Content List&rdquo; portlet. For example in the ACME sample site you can show the content in 1 or 2 columns just by selecting different templates.</p>
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png">http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png</a>&#8221;>
+One Column View</p>
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png">http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png</a>&#8221;>
+Two Columns View</p>
+
+<h3>Creating a new Content List Template</h3>
+
+<p>In this section you will learn how to create a new template using the eXo IDE. Before writing the new template it is important to learn where the templates are stored.</p>
+
+<h4>eXo Content Service: Template Storage</h4>
+
+<p>Like many things inside eXo Platform, the eXo JCR is used to stored the templates. Templates are just a special type of content. This allows developers to easily write and test code without having complex deployment process, but also it make the life easy to export a running configuration to another one. For this you just need to use the standard JCR export/import features.</p>
+
+<p>All the template and eXo Content Service configurations are stored inside a specific JCR workspace named : <code>dms-system</code>.</p>
+
+<p>Each template type (Document Type, Content List, &hellip;.) is stored in a specific location. In our case we want to work on the &ldquo;Content List&rdquo; portlet so the template are stored inside the following folder:</p>
+
+<ul>
+<li><code>/exo:ecm/views/templates/content-list-viewer/list/</code></li>
+</ul>
+
+
+<p>Just for the fun of it, let&rsquo;s inspect this folder using the eXo CRaSH utility. If you are not interested you can jump to the next section. CRaSH is a shell for Java Content Repositories, the source of CRaSH is available on <a href="http://code.google.com/p/crsh/">Google Code</a>. So in a terminal window:</p>
+
+<p>1-  Connect to CRaSH using telnet client:</p>
+
+<pre><code class="sh"> telnet 127.0.0.1 5000
+</code></pre>
+
+<p>2-  Connect to the JCR workspace using the following command:</p>
+
+<pre><code class="sh"> connect -u root -p gtn -c portal dms-system&lt;/span&gt;
+</code></pre>
+
+<p>Where: -u is the user, -p the password, -c the Portal Container, and dms-system the workspace to use</p>
+
+<p>3-  Move the the folder that contains all the templates for the Content List portlet:</p>
+
+<pre><code class="sh"> cd /exo:ecm/views/templates/content-list-viewer/list/
+</code></pre>
+
+<p>4-  List all the templates using the <code>ls</code> command
+You can see the list of all the templates available for the Content List portlet.</p>
+
+<h4>Create a new template using the eXo IDE</h4>
+
+<p>Let&rsquo;s now create a new template using the IDE. For this be sure you are connected with a user that is part of the <code>/Developer</code> group. For simplicity reason I am using the <code>root</code> user.</p>
+
+<p>The first important step is to go the the template location using the following steps:</p>
+
+<p>1-  Access the IDE: click on <code>My Spaces &amp;gt; IDE</code>.</p>
+
+<p>2-  Switch <code>dms-system</code> workspace: In the IDE menu click <code>My Spaces &amp;gt;on Window &amp;gt; Select Workspace</code>. And select the dms-system location in the dialog box and click OK.</p>
+
+<p>3-  In the file structure on the left navigate to the template location :</p>
+
+<pre><code class="sh">/exo:ecm/views/templates/content-list-viewer/list/
+</code></pre>
+
+<p>4-  Create a new template : In the IDE Menu click on <code>File &amp;gt; New &amp;gt; Groovy Template</code></p>
+
+<p>5-  Save the file as &ldquo;<code>MyNewTemplate.gtmpl</code>&rdquo;</p>
+
+<p>6-  Enter some basic code:</p>
+
+<p>&#8220;` html</p>
+
+<h1>This is my template</h1>
+
+
+<p>The date is &lt;= new Date()></p>
+
+<pre><code>
+7-  Save the template
+
+8-  Go back to the Home page of the Acme Site
+
+9-  Switch to Edit more by selecting Edit in the top right drop down list.
+
+<img src="http://3.bp.blogspot.com/-EsSUDUdUo_8/TbbRJZlZlHI/AAAAAAAAAPk/5iTn-NoC-JE/s200/edit-mode.png">
+
+10-  Move you mouse at the top of the list of news and click on the preference button: <img src="http://1.bp.blogspot.com/-ksljDe3llf4/TbbSIOl0DII/AAAAAAAAAPs/C0eBv-SJ25I/s200/PreferencesIcon.png">
+
+11-  In the list of templates, select the "MyNewTemplate", and click save.
+
+<img src="http://2.bp.blogspot.com/-7hT5osGXK1w/TbbTTJ7ZKSI/AAAAAAAAAP0/--VCTefhrSI/s320/select-template.png">
+
+We have created our new template, and use it on a page. We should now add some more interesting code to the template to really loop over the content based on the portlet configuration. But before this it is important to talk about caching and code modification.
+
+#### eXo Template and Cache
+
+To improve performances and a running system, the compiled version of the template is by default cached. This is why when you are modifying a template you do not see any change. We have two ways to work around this:
+
+*   Run eXo Platform in Debug mode, in this case nothing is cached
+*   Invalidate the cache manually using JMX
+
+Since working with no cache at all is not an option, here is the MBean you have to use to invalidate the Template Service cache:
+
+* `exo:portal="portal",service=cache,name="TemplateService"`, then call the `clearCache` operation on it
+
+I do use JConsole for this, but you can use any method to call your MBeans operation.
+
+<img src="http://1.bp.blogspot.com/-ZuMQz-VHBYY/TbldhSRY2NI/AAAAAAAAAP8/pb09UoA9_b4/s200/TemplateServiceCacheMbean.png">
+
+Do not forget to call this operation each time you modify your template to be sure eXo recompile the template.
+
+#### Accessing Content in the template
+
+The current code of the template is really simple, you need now to add code to print the content in the page. For this we will be using some eXo Content programming, once again in the IDE.
+
+If you are not interested to have detailed explanation of the code you can go to the complete source code [here](javascript: alert().
+
+The template used by the Content List portlet is based on the following Java class `org.exoplatform.wcm.webui.clv.UICLVPresentation`, this class is responsible to set the complete context that you can use in the template such as:
+
+* The folder or category that contains the content to show. The "Folder Path" field in the preference screen
+* The display settings: title, number of documents, elements to show, ...
+
+Here is the code to access these preferences:
+</code></pre>
+
+<p>// import all the classes need in the template
+import javax.jcr.Node;
+import org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator;
+import org.exoplatform.wcm.webui.clv.UICLVPortlet;
+import org.exoplatform.wcm.webui.Utils;
+import org.exoplatform.services.wcm.core.NodeLocation;</p>
+
+<p>// get the portlet preferences
+def header = uicomponent.getHeader();
+def isShowRssLink = uicomponent.isShowRssLink();
+def isShowHeader = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_HEADER);
+def isShowRefresh = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_REFRESH_BUTTON);</p>
+
+<p>def isShowTitle = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_TITLE);
+def isShowDate = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_DATE_CREATED);
+def isShowLink = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_LINK);
+def isShowReadmore = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_READMORE);
+def isShowImage = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_ILLUSTRATION) ;
+def isShowSummary = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_SUMMARY);</p>
+
+<pre><code>
+The &lt;span style="font-family: &amp;quot;Courier New&amp;quot;,Courier,monospace;"&gt;uicomponent&lt;/span&gt; object is defined by the container class of the portlet that calls the template. This class contains many utility methods. In the code above I retrieve all the preferences of the portlet, since the name are self-explanatory it is not necessary to detail them, especially when you look at the preferences screen below:
+
+<img src="http://3.bp.blogspot.com/-bDIJtSVaD9A/TblkjTr2wMI/AAAAAAAAAQE/6mRLmEYqpsE/s320/preference-screen.png">
+
+Now that the template has all the preferences, it is time to loop on the content on print the information.
+
+The eXo Content Service provides API to manipulate the content, including pagination of content. The idea behind this is to let the Content Service manage the JCR query, sorting, caching and pagination of data. So in your template you will mainly manage two classes to loop through the content to show:
+
+* `uicomponent.getUIPageIterator()` a paginator object that is configured based on the portlet preferences
+* `uicomponent.getCurrentPageData()`contains a list of the content (JCR Nodes) that should print on the current page
+
+So let's print all the content of the page as a simple HTML list:
+</code></pre>
+
+<ul style="margin: 20px">
+<%
+for (viewNode in uicomponent.getCurrentPageData()) {
+  def title = viewNode.getProperty("exo:title").getString();
+  print("<li>$title</li>&#8221;);
+}
+%>
+</ul>
+
+
+<pre><code>
+Just  copy this code in your template, save it, refresh the cache... and go to your page. You should see the list of the content in a simple HTML list.
+
+On each content (Node), eXo Content API provides some helper method to easily manipulate the content and avoid using the JCR API directly. In the following code you can see the most important methods accessing content properties:
+</code></pre>
+
+<p>def itemName = viewNode.getName();
+def itemLink = uicomponent.getURL(viewNode);<br/>
+def webdDavLink = uicomponent.getWebdavURL(viewNode);
+def itemDateCreated = uicomponent.getCreatedDate(viewNode);
+def itemModifiedDate = uicomponent.getModifiedDate(viewNode);
+def itemAuthor = uicomponent.getAuthor(viewNode);
+def imgSrc = uicomponent.getIllustrativeImage(viewNode);
+def itemTitle = uicomponent.getTitle(viewNode);
+def itemSummary = uicomponent.getSummary(viewNode);
+&#8220;`</p>
+
+<p>One important point is the fact that these methods are responsible of many things, for example: formatting dates, returning complete URLs depending of the context of the portlet.</p>
+
+<p>Based on these methods you can now work on the presentation of the information on the page. Let&rsquo;s for example print the image, the title and allow user to click on the title to go in the detail view of the article. This is done simply using the following code:</p>
+
+<pre><code class="java">&lt;%
+for (viewNode in uicomponent.getCurrentPageData()) {
+  def itemName = viewNode.getName();
+  def itemLink = uicomponent.getURL(viewNode);  
+  def webdDavLink = uicomponent.getWebdavURL(viewNode);
+  def itemDateCreated = uicomponent.getCreatedDate(viewNode);
+  def itemModifiedDate = uicomponent.getModifiedDate(viewNode);
+  def itemAuthor = uicomponent.getAuthor(viewNode);
+  def imgSrc = uicomponent.getIllustrativeImage(viewNode);
+  def itemTitle = uicomponent.getTitle(viewNode);
+  def itemSummary = uicomponent.getSummary(viewNode);
+
+  %&gt;
+  &lt;div style="overflow: auto;"&gt;
+  &lt;img src="$imgSrc" align="left"&gt;
+  &lt;h3&gt;&lt;a href="$itemLink"&gt;$itemTitle&lt;/a&gt;&lt;/h3&gt;
+  $itemSummary
+  &lt;/div&gt;
+
+  &lt;%
+}
+%&gt;
+</code></pre>
+
+<p>For simplicity reason, this code does not manage any null value. Also the template do not deal with the portlet preferences such as the &ldquo;Header&rdquo;, &ldquo;RSS&rdquo; links and so on, do not hesitate to do it if you want.</p>
+
+<p>The Web site should look like the following image:</p>
+
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png">http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png</a>&#8221;></p>
+
+<p>The last important point is to add the support for the in context editing that allows the user to edit the content directly from the template. Once again this is done with a method of the <code>uicomponent</code> object, that create a DIV around the content. Let&rsquo;s add this to the template:</p>
+
+<pre><code class="java">&lt;%
+for (viewNode in uicomponent.getCurrentPageData()) {
+  def itemName = viewNode.getName();
+  def itemLink = uicomponent.getURL(viewNode);  
+  def webdDavLink = uicomponent.getWebdavURL(viewNode);
+  def itemDateCreated = uicomponent.getCreatedDate(viewNode);
+  def itemModifiedDate = uicomponent.getModifiedDate(viewNode);
+  def itemAuthor = uicomponent.getAuthor(viewNode);
+  def imgSrc = uicomponent.getIllustrativeImage(viewNode);
+  def itemTitle = uicomponent.getTitle(viewNode);
+  def itemSummary = uicomponent.getSummary(viewNode);
+
+  %&gt;
+  &lt;div style="overflow: auto;"&gt;
+  &lt;%=uicomponent.addQuickEditDiv("MyTemplateContentEditor", viewNode)%&gt;
+  &lt;img src="$imgSrc" align="left"&gt;
+  &lt;h3&gt;&lt;a href="$itemLink"&gt;$itemTitle&lt;/a&gt;&lt;/h3&gt;
+  $itemSummary
+  &lt; /div&gt;
+  &lt;/div&gt;
+
+  &lt;%
+}
+%&gt;
+</code></pre>
+
+<p>The lines 15 and 19 are new in this template and provide support for Quick Edit feature.</p>
+
+<p>Done! We have created a new template for eXo Platform Content Service using embedded IDE.</p>
+
+<h4>Conclusion</h4>
+
+<p>In this article you have learned how to create a new template for eXo Content Service, with some basic steps:</p>
+
+<ul>
+<li>Create a new Groovy Template using the eXo IDE</li>
+<li>Edit this template using the eXo Java Content API</li>
+<li>Configure your Content List portlet instance on a page to select the new template</li>
+</ul>
+
+
+<p>You can now create your own templates and use your imagination to add cool features to your site (for example the carrousels you see on the <a href="http://www.exoplatform.com/">eXo site</a> are using custom CLV template.)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[USI2009: The Geek and Boss French Conference]]></title>
+    <link href="http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/"/>
+    <updated>2009-07-08T08:53:57+02:00</updated>
+    <id>http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference</id>
+    <content type="html"><![CDATA[<p>This year I was lucky enough to have a presentation at the second edition of the &ldquo;<a href="http://www.universite-du-si.com/">Université du SI</a>&rdquo;, organized by <a href="http://octo.com/">Octo Technologies</a>. I have to say that this conference is one of the best that I have attended, for sure it is the best in France. Unfortunately I was only able to attend the first day of the conference, but even in one day, I was very happy with the content of the presentations, keynotes, and networking opportunities.</p>
+
+<p>I won&rsquo;t go in details in all the presentations that I have seen, Google for the Enterprise, Application Server Future, Usability concerns, and keynotes. If you want to have a good feedback about this conference I invite you to read, in French, the reports from <a href="http://www.touilleur-express.fr/tag/usi/">Le Touilleur Express</a>.</p>
+
+<p>Let me just share the presentation that I gave with <a href="http://massol.net/">Vincent Massol</a> from <a href="http://www.xwiki.com/">XWiki</a>, about CMS vs Wiki.</p>
+
+<p><strong>Wiki vs CMS duel</strong></p>
+
+<p>First of all, the room was packed, so it looks like it is an interesting subject for many of you, so do not hesitate to post comments or question on this entry. Vincent and I will be pleased to update our presentation for a new event.</p>
+
+<p>The main message of the talk was:</p>
+
+<ul>
+<li><strong>For collaboration on content</strong> the wiki is king</li>
+<li><strong>For publication of content</strong> the CMS is king</li>
+</ul>
+
+
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1678352 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> 
+<a href="http://www.slideshare.net/tgrall/wiki-vs-cms-1678352" title="Wiki vs CMS ">Wiki vs CMS </a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Next Generation Portals : How OpenSocial Standard Adds Social to the Mix?]]></title>
+    <link href="http://tgrall.github.io/blog/2009/04/07/next-generation-portals-how-opensocial-standard-adds-social-to-the-mix/"/>
+    <updated>2009-04-07T02:45:36+02:00</updated>
+    <id>http://tgrall.github.io/blog/2009/04/07/next-generation-portals-how-opensocial-standard-adds-social-to-the-mix</id>
+    <content type="html"><![CDATA[<p>I have published on SlideShare a new presentation about OpenSocial and eXo Platform.</p>
+
+<p>Feel free to test OpenSocial and eXo Platform integration by downloading latest release of eXo products.</p>
+
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1258208 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Interest of Enterprise Portals]]></title>
+    <link href="http://tgrall.github.io/blog/2009/02/10/interest-of-enterprise-portals/"/>
+    <updated>2009-02-10T01:22:02+01:00</updated>
+    <id>http://tgrall.github.io/blog/2009/02/10/interest-of-enterprise-portals</id>
+    <content type="html"><![CDATA[<p>I am writing this post as an answer to <a href="http://www.christian-faure.net/2009/01/31/de-linteret-dun-portail-dentreprise/">Christian Faure&rsquo;s blog post</a>, (in French), about interest of enterprise portals. Let me take each point, one by one and comment them. I won&rsquo;t go in the all the details of many other points that why new enterprise portals are interesting for many of us, I just want to focus on Christian&rsquo;s remarks.</p>
+
+<!-- more -->
+
+
+<h3>Single Access Point</h3>
+
+<blockquote><p>Christian&rsquo;s quote: I do not need it, I have bookmarks, that I can put in any of my internet browser, allowing me to access any Web applications that I am using.</p></blockquote>
+
+<p>I think that here it is a little broader that simply the bookmarks, but let starts with this.</p>
+
+<p>Some other important part of the &ldquo;single access point&rdquo; is the fact that it becomes your home page in your working environment where you not only have access to many &ldquo;links&rdquo;  but also you have some information that are pushed to you in a personalized and automatic fashion without having to go to each applications, some example:</p>
+
+<ul>
+<li>a manager see that he has some holiday or expenses to approve</li>
+<li>a content editor see which content has been modified and should be validated to be published.</li>
+</ul>
+
+
+<p>Another interesting point, is the fact that the IT &amp; Business people define together what is the important view for this &ldquo;portal home page&rdquo; providing automatically the needed information to the users depending of its profile.</p>
+
+<p>Finally you can access your portal from everywhere, from any browser, so your “working environment” is always with you - from any browser, or computer/device. If you are using your browser bookmark you are “limited” to your computer only (I know you can use internet bookmak service à la Delicious)</p>
+
+<h5>Many Application screens in the same time</h5>
+
+<blockquote><p>Christian&rsquo;s quote: I do not need that since I can use many windows, or tabs in my Web browser</p></blockquote>
+
+<p>First of all, deploying a portal does not mean that you &ldquo;must&rdquo; execute all the applications in it. But I have to admit that it is quite useful to be able to have a quick overview of all the applications, content that you need to be aware of. When designing your portal you first design the way you want to aggregate the content based on the user profiles/roles. This is a key point in a portal project, you need to take time to choose the information you will make available to your user.</p>
+
+<p>I can reuse the example of the business process/workflow validation from the portal page. Since you are authenticated, information can be pushed to your page to inform you that you have some tasks to manage and this without to have to go to the application itself. It could make you more efficient.</p>
+
+<p>All these do not mean that you have many application screens in the same time but an overview of your most important application. Then based on the design of your application or portal you will jump to the application in another window/tab, or use the application in the portal.</p>
+
+<h3>Single Authentication Point</h3>
+
+<blockquote><p>Christian&rsquo;s quote:  Any Active Directory or LDAP will do that the same way</p></blockquote>
+
+<p>Portal is not necessary a &ldquo;Single Authentication Point&rdquo; it depends how you look at it.</p>
+
+<p>If you have multiple Web applications, including the portal, Portal is not necessary the single entry point, any application that will share the same SSO will be the entry point. You will access one of the application (the portal or another), the SSO will ask you for your crendetials, that will then be shared by all the applications in the same “domain”.  A good example is the Google applications, you are not forced to enter the system by iGoogle (the portal) to access in a secured way all the applications. This is a pure WebSSO concern that is not directly related to Enterprise Portals.</p>
+
+<p>That said, Portals provide also a mechanism for SSO. The portal is here to propagate the identity to all the application that are integrated with it.</p>
+
+<p>Let’s reuse the example of the expenses validation. The manager is authenticated to the portal. The workflow/BPM application is integrated to the portal as portlet (most BPM product provides such portlets, in eXo Platform we have dedicated portlet allowing you to integrate easily JBPM and OW2 Bonita). The cool thing here is the fact that the user identity is transmitted by the portal to the portlet so the “BPM” portlet knows who the user is and can execute the process in this context.  (You do not have to configure a WebSSO here since the credentials are managed by the backend)</p>
+
+<h3>Portal provides &lsquo;personnalized views&rsquo;</h3>
+
+<blockquote><p>Christian&rsquo;s quote:  Who needs that?</p></blockquote>
+
+<p>Here we need to see two points:</p>
+
+<ol>
+<li>the personalization: the end user that really has it &ldquo;own and Personalized&rdquo; page</li>
+<li>the profiling: a view of the portal that is based on the profile (group, business role) of the connected user.</li>
+</ol>
+
+
+<p><em>Personalization</em></p>
+
+<p>For the first point, personalization, we need to see what are the various personalization features that a portal can offer to the users.</p>
+
+<p>It is true that many portals, including eXo Portal with User Pages, allow any user to create, rearrange pages. This features has probably most of the time be oversold by the vendors. Standard users do not &ldquo;adapt&rdquo; their tools, they most of the time use the portal as it is defined by the managers.</p>
+
+<p>Another very important part of the personalization is the fact that portlets can be personalized to the user (by him or for him), for example a WebMail portlet that allows you to see &ldquo;your&rdquo; mails and select some properties (number of mails per pages, order, &hellip;) This part is quite useful when you put a portal in place.</p>
+
+<p>Finally, with the arrivals of new generation “consumer portals” such as iGoogle, Netvibes, &hellip; users have started to create their own dashboard based on a set of simple gadgets. Enterprise Portal, starting with eXo Portal, provide now these features that are simpler to use than standard portal page creation.</p>
+
+<p><em>Profiling</em></p>
+
+<p>So personalization is quite important but the real benefits of most of the enterprise portals, so not come directly from the “personalization” but more from the profiling. The portal, and applications are managed based on the role of the user in the enterprise.</p>
+
+<p>The pages you can see, the content of the applications available on the pages are not managed directly by you, but by your role. This is very useful to help people to be more productive. The flip side of that: when designing/deploying a portal it is important to take some time to understand the way people are working to give them “their portal”. The use of the profiling will help the IT to provide a business view of the information system.</p>
+
+<h3>An page with integrated applications</h3>
+
+<blockquote><p>Christian&rsquo;s quote:  Who is &ldquo;working in a portal? A simple personalizes page with widgets will offer me the perfect dashboard to manage my daily work and launch a full page with the application if needed.</p></blockquote>
+
+<p>For sure today&rsquo;s portal are not built to be used directly to &ldquo;work&rdquo; in them, but this is more a design issue, than an user experience one. When the application is already built and working perfectly used in a stand alone mode, no point to entirely &ldquo;portletize&rdquo; it to run it in the portal. When it is the case just develop Web services and publish them in the portal using Portlets or Gadgets.</p>
+
+<p>At the opposite when you build a new application from scratch, it may be useful to develop it to be executed in a Portal, to leverage interesting services of a portal: profiling, integrated SSO, centralized management, &hellip; The integration of applications in Portal are made even simpler today with the concept of Portlet Bridges allowing the developer to use a rich framework (JSF, Seam, &hellip;) and publish the application in the portal.</p>
+
+<p>Yes I do agree with that, you can see the portal as simple dashboard, but in reality if you take some time to design it properly you can also use the application in it. Portlets have been made for that. You can for example design your applications/portlets to leverage the state of the portlet: when normal you use it as a “simple view” on your dashboard, when maximize you can use the full application.</p>
+
+<p>Another important point, it is the fact that with the portal the user has a virtualize working environnement that is not dependant of the client machine but work in a simple browser. With eXo WebOS, we have pushed the concept further to provide a Web based operating system giving access in a multi window environment to the various application and content from anywhere with a rich user experience. (So we are pushing all the benefits of Enterprise Portal into an virtual operating system)</p>
+
+<h3>Conclusion</h3>
+
+<p>In my opinion enteprise portals are still very interesting. We need to keep in mind that here we are talking about &ldquo;enterprise&rdquo;, just to say that deploying a portal in the enteprise is also here to provide consistent user experience to the user, facilitate the management of the applications and users for the IT, etc etc&hellip;</p>
+
+<p>Like any other IT project, the Portal project should be managed and validated by user and management (Business and IT), if not it will be a failure. So when starting such project it is important to scope it correctly and deploy it step by step. (it is a content oriented portal or an intergration one?; which type of users will be the first audience? Which content &amp; data will be the most important for them, &hellip;) Another important point is, on the technology side, how the portal that I will chose can be integrated with my current IS?  Finally when you start the project always start with the &ldquo;most bang for the buck&rdquo; approach, choose the community of users and applications that will help you to sell the project.</p>
+
+<p>In my arguments, I have been focused on a very centralized view of the enterprise (the IT and Business people choose for the rest of us), this is because it is one important point in current portal project. But do not get me wrong, I am also a big fan of the community driven portals and tools. The next step in the portal deployment is to give more power to the user letting them create not &ldquo;their own portal&rdquo; but use the existing infrastructure to create portals/sub-portals based on their center of interest/role in the enterprise. This is where all the concepts coming from the Social Networks will be very useful in the enterprise, At eXo Platform, we have integrated in our portal an Open Social container, that is fully working in the context of the Portal and Web OS to facilitate the created of Enterprise Social Network Portals.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,576 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Couchbase : Create a Large Dataset Using Twitter and Java - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="An easy way to create large dataset when playing/demonstrating Couchbase -or any other NoSQL engine- is to inject Twitter feed into your database. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Couchbase : Create a Large Dataset Using Twitter and Java</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-11-05T21:11:00+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>9:11 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>An easy way to create large dataset when playing/demonstrating Couchbase -or any other NoSQL engine- is to inject Twitter feed into your database.</p>
+
+<p>For this small application I am using:</p>
+
+<ul>
+<li><a href="http://www.couchbase.com/downloads-all#couchbase-server-2-0">Couchbase Server 2.0 Server</a></li>
+<li><a href="http://www.couchbase.com/develop/java/next">Couchbase Java SDK</a> (will be installed by Maven)</li>
+<li><a href="http://twitter4j.org/">Twitter4J</a> (will be installed by Maven)</li>
+<li><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a> called using Twitter4J</li>
+</ul>
+
+
+<p>In this example I am using Java to inject Tweets into Couchbase, you can obviously use another langage if you want to.</p>
+
+<p>The sources of this project are available on my Github repository <a href="https://github.com/tgrall/couchbase-twitter-injector"> Twitter Injector for Couchbase</a> you can also download the Binary version <a href="https://github.com/downloads/tgrall/couchbase-twitter-injector/CouchbaseTwitterInjector.jar">here</a>, and execute the application from the command line, see <a href="http://www.blogger.com/blogger.g?blogID=785895453418216075#runTheApp">Run The Application paragraph</a>. Do not forget to create your Twitter oAuth keys (see next paragraph)</p>
+
+<h4>Create oAuth Keys</span></h4>
+
+<p>The first thing to do to be able to use the Twitter API is to create a set of keys. If you want to learn more about all these keys/tokens take a look to the oAuth protocol : <a href="http://oauth.net/">http://oauth.net/</a></p>
+
+<p>1- Log in into the Twitter Development Portal : <a href="https://dev.twitter.com/">https://dev.twitter.com/</a></p>
+
+<p>2- Create a new Application</p>
+
+<p>Click on the &ldquo;Create an App&rdquo; link or go into the &ldquo;User Menu &gt; My Applications &gt; Create a new application&rdquo;</p>
+
+<p>3- Enter the Application Details information</p>
+
+<p><img src="http://4.bp.blogspot.com/-zxOaF_YLaO0/UJhoZOhjoJI/AAAAAAAAAVk/7HnRfFRSKxs/s320/couchbase-twitter-001.png"></p>
+
+<p>4- Click &ldquo;Create Your Twitter Application&rdquo; button</p>
+
+<p>Your application&rsquo;s OAuth settings are now available :</p>
+
+<p><img src="http://3.bp.blogspot.com/-ZdaST7c-HdY/UJhqi8WJMGI/AAAAAAAAAVs/ndeXQwc4F0k/s320/couchbase-twitter-002.png"></p>
+
+<p>5- Go down on the Application Settings page and click on the &ldquo;Create My Access Token&rdquo; button</p>
+
+<p><img src="http://4.bp.blogspot.com/-WIW2AN93n6k/UJhrfZV1AVI/AAAAAAAAAV0/OseQ1EOpg9k/s320/couchbase-twitter-003.png"></p>
+
+<p>You have now all the necessary information to create your application:</p>
+
+<ul>
+<li>Consumer key</li>
+<li>Consumer secret</li>
+<li>Access token</li>
+<li>Access token secret</li>
+</ul>
+
+
+<p>These keys will be uses in the <code>twitter4j.properties</code> file when running the Java application from the command line</p>
+
+<h4>Create the Java Application</h4>
+
+<p>The following code is the main code of the application:</p>
+
+<div><script src='https://gist.github.com/4022377.js'></script>
+<noscript><pre><code>package com.couchbase.demo;
+
+import com.couchbase.client.CouchbaseClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+import twitter4j.*;
+import twitter4j.json.DataObjectFactory;
+
+
+import java.io.InputStream;
+import java.net.URI;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+public class TwitterInjector {
+
+    public final static String COUCHBASE_URIS = &quot;couchbase.uri.list&quot;;
+    public final static String COUCHBASE_BUCKET = &quot;couchbase.bucket&quot;;
+    public final static String COUCHBASE_PASSWORD = &quot;couchbase.password&quot;;
+
+    private List&lt;URI&gt; couchbaseServerUris = new ArrayList&lt;URI&gt;();
+    private String couchbaseBucket = &quot;default&quot;;
+    private String couchbasePassword = &quot;&quot;;
+
+
+    public static void main(String[] args) {
+        TwitterInjector twitterInjector = new TwitterInjector();
+        twitterInjector.setUp();
+        twitterInjector.injectTweets();
+    }
+
+    private void setUp() {
+        try {
+            Properties prop = new Properties();
+            InputStream in = TwitterInjector.class.getClassLoader().getResourceAsStream(&quot;twitter4j.properties&quot;);
+            if (in == null) {
+                throw new Exception(&quot;File twitter4j.properties not found&quot;);
+            }
+            prop.load(in);
+            in.close();
+
+            if (prop.containsKey(COUCHBASE_URIS)) {
+                String[] uriStrings =  prop.getProperty(COUCHBASE_URIS).split(&quot;,&quot;);
+                for (int i=0; i&lt;uriStrings.length; i++) {
+                    couchbaseServerUris.add( new URI( uriStrings[i] ) );
+                }
+
+            } else {
+                couchbaseServerUris.add( new URI(&quot;http://127.0.0.1:8091/pools&quot;) );
+            }
+
+            if (prop.containsKey(COUCHBASE_BUCKET)) {
+                couchbaseBucket = prop.getProperty(COUCHBASE_BUCKET);
+            }
+
+            if (prop.containsKey(COUCHBASE_PASSWORD)) {
+                couchbasePassword = prop.getProperty(COUCHBASE_PASSWORD);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println( e.getMessage() );
+            System.exit(0);
+        }
+
+
+    }
+
+
+
+    private void injectTweets() {
+        TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+        try {
+            final CouchbaseClient cbClient = new CouchbaseClient( couchbaseServerUris , couchbaseBucket , couchbasePassword );
+            System.out.println(&quot;Send data to : &quot;+  couchbaseServerUris +&quot;/&quot;+ couchbaseBucket );
+            StatusListener listener = new StatusListener() {
+
+                @Override
+                public void onStatus(Status status) {
+                    String twitterMessage = DataObjectFactory.getRawJSON(status);
+
+                    // extract the id_str from the JSON document
+                    // see : https://dev.twitter.com/docs/twitter-ids-json-and-snowflake
+                    try {
+                        JSONObject statusAsJson = new JSONObject(twitterMessage);
+                        String idStr = statusAsJson.getString(&quot;id_str&quot;);
+                        cbClient.add( idStr ,0, twitterMessage  );
+                        System.out.print(&quot;.&quot;);
+                    } catch (JSONException e) {
+                        e.printStackTrace(); 
+                    }
+                }
+
+                @Override
+                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+                }
+
+                @Override
+                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+                }
+
+                @Override
+                public void onScrubGeo(long userId, long upToStatusId) {
+                }
+
+                @Override
+                public void onException(Exception ex) {
+                    ex.printStackTrace();
+                }
+            };
+
+        twitterStream.addListener(listener);
+        twitterStream.sample();
+
+        } catch (Exception e) {
+            e.printStackTrace();  
+        }
+    }
+
+
+
+}
+</code></pre></noscript></div>
+
+
+<p>Some basic explanation:</p>
+
+<ul>
+<li>The <code>setUp()</code> method simply reads the <code>twitter4j.properties</code> file from the classpath to build the Couchbase connection string.</li>
+<li>The <code>injectTweets</code> opens the Couchbase connection -line 76- and calls the TwitterStream API.</li>
+<li>A Listener is created and will receive all the <code>onStatus(Status status)</code> from Twitter. The most important method is onStatus() that receive the message and save it into Couchbase.</li>
+<li>One interesting thing : since Couchbase is a JSON Document database it allows your to just take the JSON String and save it directly. <code>cbClient.add(idStr,0 ,twitterMessage);</code></li>
+</ul>
+
+
+<h4>Packaging</h4>
+
+<p>To be able to execute the application directly from the Jar file, I am using the assembly plugin with the following informations from the pom.xml:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>  ...
+</span><span class='line'><span class="nt">&lt;archive&gt;</span>
+</span><span class='line'><span class="nt">&lt;manifest&gt;</span>
+</span><span class='line'><span class="nt">&lt;mainclass&gt;</span>com.couchbase.demo.TwitterInjector<span class="nt">&lt;/mainclass&gt;</span>
+</span><span class='line'><span class="nt">&lt;/manifest&gt;</span>
+</span><span class='line'><span class="nt">&lt;manifestentries&gt;</span>
+</span><span class='line'><span class="nt">&lt;class-path&gt;</span>.<span class="nt">&lt;/class-path&gt;</span>
+</span><span class='line'><span class="nt">&lt;/manifestentries&gt;</span>
+</span><span class='line'><span class="nt">&lt;/archive&gt;</span>
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Some information:</p>
+
+<ul>
+<li>The mainClass</span> entry allows you to set which class to execute when running java -jar</span> command.</li>
+<li>The Class-Path</span> entry allows you to set the current directory as part of the classpath where the program will search for the twitter4j.properties</span> file.</li>
+<li>The assembly file is also configure to include all the dependencies (Twitter4J, Couchbase client  SDK, &hellip;)</li>
+</ul>
+
+
+<p>If you do want to build it from the sources, simply run :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mvn clean package
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will create the following Jar file ./target/CouchbaseTwitterInjector.jar</span></p>
+
+<h4>Run the Java Application</span></h4>
+
+<p>Before running the application you must create a twitter4j.properties file with the following information :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>twitter4j.jsonStoreEnabled<span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>
+</span><span class='line'>oauth.consumerKey<span class="o">=[</span>YOUR CONSUMER KEY<span class="o">]</span>
+</span><span class='line'>oauth.consumerSecret<span class="o">=[</span>YOUR CONSUMER SECRET KEY<span class="o">]</span>
+</span><span class='line'>oauth.accessToken<span class="o">=[</span>YOUR ACCESS TOKEN<span class="o">]</span>
+</span><span class='line'>oauth.accessTokenSecret<span class="o">=[</span>YOUR ACCESS TOKEN SECRET<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>couchbase.uri.list<span class="o">=</span>http://127.0.0.1:8091/pools
+</span><span class='line'>couchbase.bucket<span class="o">=</span>default
+</span><span class='line'>couchbase.password<span class="o">=</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Save the properties file and from the same location run:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>jar -jar <span class="o">[</span>path-to-jar<span class="o">]</span>/CouchbaseTwitterInjector.jar
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will inject Tweets into your Couchbase Server. Enjoy !</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2012-11-05T21:11:00+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>9:11 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/couchbase/'>couchbase</a>, <a class='category' href='/blog/categories/java/'>java</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>, <a class='category' href='/blog/categories/twitter/'>twitter</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/09/24/create-a-simple-node-dot-js-and-couchbase-application-dot-dot-dot-on-os-x/" title="Previous Post: Create a Simple Node.js and Couchbase application... on OS X">&laquo; Create a Simple Node.js and Couchbase application&#8230; on OS X</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/12/01/new-adventure-dot-dot-dot/" title="Next Post: New Adventure...">New Adventure&#8230; &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/';
+        var disqus_url = 'http://tgrall.github.io/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

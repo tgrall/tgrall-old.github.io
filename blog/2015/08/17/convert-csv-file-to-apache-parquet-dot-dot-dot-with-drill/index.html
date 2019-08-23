@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Convert a CSV File to Apache Parquet With Drill - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="A very common use case when working with Hadoop is to store and query simple files (CSV, TSV, &hellip;); then to get better performance and efficient &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Convert a CSV File to Apache Parquet With Drill</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-17T14:07:00+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:07 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>A very common use case when working with Hadoop is to store and query simple files (CSV, TSV, &hellip;); then to get better performance and efficient storage convert these files into more efficient format, for example <a href="https://parquet.apache.org/">Apache Parquet</a>.</p>
+
+<p><a href="https://parquet.apache.org/">Apache Parquet</a> is a <a href="https://en.wikipedia.org/wiki/Column-oriented_DBMS">columnar storage format</a> available to any project in the Hadoop ecosystem. Apache Parquet has the following characteristics:</p>
+
+<ul>
+<li>Self-describing</li>
+<li>Columnar format</li>
+<li>Language-independent</li>
+</ul>
+
+
+<p>Let&rsquo;s take a concrete example, you can find many interesting Open Data sources that distribute data as CSV files- or equivalent format-. So you can store them into your distributed file system and use them in your applications/jobs/analytics queries. This is not the most efficient way especially when we know that these data won&rsquo;t move that often. So instead of simply storing the CSV let&rsquo;s copy this information into Parquet.</p>
+
+<h3>How to convert CSV files into Parquet files?</h3>
+
+<p>You can use code to achieve this, as you can see in the <a href="https://github.com/Parquet/parquet-compatibility/blob/master/parquet-compat/src/test/java/parquet/compat/test/ConvertUtils.java">ConvertUtils</a> sample/test class. You can use a simpler way with Apache Drill. Drill allows you save the result of a query as Parquet files.</p>
+
+<p>The following steps will show you how to do convert a simple CSV into a Parquet file using Drill.</p>
+
+<!-- more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Apache Drill : Standalone <a href="https://drill.apache.org/">Apache Drill</a> or using <a href="https://www.mapr.com/products/mapr-sandbox-hadoop/download-sandbox-drill">Apache Drill Sandbox from MapR</a></li>
+<li>Some CSV Files: for example <a href="http://www.flysfo.com/media/facts-statistics/air-traffic-statistics">Passenger Dataset from SFO Air Traffic Statistics</a></li>
+</ul>
+
+
+<h4>Querying the CSV file</h4>
+
+<p>Let&rsquo;s execute a basic query:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="o">*</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">dfs</span><span class="p">.</span><span class="o">`/</span><span class="n">opendata</span><span class="o">/</span><span class="n">Passenger</span><span class="o">/</span><span class="n">SFO_Passenger_Data</span><span class="o">/</span><span class="n">MonthlyPassengerData_200507_to_201503</span><span class="p">.</span><span class="n">csv</span><span class="o">`</span>
+</span><span class='line'><span class="k">LIMIT</span> <span class="mi">5</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="ss">&quot;200507&quot;</span><span class="p">,</span><span class="ss">&quot;ATA Airlines&quot;</span><span class="p">,</span><span class="ss">&quot;TZ&quot;</span><span class="p">,</span><span class="ss">&quot;ATA Airlines&quot;</span><span class="p">,</span><span class="ss">&quot;TZ&quot;</span><span class="p">,</span><span class="ss">&quot;Domestic&quot;</span><span class="p">,</span><span class="ss">&quot;US&quot;</span><span class="p">,</span><span class="ss">&quot;Deplaned&quot;</span><span class="p">,</span><span class="ss">&quot;Low Fare&quot;</span><span class="p">,</span><span class="ss">&quot;Terminal 1&quot;</span><span class="p">,</span><span class="ss">&quot;B&quot;</span><span class="p">,</span><span class="ss">&quot;27271\r&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see, by default Drill processes each line as an array of columns, all values being simple String. So if you need to do some operations with these values (projection or where clause) you must use the column index, and cast the value to the proper type. You can see a simple example below:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="nb">DATE</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">AIRLINE</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="k">CAST</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="k">AS</span> <span class="n">DOUBLE</span><span class="p">)</span> <span class="k">as</span> <span class="o">`</span><span class="n">PASSENGER_COUNT</span><span class="o">`</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">dfs</span><span class="p">.</span><span class="o">`/</span><span class="n">opendata</span><span class="o">/</span><span class="n">Passenger</span><span class="o">/</span><span class="n">SFO_Passenger_Data</span><span class="cm">/*.csv`</span>
+</span><span class='line'><span class="cm">WHERE CAST(columns[11] AS DOUBLE) &lt; 5</span>
+</span><span class='line'><span class="cm">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">+---------+-----------------------------------+------------------+</span>
+</span><span class='line'><span class="cm">|  DATE   |              AIRLINE              | PASSENGER_COUNT  |</span>
+</span><span class='line'><span class="cm">+---------+-----------------------------------+------------------+</span>
+</span><span class='line'><span class="cm">| 200610  | United Airlines - Pre 07/01/2013  | 2.0              |</span>
+</span><span class='line'><span class="cm">...</span>
+</span><span class='line'><span class="cm">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We are now ready to create our Parquet files using the &ldquo;Create Table As Select&rdquo; (aka <a href="http://drill.apache.org/docs/create-table-as-ctas-command/">CTAS</a>)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">alter</span> <span class="k">session</span> <span class="k">set</span> <span class="o">`</span><span class="n">store</span><span class="p">.</span><span class="n">format</span><span class="o">`=</span><span class="s1">&#39;parquet&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">dfs</span><span class="p">.</span><span class="n">tmp</span><span class="p">.</span><span class="o">`/</span><span class="n">stats</span><span class="o">/</span><span class="n">airport_data</span><span class="o">/`</span> <span class="k">AS</span>
+</span><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="k">CAST</span><span class="p">(</span><span class="n">SUBSTR</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="k">AS</span> <span class="nb">INT</span><span class="p">)</span>  <span class="o">`</span><span class="k">YEAR</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="k">CAST</span><span class="p">(</span><span class="n">SUBSTR</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="k">AS</span> <span class="nb">INT</span><span class="p">)</span> <span class="o">`</span><span class="k">MONTH</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">AIRLINE</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">IATA_CODE</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">AIRLINE_2</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">IATA_CODE_2</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">GEO_SUMMARY</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">GEO_REGION</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">ACTIVITY_CODE</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">PRICE_CODE</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">TERMINAL</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="n">columns</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="k">as</span> <span class="o">`</span><span class="n">BOARDING_AREA</span><span class="o">`</span><span class="p">,</span>
+</span><span class='line'><span class="k">CAST</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="k">AS</span> <span class="n">DOUBLE</span><span class="p">)</span> <span class="k">as</span> <span class="o">`</span><span class="n">PASSENGER_COUNT</span><span class="o">`</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">dfs</span><span class="p">.</span><span class="o">`/</span><span class="n">opendata</span><span class="o">/</span><span class="n">Passenger</span><span class="o">/</span><span class="n">SFO_Passenger_Data</span><span class="cm">/*.csv`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it! You have now a Parquet file, a single file in our case since our dataset is really small. Apache Drill will create multiples files for the tables depending of the size and configuration your environment.</p>
+
+<p>I invite you to read this Chapter in the Apache Drill documentation to learn more about <a href="https://drill.apache.org/docs/parquet-format/">Drill and Parquet</a>.</p>
+
+<h3>Query Parquet Files</h3>
+
+<p>Now that you have created your Parquet files you can use them in any of your Hadoop processes, but you can also use them in Drill, as follow:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="o">*</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">dfs</span><span class="p">.</span><span class="n">tmp</span><span class="p">.</span><span class="o">`/</span><span class="n">stats</span><span class="o">/</span><span class="n">airport_data</span><span class="cm">/*`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to convert a CSV file using an Apache Drill query.</p>
+
+<p>You can do that with any source supported by Drill, for example from JSON to Parquet, or even a complex join query between multiple data sources. You can also chose a different output format for example JSON, or a CSV.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-08-17T14:07:00+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:07 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bigdata/'>bigdata</a>, <a class='category' href='/blog/categories/drill/'>drill</a>, <a class='category' href='/blog/categories/hadoop/'>hadoop</a>, <a class='category' href='/blog/categories/parquet/'>parquet</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/07/22/apache-drill-how-to-create-a-new-function/" title="Previous Post: Apache Drill : How to create a new function?">&laquo; Apache Drill : How to create a new function?</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/12/10/using-apache-drill-rest-api-to-build-ascii-dashboard-with-node/" title="Next Post: Using Apache Drill REST API to build ASCII Dashboard with node">Using Apache Drill REST API to build ASCII Dashboard with node &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/';
+        var disqus_url = 'http://tgrall.github.io/blog/2015/08/17/convert-csv-file-to-apache-parquet-dot-dot-dot-with-drill/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

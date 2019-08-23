@@ -1,0 +1,498 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Getting Started With Couchbase and node.js on Windows - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="In a previous post I have explained how to use Couchbase and Node.js on OS X. Since it is quite different on Windows here another article about it. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Getting Started With Couchbase and node.js on Windows</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-01-04T19:54:43+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>7:54 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In a previous post I have explained how to use Couchbase and Node.js on OS X. Since it is quite different on Windows here another article about it.</p>
+
+<h3>Install Couchbase Server 2.0</h3>
+
+<p>If you have not installed Couchbase Server already, do the following :</p>
+
+<ol>
+<li>Download Couchbase Server from <a href="http://www.couchbase.com/download">here</a></li>
+<li>Run the installer</li>
+<li>Configure the database at <a href="http://localhost:8091/">http://localhost:8091</a> (if you have issue take a look to <a href="http://tugdualgrall.blogspot.fr/2012/12/what-to-do-if-your-couchbase-server.html">this article</a>)</li>
+</ol>
+
+
+<p>These steps are documented in the <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-getting-started-install-win.html">Couchbase Server Manual</a>.</p>
+
+<h3>Install Node</h3>
+
+<p><strong>Install latest version of node</strong></p>
+
+<p>It is quite easy to install Node.js using the Windows installer provided at <a href="http://nodejs.org/">http://nodejs.org</a>.</p>
+
+<p>Once you have installed node, you can test is using the command line interface:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>node
+</span><span class='line'><span class="p">&amp;</span>gt<span class="p">;</span> console.log<span class="o">(</span>process.version<span class="o">)</span><span class="p">;</span>
+</span><span class='line'>v0.8.16
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Node is installed. So far so good !</p>
+
+<h3>Install Couchnode</h3>
+
+<p>Couchnode, the Couchbase Client Library for Node.js, is a native module. The tool used to install native modules is <code>node-gyp</code>.  So to install couchnode you need to install :</p>
+
+<ul>
+<li>node-gyp</li>
+<li>python</li>
+<li>Visual Studio to have access to a C/C++ compiler</li>
+</ul>
+
+
+<h4>Install node-gyp</h4>
+
+<p>The node-gyp module is easy to install and you can install it using npm using the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>npm install -g node-gyp
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <em>-g</em> parameter indicates that this module will be installed globally and added to your <code>%PATH%</code>.</p>
+
+<h4>Install Python</h4>
+
+<p>GYP uses Python to generate the project, so you need to install it on your environment. I have installed <a href="http://www.python.org/download/releases/2.7.3/">Python 2.7.3</a> using the Windows installer.</p>
+
+<p><strong>Install Visual Studio</strong></p>
+
+<p>Finally you need a C/C++ compiler, the best way to get it is to install Visual Studio. As you probably know I am not a Windows expert and I do not know a lot about Microsoft development tools. I have downloaded Visual Studio Express the free development tools from <a href="http://www.microsoft.com/visualstudio/eng/downloads">here</a>; it was sufficient.</p>
+
+<p><strong>Install Libcouchbase for Windows</strong></p>
+
+<p>Couchnode uses libcouchbase the C client library, so before running the npm install for Couchbase, you need to install libcouchbase itself.</p>
+
+<p>You can download it from <a href="http://www.couchbase.com/develop/c/current">Couchbase site</a>. The Windows versions are located in the left menu of the page. Download the zip file, that matches your environment. I have downloaded the &ldquo;Windows, 64-bit MSVC 10&rdquo;.</p>
+
+<p>Node-gyp will look for all the dependencies (DLL, library headers) into <code>c:\couchbase</code> directory, so you need to unzip the file in this folder. This location comes from the <a href="https://github.com/couchbase/couchnode/blob/master/binding.gyp#L7">binding.gyp</a> file of the couchnode project.</p>
+
+<p><strong>Install and Test Couchnode itself!</strong></p>
+
+<p>Let&rsquo;s check what we have done so far; we have installed:</p>
+
+<ul>
+<li>Node</li>
+<li>node-gyp</li>
+<li>Python</li>
+<li>Visual Studio</li>
+<li>Libcouchbase</li>
+</ul>
+
+
+<p>We are now ready to install and use couchnode itself. For this we can create a new node project.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir my-app
+</span><span class='line'><span class="nb">cd </span>my-app
+</span><span class='line'>npm install couchbase
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The install command will:</p>
+
+<ul>
+<li>Create a node_modules folder and put couchbase client library in it</li>
+<li>When installing/building couchnode on Windows I had the following warning :</li>
+</ul>
+
+
+<p>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1138,5): warning MSB8012: TargetExt(.dll) does not match the Linker&rsquo;s Output
+File property value (.node). This may cause your project to build incorrectly.
+To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+[C:\Users\tgrall\node\node_modules\couchbase\build\couchbase_impl.vcxproj]</p>
+
+<p>This is only a warning and as far as I know, it is not a blocker. At the end of the log you should see:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>couchbase@0.0.10 node_modules<span class="se">\c</span>ouchbase
+</span><span class='line'>├── bindings@1.0.0
+</span><span class='line'>└── request@2.11.4
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You have successfully installed couchnode.</p>
+
+<p>Let&rsquo;s now write a small test. Create a <code>test.js</code> file with the following content:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span>  <span class="nx">driver</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;couchbase&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">driver</span><span class="p">.</span><span class="nx">connect</span><span class="p">({</span>
+</span><span class='line'>  <span class="s2">&quot;username&quot;</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;password&quot;</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;hostname&quot;</span><span class="o">:</span> <span class="s2">&quot;localhost:8091&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;bucket&quot;</span><span class="o">:</span> <span class="s2">&quot;default&quot;</span><span class="p">},</span>
+</span><span class='line'>  <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">throw</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">cb</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="s1">&#39;{&quot;server&quot; : &quot;couchbase&quot;, &quot;version&quot; : 2 }&#39;</span> <span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span> <span class="p">}</span>
+</span><span class='line'>      <span class="nx">cb</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">){</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);}</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">doc</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Run this with the command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>node test.js
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should see the following text in your console :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">{</span> server: <span class="s1">&#39;couchbase&#39;</span>, version: <span class="m">2</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>In this article you have learned how to:</p>
+
+<ul>
+<li>Install Couchbase</li>
+<li>Install Node</li>
+<li>Install and configure node-gyp</li>
+<li>Install and use Couchbase and Node</li>
+</ul>
+
+
+<p>all this on Windows 7.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-01-04T19:54:43+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>7:54 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/couchbase/'>couchbase</a>, <a class='category' href='/blog/categories/nodejs/'>nodejs</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>, <a class='category' href='/blog/categories/windows/'>windows</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/12/30/couchbase-101-create-views-mapreduce-from-your-java-application/" title="Previous Post: Couchbase 101: Create views (MapReduce) from your Java application">&laquo; Couchbase 101: Create views (MapReduce) from your Java application</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/02/13/introduction-to-collated-views-with-couchbase-2-dot-0/" title="Next Post: Introduction to Collated Views with Couchbase 2.0">Introduction to Collated Views with Couchbase 2.0 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/';
+        var disqus_url = 'http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

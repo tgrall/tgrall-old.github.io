@@ -1,0 +1,686 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Grails on Oracle (OracleAS and OracleXE) - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="OTN (Oracle Technology Network)
+Readers have noticed, that Oracle has
+published an article from Richard Monson-Haefel about Ruby On Rails on Oracle. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2006/05/03/grails-on-oracle-oracleas-and-oraclexe/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Grails on Oracle (OracleAS and OracleXE)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2006-05-03T21:31:41+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2006</span></span> <span class='time'>9:31 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>OTN (Oracle Technology Network)
+Readers have noticed, that Oracle has
+published an article from <a href="http://www.monson-haefel.com/">Richard Monson-Haefel</a> about <a href="http://www.oracle.com/technology/pub/articles/haefel-oracle-ruby.html">Ruby On Rails on Oracle</a>. This
+article introduces the Ruby On Rails framework and explains how to use
+it to access an Oracle database. (<a href="http://www.oracle.com/technology/products/database/xe/index.html">Oracle 10g Express Edition</a> to be exact)</p>
+
+<p>If you are not familiar at all with Ruby On Rails, it is important to
+notice that it has nothing to do with Java, J2EE. It is a <a href="http://www.ruby-lang.org/">Ruby</a>
+based framework. &nbsp;So yes Ruby On Rails is really interesting,
+powerful and so on&hellip; but for me as a Java developer I would like to do
+the same using Java (or equivalent) leveraging the investment that I
+have done in J2EE; also important I want to be able to deploy and
+manage applications that are developed this way using my tools such as
+Oracle Enterprise Manager Application Server Control.</p>
+
+<p>The paradigm &ldquo;coding by convention&rdquo; that is the driver of Ruby on Rails
+has been leveraged to developed a new framework: GRAILS. Grails uses
+Groovy as the underlying language, so it runs on a JVM and can leverage
+any existing Java API.</p>
+
+<p>If you are a Java developer you will find very interesting to use this
+framework to accelerate the development of Web applications. If you are
+not yet a Java developer but need to develop Web application faster,
+and deploy the to your J2EE application server, Grails is also a very
+good tools.</p>
+
+<p>Since I have started with Richard&rsquo;s article I will use the same
+application/database schema to develop my first GRAILS application, and
+also use the same structure in my article&hellip;(<em>is it what we call lazy loading?</em>)</p>
+
+<h3>What is Groovy? What is Grails?</h3>
+
+<p>Groovy is a dynamic language that leverage features from other
+languages such as Ruby, Jython, and Smalltalk. Groovy is running at the
+top of a Java VM and makes available any existing Java objects (so all
+  the API) to Groovy. Groovy is currently under standardization with the <a href="http://www.jcp.org/en/jsr/detail?id=241">JSR-24</a><a href="http://www.jcp.org/en/jsr/detail?id=241">1</a>.
+  &nbsp;You can learn more about Groovy on the <a href="http://groovy.codehaus.org/">Groovy site</a> and is <a href="http://glaforge.free.fr/weblog/?catid=2">project leader&rsquo;s (Guillaume Laforge) blog</a>.</p>
+
+<p>GRAILS is to Groovy what Ruby On Rails is to Ruby. Originally named &ldquo;<em>Groovy On Rails</em>&rdquo;,
+  this name has been dropped in favor of Grails to avoid
+  confusion/competition. Like Ruby on Rails, Grails is designed to
+  create <a href="http://en.wikipedia.org/wiki/CRUD_%28acronym%29">CRUD</a>
+  (<em>Create Read Update Delete</em>) Web applications. &nbsp;You can learn more
+  about Grail on the <a href="http://grails.codehaus.org/">Grails site</a> and is <a href="http://graemerocher.blogspot.com/">project leader&rsquo;s (Graeme Rocher) blog</a>.</p>
+
+<p>Let&rsquo;s now dive in the sample application, for this, as stated earlier I
+  am using the sample application described in the OTN articles.</p>
+
+<h3>Example: The product Catalog</h3>
+
+<h4>Step 1: Set up the Oracle database</h4>
+
+<p>If you have not set up the schema and table from the article you just
+  need to create the following objects:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>CREATE TABLE comics (
+</span><span class='line'>    id NUMBER(10) NOT NULL,
+</span><span class='line'>    title VARCHAR2(60),
+</span><span class='line'>    issue NUMBER(4),
+</span><span class='line'>    publisher VARCHAR2(60),
+</span><span class='line'>    PRIMARY KEY (id)
+</span><span class='line'>    );
+</span><span class='line'>    CREATE SEQUENCE comics_seq;</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Based on the OTN article I have created this table in the <span class="code">ruby</span> schema.</p>
+
+<h4>Step 2: Install Grails</h4>
+
+<p>Grails installation is straight forward and explained in the <a href="http://grails.codehaus.org/Installation">Installation guide</a>, basically:</p>
+
+<ol>
+<li>Download the binaries (I used <a href="http://build.canoo.com/grails/artifacts//grails-bin-0.2-SNAPSHOT.zip">Grails 0.2</a>)</li>
+<li>Setup the different environment variable (<span class="code">GRAILS_HOME, JAVA_HOME, PATH</span>), I used Java 5.</li>
+</ol>
+
+
+<p>You are done !</p>
+
+<h4>Step 3: create the Web Application</h4>
+
+<p>Now we have installed the product, the next step is to create the application itself.</p>
+
+<p><strong>Create the application</strong></p>
+
+<p>The <span class="code">create-app</span> command is
+  creating the full project, with the template
+  with placeholder for the different components of your application such
+  as configuration, MVC, and library and much more. To do it enter the
+  following command, in your command line interface:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; grails create-app
+</span><span class='line'>....
+</span><span class='line'>.....
+</span><span class='line'>create-app:
+</span><span class='line'>[input] Enter application name:
+</span><span class='line'>comics_catalog
+</span><span class='line'>.....</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you will see, Grails uses Ant intensively, the <span class="code">create-app</span>
+  command will ask you for an application name, enter for example <span class="code">comics_catalog</span>.</p>
+
+<p>The created application contains now a list of directory allowing
+  developer to start to build the application using Groovy, Grails and
+  any Web components.</p>
+
+<p><strong><em>Add the Business Logic and Model:Domain Classes</em></strong></p>
+
+<p>One of the biggest differences between Grails and RoR, is the fact that
+  the main components of your application development is not the Table
+  like you have in RubyOnRails but the &ldquo;Domain Class&rdquo;. &nbsp;The
+  domain class are the core of the business application, they contains
+  the state and the behavior of your application.</p>
+
+<p>So the next step is to create a Domain Class for the Comics, to do that
+  you just need to go in the home directory of your project, eg cd <span class="code">comics_catalog</span> and run the <span class="code">create-domain-class</span>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; cd comics_catalog
+</span><span class='line'>&gt; grails create-domain-class
+</span><span class='line'>....
+</span><span class='line'>create-domain-class:
+</span><span class='line'>[input] Enter domain class name:
+</span><span class='line'>comics
+</span><span class='line'>....</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When the command ask you to enter the class name, enter <span class="code">comics</span>. Grails, will not use the
+  same naming convention that RoR has, so you need to use the same name
+  for the class and the table you want to map your object on. The
+  persistence layer is made using GROM (Grails Object Relational Mapping)
+  that leverage hibernate.</p>
+
+<p>Note: In our case what we are doing is to leverage an existing database
+  object and create the domain class at the top of it. Usually, Grails
+  uses a different approach where everything is driven by the
+  application, so you create the domain class first and then Grails will
+  create the different database objects.</p>
+
+<p>The Comics class does not have any information related to the mapping
+  itself, so you have to create the different attributes in the domain
+  class. This is where you you start to use Groovy, the domain class is
+  located in the following location:</p>
+
+<ul>
+<li><code>./comics_catalog/grails-app/domain/Comics.groovy</code></li>
+</ul>
+
+
+<p>Note hat by default Grails create the class with 2 attributes: id and
+  version, keep them in place, and add title, issue and
+  publisher.&nbsp;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">Comics</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">Long</span> <span class="n">id</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">Long</span> <span class="n">version</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// new properties for the Comics class</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">String</span> <span class="n">title</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">Long</span> <span class="n">issue</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">String</span> <span class="n">publisher</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span> <span class="s">&quot;${this.class.name} :  $id&quot;</span> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We are all set, we are ready to run the magic command that will create the different screens and flow.</p>
+
+<p><strong>Create the different screens from the domain class</strong></p>
+
+<p>You can now run the <code>generate-all</code> command to create all the different screens.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">grails</span> <span class="n">generate</span><span class="o">-</span><span class="n">all</span>
+</span><span class='line'><span class="o">....</span>
+</span><span class='line'><span class="n">input</span><span class="o">-</span><span class="n">domain</span><span class="o">-</span><span class="nl">class:</span>
+</span><span class='line'><span class="o">[</span><span class="n">input</span><span class="o">]</span> <span class="n">Enter</span> <span class="n">domain</span> <span class="kd">class</span> <span class="nc">name</span><span class="o">:</span>
+</span><span class='line'><span class="n">comics</span>
+</span><span class='line'><span class="o">....</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This command creates the different Views and Controllers, you can take a look to the directories:</p>
+
+<ul>
+<li><code>./comics_catalog/grails-app/controllers</code></li>
+<li><code>./comics_catalog/grails-app/views</code></li>
+</ul>
+
+
+<p><strong>Configure the database access</strong></p>
+
+<p>What we have to do is now to configure the application to use the Oracle database and schema.</p>
+
+<p>Grails uses a configuration file for data source:</p>
+
+<ul>
+<li><code>./comics_catalog/grails-app/conf/ApplicationDataSource.groovy</code></li>
+</ul>
+
+
+<p>Let&rsquo;s edit this file to connect to our Oracle database.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">class</span> <span class="nc">ApplicationDataSource</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="kt">boolean</span> <span class="n">pooled</span> <span class="o">=</span> <span class="kc">true</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">String</span> <span class="n">dbCreate</span> <span class="o">=</span> <span class="s">&quot;update&quot;</span> <span class="c1">// one of &#39;create&#39;, &#39;create-drop&#39;,&#39;update&#39;</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">String</span> <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;jdbc:oracle:thin:@localhost:1521:XE&quot;</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">String</span> <span class="n">driverClassName</span> <span class="o">=</span> <span class="s">&quot;oracle.jdbc.OracleDriver&quot;</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">String</span> <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;ruby&quot;</span>
+</span><span class='line'>  <span class="nd">@Property</span> <span class="n">String</span> <span class="n">password</span> <span class="o">=</span> <span class="s">&quot;ruby&quot;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Nothing special concerning the properties such as URL, DriverClassName,
+  username and password.</p>
+
+<p>The one that is interesting is the <span class="code">dbCreate</span>,
+  that allows you to configure the behavior on the schema to create or
+  not objects.In our sample the table exists, so we want to reuse the
+  object, but we want to be sure that we have all the mandatory objects,
+  columns too, so I selected <span class="code">update</span>.</p>
+
+<p>The next thing to do is to add the Oracle JDBC driver to the
+  application, to make it available. To make it available you just need
+  to copy the JDBC driver into the lib directory of your application. In
+  my case I am using Oracle XE so I copy the file from the following
+  location:</p>
+
+<ul>
+<li><code>ORACLE_XE_HOME/app/oracle/product/10.2.0/server/jdbc/lib/ojdbc14.jar</code>
+to</li>
+<li><code>./comics_catalog/lib/</code></li>
+</ul>
+
+
+<h4>Step 4: Run the application</h4>
+
+<p>Grails provide a way to run the application in stand alone mode, the command is <span class="code">run-app</span>. This command starts an Web container (based on Jetty) with the application&nbsp;deployed.</p>
+
+<p><code>grails run-app</code></p>
+
+<p>Note: Jetty will start on port 8080, in order to start in on a different port like e.g. 9090 use:</p>
+
+<p><code>grails -Dserver.port=9090 run-app</code></p>
+
+<p>You can now access the application using the following URL:</p>
+
+<p><code>http://localhost:8080/comics_catalog/comics/</code></p>
+
+<p>Your browser should show the list of comics from the Comics table.</p>
+
+<p><img src="http://static.flickr.com/45/127519247_646a991d3a_o.png"></p>
+
+<p><em>List of Comics</em></p>
+
+<p>You can create a new entry by clicking on the &ldquo;New Comics&rdquo; tab, and view/edit/delete existing record by clicking on the &ldquo;Show&rdquo; link.</p>
+
+<p><img src="http://static.flickr.com/56/127519249_0e580ede98_o.png"></p>
+
+<p><em>Edit/Create entry</em></p>
+
+<p>As you see the creation of an application is really easy. The next step is to deploy the application in your application server.</p>
+
+<h4>Step 5: Deploy the application</h4>
+
+<p>Grails provides a command to package the application as a WAR ready to
+  be deployed, so in the root directory of your project you can run the
+  following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">grails</span> <span class="n">war</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you run this command you end with a WAR with the name of your
+  application located in the root of your project, in our case: <span class="code">comics_catalog.war</span></p>
+
+<p>If you take a look to this WAR you&rsquo;ll see that it is quite big ~10Mb,
+  this is because all the libraries are included in the Lib directory of
+  the web application. You can see the exact structure of the WAR in the
+  ./tmp (<span class="code">./comics_catalog/tmp/war</span>) directory of the application.</p>
+
+<p>You can deploy the application as it is to Oracle Application Server 10<span style="font-style: italic;">g</span>,
+  but to avoid the issue with the class loader you should configure the
+  Web application to load the local classes first. It can be done during
+  deployment with the class loader configuration screen:</p>
+
+<p><img src="http://static.flickr.com/52/127519251_8a522dac17_o.png"></p>
+
+<p>You can also save this configuration in a deployment plan to facilitate later deployment.</p>
+
+<p>When the deployment is done you can access the application using the OracleAS host and port, something like:</p>
+
+<p><code>http://localhost:8888/comics_catalog/comics/list</code></p>
+
+<p>You can now administer and monitor the application like any other J2EE application deployed in OracleAS 10g.</p>
+
+<p><em>Better Deployment Options</em></p>
+
+<ul>
+<li>I personally do not like the idea of shipping all the Jar
+files in the WAR file, so instead you can use the OracleAS Shared
+Libraries to create a Grails library by uploading and configuring all
+the Jars. And package the War without all these libraries.</li>
+<li>Also you should be able to configure Hibernate/Spring to
+use a standard define Data source and use the JNDI name to lookup the
+connections.</li>
+</ul>
+
+
+<h3>Conclusion</h3>
+
+<p>GRAILS like Ruby On Rails are really interesting frameworks allowing
+  developers to create quickly Web application that access relational
+  database and especially the Oracle Database.</p>
+
+<p>Grails is quite new (release 0.2), but the documentation is really nice
+  and complete. I will encourage all developers that are interested by
+  such framework to use it and provide feedback to the development team.</p>
+
+<p>I will try provide other post about deployment of Grails on OracleAS,
+  but also related to other interesting features of this framework, for
+  example Ajax support, Validations etc etc.</p>
+
+<h3>Resources</h3>
+
+<ul>
+<li><a href="http://grails.codehaus.org/">Grails</a></li>
+<li><a href="http://groovy.codehaus.org/">Groovy</a></li>
+<li><a href="http://rubyonrails.org/">Ruby on Rails</a></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2006-05-03T21:31:41+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2006</span></span> <span class='time'>9:31 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/grails/'>grails</a>, <a class='category' href='/blog/categories/groovy/'>groovy</a>, <a class='category' href='/blog/categories/oracle/'>oracle</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2006/05/03/grails-on-oracle-oracleas-and-oraclexe/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2006/05/03/grails-on-oracle-oracleas-and-oraclexe/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2006/04/23/oracle-bpel-debugging-internal-soap-messages/" title="Previous Post: Oracle BPEL: Debugging 'internal' SOAP Messages">&laquo; Oracle BPEL: Debugging &#8216;internal&#8217; SOAP Messages</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2006/05/11/more-groovy-at-javaone/" title="Next Post: More Groovy at Javaone !">More Groovy at Javaone ! &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2006/05/03/grails-on-oracle-oracleas-and-oraclexe/';
+        var disqus_url = 'http://tgrall.github.io/blog/2006/05/03/grails-on-oracle-oracleas-and-oraclexe/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

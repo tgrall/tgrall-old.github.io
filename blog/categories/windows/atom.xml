@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Windows | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/windows/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With Couchbase and node.js on Windows]]></title>
+    <link href="http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/"/>
+    <updated>2013-01-04T19:54:43+01:00</updated>
+    <id>http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows</id>
+    <content type="html"><![CDATA[<p>In a previous post I have explained how to use Couchbase and Node.js on OS X. Since it is quite different on Windows here another article about it.</p>
+
+<h3>Install Couchbase Server 2.0</h3>
+
+<p>If you have not installed Couchbase Server already, do the following :</p>
+
+<ol>
+<li>Download Couchbase Server from <a href="http://www.couchbase.com/download">here</a></li>
+<li>Run the installer</li>
+<li>Configure the database at <a href="http://localhost:8091/">http://localhost:8091</a> (if you have issue take a look to <a href="http://tugdualgrall.blogspot.fr/2012/12/what-to-do-if-your-couchbase-server.html">this article</a>)</li>
+</ol>
+
+
+<p>These steps are documented in the <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-getting-started-install-win.html">Couchbase Server Manual</a>.</p>
+
+<h3>Install Node</h3>
+
+<p><strong>Install latest version of node</strong></p>
+
+<p>It is quite easy to install Node.js using the Windows installer provided at <a href="http://nodejs.org/">http://nodejs.org</a>.</p>
+
+<p>Once you have installed node, you can test is using the command line interface:</p>
+
+<pre><code class="sh">node
+&amp;gt; console.log(process.version);
+v0.8.16
+</code></pre>
+
+<p>Node is installed. So far so good !</p>
+
+<h3>Install Couchnode</h3>
+
+<p>Couchnode, the Couchbase Client Library for Node.js, is a native module. The tool used to install native modules is <code>node-gyp</code>.  So to install couchnode you need to install :</p>
+
+<ul>
+<li>node-gyp</li>
+<li>python</li>
+<li>Visual Studio to have access to a C/C++ compiler</li>
+</ul>
+
+
+<h4>Install node-gyp</h4>
+
+<p>The node-gyp module is easy to install and you can install it using npm using the following command:</p>
+
+<pre><code class="sh">npm install -g node-gyp
+</code></pre>
+
+<p>The <em>-g</em> parameter indicates that this module will be installed globally and added to your <code>%PATH%</code>.</p>
+
+<h4>Install Python</h4>
+
+<p>GYP uses Python to generate the project, so you need to install it on your environment. I have installed <a href="http://www.python.org/download/releases/2.7.3/">Python 2.7.3</a> using the Windows installer.</p>
+
+<p><strong>Install Visual Studio</strong></p>
+
+<p>Finally you need a C/C++ compiler, the best way to get it is to install Visual Studio. As you probably know I am not a Windows expert and I do not know a lot about Microsoft development tools. I have downloaded Visual Studio Express the free development tools from <a href="http://www.microsoft.com/visualstudio/eng/downloads">here</a>; it was sufficient.</p>
+
+<p><strong>Install Libcouchbase for Windows</strong></p>
+
+<p>Couchnode uses libcouchbase the C client library, so before running the npm install for Couchbase, you need to install libcouchbase itself.</p>
+
+<p>You can download it from <a href="http://www.couchbase.com/develop/c/current">Couchbase site</a>. The Windows versions are located in the left menu of the page. Download the zip file, that matches your environment. I have downloaded the &ldquo;Windows, 64-bit MSVC 10&rdquo;.</p>
+
+<p>Node-gyp will look for all the dependencies (DLL, library headers) into <code>c:\couchbase</code> directory, so you need to unzip the file in this folder. This location comes from the <a href="https://github.com/couchbase/couchnode/blob/master/binding.gyp#L7">binding.gyp</a> file of the couchnode project.</p>
+
+<p><strong>Install and Test Couchnode itself!</strong></p>
+
+<p>Let&rsquo;s check what we have done so far; we have installed:</p>
+
+<ul>
+<li>Node</li>
+<li>node-gyp</li>
+<li>Python</li>
+<li>Visual Studio</li>
+<li>Libcouchbase</li>
+</ul>
+
+
+<p>We are now ready to install and use couchnode itself. For this we can create a new node project.</p>
+
+<pre><code class="sh">mkdir my-app
+cd my-app
+npm install couchbase
+</code></pre>
+
+<p>The install command will:</p>
+
+<ul>
+<li>Create a node_modules folder and put couchbase client library in it</li>
+<li>When installing/building couchnode on Windows I had the following warning :</li>
+</ul>
+
+
+<p>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1138,5): warning MSB8012: TargetExt(.dll) does not match the Linker&rsquo;s Output
+File property value (.node). This may cause your project to build incorrectly.
+To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+[C:\Users\tgrall\node\node_modules\couchbase\build\couchbase_impl.vcxproj]</p>
+
+<p>This is only a warning and as far as I know, it is not a blocker. At the end of the log you should see:</p>
+
+<pre><code class="sh">couchbase@0.0.10 node_modules\couchbase
+├── bindings@1.0.0
+└── request@2.11.4
+</code></pre>
+
+<p>You have successfully installed couchnode.</p>
+
+<p>Let&rsquo;s now write a small test. Create a <code>test.js</code> file with the following content:</p>
+
+<pre><code class="js">var  driver = require('couchbase');
+
+driver.connect({
+  "username": "",
+  "password": "",
+  "hostname": "localhost:8091",
+  "bucket": "default"},
+  function(err, cb) {
+    if (err) {
+      throw (err)
+    }
+
+    var key = 'foo';
+    cb.set(key, '{"server" : "couchbase", "version" : 2 }' , function (err, meta) {
+      if (err) { console.log(err); }
+      cb.get(key, function(err, doc) {
+        if (err){ console.log(err);}
+        console.log(doc);
+      });  
+    });
+  });
+</code></pre>
+
+<p>Run this with the command:</p>
+
+<pre><code class="sh">node test.js
+</code></pre>
+
+<p>You should see the following text in your console :</p>
+
+<pre><code>{ server: 'couchbase', version: 2 }
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>In this article you have learned how to:</p>
+
+<ul>
+<li>Install Couchbase</li>
+<li>Install Node</li>
+<li>Install and configure node-gyp</li>
+<li>Install and use Couchbase and Node</li>
+</ul>
+
+
+<p>all this on Windows 7.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[What to Do if Your Couchbase Server Does Not Start?]]></title>
+    <link href="http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/"/>
+    <updated>2012-12-26T11:08:37+01:00</updated>
+    <id>http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start</id>
+    <content type="html"><![CDATA[<p>Working with the Couchbase 2.0.0 release you may have issues when trying to access the Web Admin Console or simply starting the server. This is due to the way Couchbase Server uses the IP address/hostname during the installation process. So when you have one of the following errors :</p>
+
+<ul>
+<li>On Windows, Server is not working at all, even after installation. You can access the sever on port 8092 (Couchbase API port), but cannot on port 8091</li>
+<li>You have the following error when accessing the console <code>"[10:02:02] IP address seems to have changed. Unable to listen on 'ns_1@10.0.2.15'"</code></li>
+</ul>
+
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png">http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png</a>&#8221;></p>
+
+<ul>
+<li>When you try to restart the server it does not start and you have the following error message in the error log :
+<code>"Configured address '10.0.2.15' seems to be invalid. Will refuse to start for safety reasons"</code></li>
+</ul>
+
+
+<p>Some of these issues are related to a known issue on Windows ( see <a href="http://www.couchbase.com/issues/browse/MB-7417">MB-7417</a> that will be fixed in 2.0.1) or the fact that Couchbase server does not support change of the IP address after installation.  This is documented in the section “<a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-bestpractice-cloud-ip.html">Using Couchbase in the Cloud: Handling Changes in IP Addresses</a>” of the Couchbase Server Manual. This article explains what should be done when configuring Couchbase Server on Windows, but you can do equivalent steps on any platform using the shell scripts available on Linux and/or Mac OS X.</p>
+
+<p>Once you have installed Couchbase, you can see in the console that the IP address of your server is used :
+  <img class="<a" src="href="http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png">http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png</a>&#8221;></p>
+
+<p>Typically the address 192.168.0.97 is stored in the configuration of Couchbase. If your server receives a new address from the DHCP server, Couchbase will not work anymore. In this article you will see how you can configure Couchbase to use another IP address or Hostname.</p>
+
+<p><strong>Important:</strong> The steps that follow will completely destroy any data and configuration from the node, so it is best to start with a fresh Couchbase install. If you can not, you should backup your data using the file based backup-restore documented <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-backup-restore.html">here</a>.</p>
+
+<!-- more -->
+
+
+<h3>Setting up a hostname in hosts file</h3>
+
+<p>The best practice is to register Couchbase using a hostname instead of an IP Address. For this you will need to associate this hostname to an IP address in the <code>hosts</code> file.</p>
+
+<p>Since the <code>hosts</code> file is part of the system, <em>you need to edit it as administrator</em>. You have different approaches to achieve this:</p>
+
+<p>The following steps explain the easiest way to do it:</p>
+
+<ol>
+<li>Click “Start Menu”</li>
+<li>Navigate to “All Programs &gt; Accessories”</li>
+<li>“Right Click” on “Notepad” (or your favorite text editor)</li>
+<li>Click “Run as Administrator”</li>
+</ol>
+
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-gxd-rAWLqd8/ULy-vIxak3I/AAAAAAAAAZc/00pNi3Iu0uc/s320/Screen+Shot+2012-12-03+at+3.57.16+PM.png">http://4.bp.blogspot.com/-gxd-rAWLqd8/ULy-vIxak3I/AAAAAAAAAZc/00pNi3Iu0uc/s320/Screen+Shot+2012-12-03+at+3.57.16+PM.png</a>&#8221;></p>
+
+<p>You can now open the file <code>C:\Windows\System21\drivers\etc\hosts</code></p>
+
+<p>Add a new entry with a host name that will be used by Couchbase Server for example something like :</p>
+
+<p><code>127.0.0.1    couchbase-node1.mycompany.com</code></p>
+
+<p>Here I am using the local address (127.0.0.1) like that I won&rsquo;t have to change it even when my IP address changes. (This is useful when you are working in a single node mode)</p>
+
+<h3>Configure Couchbase to use the hostname or new IP address</h3>
+
+<p>During the installation Couchbase has been registered as a Windows Service. To be able to associate Couchbase to the new hostname (or IP address) the service needs to re-configured and reinstalled.</p>
+
+<p>This could be done using the scripts provided with the product. To run the scripts you need to do it as administrators, you can do it with one of the following methods:</p>
+
+<ul>
+<li>Search for the file and right click and select <code>Run as Administrator</code> (documented below)</li>
+<li>Run the terminal as administrator and run all the command from there (documented below)</li>
+<li>Search for the file and run it using <code>Ctrl+Shift+Enter</code></li>
+</ul>
+
+
+<h4>Option 1 : Using the Start Menu and Search Program</h4>
+
+<p><strong>Stop Couchbase Server Windows Service</strong></p>
+
+<p>The first thing to do, is to stop this service that is automatically started after the installation:</p>
+
+<ol>
+<li>Click <code>Start Menu</code></li>
+<li>Type <code>Services</code> in the Search Program form</li>
+<li>Click on <code>Services</code></li>
+<li>In the Services Application navigate to <code>CouchbaseServer</code></li>
+<li>Right Click and Click on <code>Stop</code></li>
+<li>Couchbase is now stopped.</li>
+</ol>
+
+
+<p><strong>Edit the Service Register script</strong></p>
+
+<p>Note: Due to a small formatting issue (See <a href="http://www.couchbase.com/issues/browse/MB-7322">MB-7322</a>), Notepad could not be used, a solution is to take <a href="http://notepad-plus-plus.org/">Notepad++</a> or any other advanced editing tool.</p>
+
+<ol>
+<li>As Administrator, open the <code>C:\Program Files\Couchbase\Server\bin\service_register.bat</code> file with your favorite editor. To open the editor as Administrator you can use the approach described in the previous step.</li>
+<li>Edit the line 9 to replace <code>%IP_ADDR%</code> by your hostname, the line should look like: <code>NS_NAME=ns_1@couchbase-node1.mycompany.com</code></li>
+<li>Save the file</li>
+</ol>
+
+
+<p><strong>Delete existing configuration and logs</strong></p>
+
+<ol>
+<li>Using the file explorer, go into: <code>C:\Program Files\Couchbase\Server\var\lib\couchbase\mnesia</code></li>
+<li>Delete its content (Select All and Right Click)</li>
+</ol>
+
+
+<p><strong>Register the new Configuration as Service</strong></p>
+
+<ol>
+<li>Using the file explorer, go into: <code>C:\Program Files\Couchbase\Server\bin</code></li>
+<li>Right Click on <code>service_reregister.bat</code></li>
+<li>Click on <code>Run as Administrator</code></li>
+</ol>
+
+
+<p>This script recreates the Couchbase Server Windows Service and starts it automatically.</p>
+
+<p><strong>Check the configuration</strong></p>
+
+<ol>
+<li>Launch your Internet Browser</li>
+<li>Go to <a href="http://localhost:8091">http://localhost:8091</a></li>
+<li>Follow the Couchbase Installation Steps</li>
+<li>Once install connect to the console</li>
+<li>Go to <code>Server Nodes</code> tab</li>
+<li>Check that the server name is now <code>couchbase-node1.mycompany.com</code></li>
+</ol>
+
+
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png">http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png</a>&#8221;></p>
+
+<p>Your Couchbase node is now configured to use the hostname of your server.</p>
+
+<h4>Option 2 : Using the Command Line</h4>
+
+<p><strong>Launch Command Prompt as Administrator</strong></p>
+
+<ol>
+<li>Click <code>Start Menu</code></li>
+<li>Type <code>Command Prompt</code> in the Search program form</li>
+<li>Type <code>Ctrl+Shift+Enter</code></li>
+<li>Go to <code>C:\Program Files\Couchbase\Server\bin</code> (or other location if you have chosen another location during installation)</li>
+</ol>
+
+
+<p>You are now ready to do the administration tasks.</p>
+
+<ol>
+<li>Execute the <code>service_stop.bat</code></li>
+<li><p>Edit the Service Register script</p></li>
+<li><p>Open <code>service_register.bat</code></p></li>
+<li>Edit the line 9 to replace <code>%IP_ADDR%`` by your hostname (or your IP address), the line should look like:</code>set NS_NAME=<a href="&#109;&#x61;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x6e;&#115;&#x5f;&#49;&#x40;&#99;&#111;&#x75;&#x63;&#x68;&#x62;&#x61;&#x73;&#x65;&#45;&#x6e;&#x6f;&#100;&#101;&#49;&#x2e;&#109;&#x79;&#99;&#111;&#109;&#112;&#97;&#110;&#x79;&#x2e;&#99;&#x6f;&#109;">&#110;&#115;&#95;&#49;&#64;&#x63;&#x6f;&#x75;&#99;&#104;&#98;&#97;&#x73;&#x65;&#x2d;&#110;&#x6f;&#100;&#101;&#49;&#46;&#109;&#x79;&#99;&#111;&#x6d;&#x70;&#x61;&#x6e;&#x79;&#46;&#x63;&#x6f;&#109;</a>`</li>
+<li>Save the file3.  Delete the content of: <code>C:\Program Files\Couchbase\Server\var\lib\couchbase\mnesia</code></li>
+<li>Execute the `service_reregister.bat</li>
+</ol>
+
+
+<p>This script recreates the Couchbase Server Windows Service and starts it automatically.</p>
+
+<p><strong>Check the configuration</strong></p>
+
+<ol>
+<li>Launch your Internet Browser</li>
+<li>Go to <a href="http://localhost:8091">http://localhost:8091</a></li>
+<li>Follow the Couchbase Installation Steps</li>
+<li>Once install connect to the console</li>
+<li>Go to <code>Server Nodes</code> tab</li>
+<li>Check that the server name is now <code>couchbase-node1.mycompany.com</code></li>
+</ol>
+
+
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png">http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png</a>&#8221;></p>
+
+<p>Your Couchbase node is now configured to use the hostname of your server.</p>
+]]></content>
+  </entry>
+  
+</feed>

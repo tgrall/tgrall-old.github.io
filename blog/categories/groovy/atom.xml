@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Groovy | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/groovy/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[How to Create a New Content List Template for eXo Platform 3]]></title>
+    <link href="http://tgrall.github.io/blog/2011/08/31/how-to-create-a-new-content-list-template-for-exo-platform-3/"/>
+    <updated>2011-08-31T23:50:18+02:00</updated>
+    <id>http://tgrall.github.io/blog/2011/08/31/how-to-create-a-new-content-list-template-for-exo-platform-3</id>
+    <content type="html"><![CDATA[<h3>Introduction</h3>
+
+<p>eXo Platform provide many powerful features to manipulate and expose any type of content on a page. This is due to the fact that eXo stores the all the content in its Java Content Repository (JCR) and render the content on a page using Groovy Templates.</p>
+
+<p>In this how to you will learn how you can create and use template that are used in the &ldquo;Content List&rdquo; portlet. For example in the ACME sample site you can show the content in 1 or 2 columns just by selecting different templates.</p>
+
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png">http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png</a>&#8221;>
+One Column View</p>
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png">http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png</a>&#8221;>
+Two Columns View</p>
+
+<h3>Creating a new Content List Template</h3>
+
+<p>In this section you will learn how to create a new template using the eXo IDE. Before writing the new template it is important to learn where the templates are stored.</p>
+
+<h4>eXo Content Service: Template Storage</h4>
+
+<p>Like many things inside eXo Platform, the eXo JCR is used to stored the templates. Templates are just a special type of content. This allows developers to easily write and test code without having complex deployment process, but also it make the life easy to export a running configuration to another one. For this you just need to use the standard JCR export/import features.</p>
+
+<p>All the template and eXo Content Service configurations are stored inside a specific JCR workspace named : <code>dms-system</code>.</p>
+
+<p>Each template type (Document Type, Content List, &hellip;.) is stored in a specific location. In our case we want to work on the &ldquo;Content List&rdquo; portlet so the template are stored inside the following folder:</p>
+
+<ul>
+<li><code>/exo:ecm/views/templates/content-list-viewer/list/</code></li>
+</ul>
+
+
+<p>Just for the fun of it, let&rsquo;s inspect this folder using the eXo CRaSH utility. If you are not interested you can jump to the next section. CRaSH is a shell for Java Content Repositories, the source of CRaSH is available on <a href="http://code.google.com/p/crsh/">Google Code</a>. So in a terminal window:</p>
+
+<p>1-  Connect to CRaSH using telnet client:</p>
+
+<pre><code class="sh"> telnet 127.0.0.1 5000
+</code></pre>
+
+<p>2-  Connect to the JCR workspace using the following command:</p>
+
+<pre><code class="sh"> connect -u root -p gtn -c portal dms-system&lt;/span&gt;
+</code></pre>
+
+<p>Where: -u is the user, -p the password, -c the Portal Container, and dms-system the workspace to use</p>
+
+<p>3-  Move the the folder that contains all the templates for the Content List portlet:</p>
+
+<pre><code class="sh"> cd /exo:ecm/views/templates/content-list-viewer/list/
+</code></pre>
+
+<p>4-  List all the templates using the <code>ls</code> command
+You can see the list of all the templates available for the Content List portlet.</p>
+
+<h4>Create a new template using the eXo IDE</h4>
+
+<p>Let&rsquo;s now create a new template using the IDE. For this be sure you are connected with a user that is part of the <code>/Developer</code> group. For simplicity reason I am using the <code>root</code> user.</p>
+
+<p>The first important step is to go the the template location using the following steps:</p>
+
+<p>1-  Access the IDE: click on <code>My Spaces &amp;gt; IDE</code>.</p>
+
+<p>2-  Switch <code>dms-system</code> workspace: In the IDE menu click <code>My Spaces &amp;gt;on Window &amp;gt; Select Workspace</code>. And select the dms-system location in the dialog box and click OK.</p>
+
+<p>3-  In the file structure on the left navigate to the template location :</p>
+
+<pre><code class="sh">/exo:ecm/views/templates/content-list-viewer/list/
+</code></pre>
+
+<p>4-  Create a new template : In the IDE Menu click on <code>File &amp;gt; New &amp;gt; Groovy Template</code></p>
+
+<p>5-  Save the file as &ldquo;<code>MyNewTemplate.gtmpl</code>&rdquo;</p>
+
+<p>6-  Enter some basic code:</p>
+
+<p>&#8220;` html</p>
+
+<h1>This is my template</h1>
+
+
+<p>The date is &lt;= new Date()></p>
+
+<pre><code>
+7-  Save the template
+
+8-  Go back to the Home page of the Acme Site
+
+9-  Switch to Edit more by selecting Edit in the top right drop down list.
+
+<img src="http://3.bp.blogspot.com/-EsSUDUdUo_8/TbbRJZlZlHI/AAAAAAAAAPk/5iTn-NoC-JE/s200/edit-mode.png">
+
+10-  Move you mouse at the top of the list of news and click on the preference button: <img src="http://1.bp.blogspot.com/-ksljDe3llf4/TbbSIOl0DII/AAAAAAAAAPs/C0eBv-SJ25I/s200/PreferencesIcon.png">
+
+11-  In the list of templates, select the "MyNewTemplate", and click save.
+
+<img src="http://2.bp.blogspot.com/-7hT5osGXK1w/TbbTTJ7ZKSI/AAAAAAAAAP0/--VCTefhrSI/s320/select-template.png">
+
+We have created our new template, and use it on a page. We should now add some more interesting code to the template to really loop over the content based on the portlet configuration. But before this it is important to talk about caching and code modification.
+
+#### eXo Template and Cache
+
+To improve performances and a running system, the compiled version of the template is by default cached. This is why when you are modifying a template you do not see any change. We have two ways to work around this:
+
+*   Run eXo Platform in Debug mode, in this case nothing is cached
+*   Invalidate the cache manually using JMX
+
+Since working with no cache at all is not an option, here is the MBean you have to use to invalidate the Template Service cache:
+
+* `exo:portal="portal",service=cache,name="TemplateService"`, then call the `clearCache` operation on it
+
+I do use JConsole for this, but you can use any method to call your MBeans operation.
+
+<img src="http://1.bp.blogspot.com/-ZuMQz-VHBYY/TbldhSRY2NI/AAAAAAAAAP8/pb09UoA9_b4/s200/TemplateServiceCacheMbean.png">
+
+Do not forget to call this operation each time you modify your template to be sure eXo recompile the template.
+
+#### Accessing Content in the template
+
+The current code of the template is really simple, you need now to add code to print the content in the page. For this we will be using some eXo Content programming, once again in the IDE.
+
+If you are not interested to have detailed explanation of the code you can go to the complete source code [here](javascript: alert().
+
+The template used by the Content List portlet is based on the following Java class `org.exoplatform.wcm.webui.clv.UICLVPresentation`, this class is responsible to set the complete context that you can use in the template such as:
+
+* The folder or category that contains the content to show. The "Folder Path" field in the preference screen
+* The display settings: title, number of documents, elements to show, ...
+
+Here is the code to access these preferences:
+</code></pre>
+
+<p>// import all the classes need in the template
+import javax.jcr.Node;
+import org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator;
+import org.exoplatform.wcm.webui.clv.UICLVPortlet;
+import org.exoplatform.wcm.webui.Utils;
+import org.exoplatform.services.wcm.core.NodeLocation;</p>
+
+<p>// get the portlet preferences
+def header = uicomponent.getHeader();
+def isShowRssLink = uicomponent.isShowRssLink();
+def isShowHeader = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_HEADER);
+def isShowRefresh = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_REFRESH_BUTTON);</p>
+
+<p>def isShowTitle = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_TITLE);
+def isShowDate = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_DATE_CREATED);
+def isShowLink = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_LINK);
+def isShowReadmore = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_READMORE);
+def isShowImage = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_ILLUSTRATION) ;
+def isShowSummary = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_SUMMARY);</p>
+
+<pre><code>
+The &lt;span style="font-family: &amp;quot;Courier New&amp;quot;,Courier,monospace;"&gt;uicomponent&lt;/span&gt; object is defined by the container class of the portlet that calls the template. This class contains many utility methods. In the code above I retrieve all the preferences of the portlet, since the name are self-explanatory it is not necessary to detail them, especially when you look at the preferences screen below:
+
+<img src="http://3.bp.blogspot.com/-bDIJtSVaD9A/TblkjTr2wMI/AAAAAAAAAQE/6mRLmEYqpsE/s320/preference-screen.png">
+
+Now that the template has all the preferences, it is time to loop on the content on print the information.
+
+The eXo Content Service provides API to manipulate the content, including pagination of content. The idea behind this is to let the Content Service manage the JCR query, sorting, caching and pagination of data. So in your template you will mainly manage two classes to loop through the content to show:
+
+* `uicomponent.getUIPageIterator()` a paginator object that is configured based on the portlet preferences
+* `uicomponent.getCurrentPageData()`contains a list of the content (JCR Nodes) that should print on the current page
+
+So let's print all the content of the page as a simple HTML list:
+</code></pre>
+
+<ul style="margin: 20px">
+<%
+for (viewNode in uicomponent.getCurrentPageData()) {
+  def title = viewNode.getProperty("exo:title").getString();
+  print("<li>$title</li>&#8221;);
+}
+%>
+</ul>
+
+
+<pre><code>
+Just  copy this code in your template, save it, refresh the cache... and go to your page. You should see the list of the content in a simple HTML list.
+
+On each content (Node), eXo Content API provides some helper method to easily manipulate the content and avoid using the JCR API directly. In the following code you can see the most important methods accessing content properties:
+</code></pre>
+
+<p>def itemName = viewNode.getName();
+def itemLink = uicomponent.getURL(viewNode);<br/>
+def webdDavLink = uicomponent.getWebdavURL(viewNode);
+def itemDateCreated = uicomponent.getCreatedDate(viewNode);
+def itemModifiedDate = uicomponent.getModifiedDate(viewNode);
+def itemAuthor = uicomponent.getAuthor(viewNode);
+def imgSrc = uicomponent.getIllustrativeImage(viewNode);
+def itemTitle = uicomponent.getTitle(viewNode);
+def itemSummary = uicomponent.getSummary(viewNode);
+&#8220;`</p>
+
+<p>One important point is the fact that these methods are responsible of many things, for example: formatting dates, returning complete URLs depending of the context of the portlet.</p>
+
+<p>Based on these methods you can now work on the presentation of the information on the page. Let&rsquo;s for example print the image, the title and allow user to click on the title to go in the detail view of the article. This is done simply using the following code:</p>
+
+<pre><code class="java">&lt;%
+for (viewNode in uicomponent.getCurrentPageData()) {
+  def itemName = viewNode.getName();
+  def itemLink = uicomponent.getURL(viewNode);  
+  def webdDavLink = uicomponent.getWebdavURL(viewNode);
+  def itemDateCreated = uicomponent.getCreatedDate(viewNode);
+  def itemModifiedDate = uicomponent.getModifiedDate(viewNode);
+  def itemAuthor = uicomponent.getAuthor(viewNode);
+  def imgSrc = uicomponent.getIllustrativeImage(viewNode);
+  def itemTitle = uicomponent.getTitle(viewNode);
+  def itemSummary = uicomponent.getSummary(viewNode);
+
+  %&gt;
+  &lt;div style="overflow: auto;"&gt;
+  &lt;img src="$imgSrc" align="left"&gt;
+  &lt;h3&gt;&lt;a href="$itemLink"&gt;$itemTitle&lt;/a&gt;&lt;/h3&gt;
+  $itemSummary
+  &lt;/div&gt;
+
+  &lt;%
+}
+%&gt;
+</code></pre>
+
+<p>For simplicity reason, this code does not manage any null value. Also the template do not deal with the portlet preferences such as the &ldquo;Header&rdquo;, &ldquo;RSS&rdquo; links and so on, do not hesitate to do it if you want.</p>
+
+<p>The Web site should look like the following image:</p>
+
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png">http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png</a>&#8221;></p>
+
+<p>The last important point is to add the support for the in context editing that allows the user to edit the content directly from the template. Once again this is done with a method of the <code>uicomponent</code> object, that create a DIV around the content. Let&rsquo;s add this to the template:</p>
+
+<pre><code class="java">&lt;%
+for (viewNode in uicomponent.getCurrentPageData()) {
+  def itemName = viewNode.getName();
+  def itemLink = uicomponent.getURL(viewNode);  
+  def webdDavLink = uicomponent.getWebdavURL(viewNode);
+  def itemDateCreated = uicomponent.getCreatedDate(viewNode);
+  def itemModifiedDate = uicomponent.getModifiedDate(viewNode);
+  def itemAuthor = uicomponent.getAuthor(viewNode);
+  def imgSrc = uicomponent.getIllustrativeImage(viewNode);
+  def itemTitle = uicomponent.getTitle(viewNode);
+  def itemSummary = uicomponent.getSummary(viewNode);
+
+  %&gt;
+  &lt;div style="overflow: auto;"&gt;
+  &lt;%=uicomponent.addQuickEditDiv("MyTemplateContentEditor", viewNode)%&gt;
+  &lt;img src="$imgSrc" align="left"&gt;
+  &lt;h3&gt;&lt;a href="$itemLink"&gt;$itemTitle&lt;/a&gt;&lt;/h3&gt;
+  $itemSummary
+  &lt; /div&gt;
+  &lt;/div&gt;
+
+  &lt;%
+}
+%&gt;
+</code></pre>
+
+<p>The lines 15 and 19 are new in this template and provide support for Quick Edit feature.</p>
+
+<p>Done! We have created a new template for eXo Platform Content Service using embedded IDE.</p>
+
+<h4>Conclusion</h4>
+
+<p>In this article you have learned how to create a new template for eXo Content Service, with some basic steps:</p>
+
+<ul>
+<li>Create a new Groovy Template using the eXo IDE</li>
+<li>Edit this template using the eXo Java Content API</li>
+<li>Configure your Content List portlet instance on a page to select the new template</li>
+</ul>
+
+
+<p>You can now create your own templates and use your imagination to add cool features to your site (for example the carrousels you see on the <a href="http://www.exoplatform.com/">eXo site</a> are using custom CLV template.)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaOne 2008: Groovy and Grails Presentations and Code]]></title>
+    <link href="http://tgrall.github.io/blog/2008/05/16/javaone-2008-groovy-and-grails-presentations-and-code/"/>
+    <updated>2008-05-16T12:47:00+02:00</updated>
+    <id>http://tgrall.github.io/blog/2008/05/16/javaone-2008-groovy-and-grails-presentations-and-code</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a>&#8220;>Andres and Guillaume have posted on the Groovy Users list the pointers to many (if not all) the Groovy and Grails sessions of JavaOne 2008&hellip; You want to learn more, this is a great opportunity to do it so:</p>
+
+<ul>
+<li><a href="http://permalink.gmane.org/gmane.comp.lang.groovy.user/32891">JavaOne 2008: Groovy and Grails presentations and code</a></li>
+</ul>
+
+
+<p>Thanks to all of the authors&hellip; I would love to be there watching these session live&hellip; This post is the opportunity also to point you to this video from InfoQ of <a href="http://www.infoq.com/presentations/rudolph-grails-intro">Jason Rudolph doing a very nice introduction to Grails</a> during last year QCon conference&hellip;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[JavaOne 2008: My Sessions Choice...]]></title>
+    <link href="http://tgrall.github.io/blog/2008/05/01/javaone-2008-my-sessions-choice-dot-dot-dot/"/>
+    <updated>2008-05-01T22:48:00+01:00</updated>
+    <id>http://tgrall.github.io/blog/2008/05/01/javaone-2008-my-sessions-choice-dot-dot-dot</id>
+    <content type="html"><![CDATA[<p>I have attended or presented at JavaOne for the last 6 years when I was living in the SF Bay Area&hellip; But this year I won&rsquo;t be in San Francisco for JavaOne. As you can guess, I am sad about that&hellip; However, I still look at the schedule and events, and here what I would like to do:</p>
+
+<ul>
+<li><a href="http://www.g2one.com/meetup/">Groovy/Grails meetup</a> organized by G2One and NFJS</li>
+<li>Sun and Oracle General Sessions: Tuesday, Wednesday and Friday at 8:30am. I am particularly interested to see the Oracle&rsquo;s one  talk about the Oracle/BEA deal&hellip; May be we will be able to learn more about the products roadmap</li>
+<li>TS-6050 - Comparing JRuby and Groovy</li>
+<li>TS-5274 - Groovy on a Cloud: Testing Java EE Platform Applications on Amazon EC2</li>
+<li>BOF-5102 - Cooking Your Own Groovy Builder: A Step Forward into Domain-Specific Languages</li>
+<li>TS-5793 - Groovy and Grails: Changing the Landscape of Java EE Platform Patterns</li>
+<li>BOF-5101 - Boosting Your Testing Productivity with Groovy</li>
+<li>TS-5764 - Grails in Depth</li>
+<li>TS-6298 - Designing Graphical Model-Driven Applications: Lego MindStorm &hellip; long time that I have not programmed/designed with my Legos&hellip;</li>
+<li>BOF-4888 - Taming the Leopard: Extending OS X the Java Technology Way: would be great to see my ex-coworker talking about OS X and Java.. John and Tim are terrific developers</li>
+<li>BOF-6400 - The Future of Guice. even if I have not used (yet) this API from Google I have been a big fan of Bob&rsquo;s work</li>
+<li>TS-5657 - JavaFX Technology: Bring the Web with You&ndash;Multiple Interfaces to Games, Chat, and More</li>
+<li>TS-4817 - The Java Platform Portlet Specification 2.0 (JSR 286)</li>
+<li>TS-5343 - Enterprise JavaBeans (EJB) 3.1 Technology. As I am pushing more and more customer to use the standard JPA.. would be great to learn more about the next release of EJB</li>
+<li>TS-6169 - Spring Framework 2.5: New and Notable&hellip; would like to see what will be said about SpringAppServer</li>
+<li>TS-6072 - Advanced Enterprise Debugging Techniques</li>
+<li>BOF-5634 -  Java EE Platform Connector Architecture 1.6 Overview. I have been using J2CA a lot lately when dealing with SOA in large IT department&hellip; So quite cool to have an update on this spec.</li>
+<li>TS-5318 - Dealing with Asynchronicity in Java Technology-Based Web Services. A feature in the WS Stack that I have been pushing a lot&hellip;</li>
+<li>TS-5616 - JSR 303: From a World of Constraints to Constrain the World</li>
+<li>TS-6339 - Top 10 Patterns for Scaling Out Java Technology-Based Applications</li>
+<li>TS-5706 - SCA and Java Platform, Enterprise Edition (Java EE Platform): Integration Inside</li>
+<li>BOF-5495 - Untangling the Asynchronous Web</li>
+<li>TS-5425 - JAX-RS: The Java API for RESTful Web Services</li>
+<li>LAB-4500LT - Develop AJAX Based Portlets With OpenPortal and GWT</li>
+<li>TS-6574 - How to Implement Your Own OpenSocial Container on the Java Platform</li>
+<li>TS-6807 - What’s New in Ajax</li>
+<li>BOF-5661 - Comet: The Rise of Highly Interactive Web Sites</li>
+<li>BOF-4922 - Writing Real-Time Web Applications, Using Google Web Toolkit and Comet</li>
+<li>TS-5870 - The Best of Both Worlds with Java™ Business Integration and Service Component Architecture</li>
+<li>TS-5152 - Overview of the JavaFX Script Programming Language</li>
+<li>TS-5572 - Groovy, the Red Pill: Metaprogramming&ndash;How to Blow the Mind of Developers on the Java Platform</li>
+<li>TS-5815 - Going Mobile with JavaFX Script Technology, Groovy, and Google Android</li>
+<li>TS-5535 - Tying Java Technologies Together the RESTful Way</li>
+</ul>
+
+
+<p>I have probably selected many conflicting sessions, not really an issue since I am not going there. That said, this year again JavaOne looks quite exciting and a lot of content again around Scripting Languages and Framework; Web2.0 related technologies and SOA.</p>
+
+<p>I hope that I will be there for the 2009 one ;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[A Groovier ADF With Oracle ADF 11]]></title>
+    <link href="http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/"/>
+    <updated>2007-11-08T06:39:38+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a>&#8221;></p>
+
+<p>Steve Muench has published in Oracle Magazine an article about the use of Groovy in Oracle ADF. In this article you learn how you can do validation and calculation in you business service layer.</p>
+
+<ul>
+<li><a href="http://www.oracle.com/technology/oramag/oracle/07-nov/o67frame.html">Enhanced Calculation and Validation</a></li>
+<li><a href="http://www.oracle.com/technology/products/adf/index.html">Oracle ADF</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Guillaume Laforge Interview on JavaLobby]]></title>
+    <link href="http://tgrall.github.io/blog/2007/11/03/guillaume-laforge-interview-on-javalobby/"/>
+    <updated>2007-11-03T05:16:19+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/11/03/guillaume-laforge-interview-on-javalobby</id>
+    <content type="html"><![CDATA[<p>I am sure you have seen it before, but just in case&hellip; Geertjan from JavaLobby has interviewed yesterday Guillaume, in case you do not know.. Guillaume is the Project Leader of the Groovy project and co-founder of the G2One company.</p>
+
+<p>Interview: <a href="http://www.javalobby.org/java/forums/t103036.html">What&rsquo;s so groovy about Groovy?</a>.</p>
+
+<p>In case you have not look at it, <a href="http://www.g2one.com/">G2One</a> is offering many services around Groovy and Grails &hellip; directly from the source since Guillaume, and Graeme Rocher are working there&hellip; So if you need any help on these nice technologies do not hesitate&hellip;.</p>
+]]></content>
+  </entry>
+  
+</feed>

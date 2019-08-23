@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Web UI: What&#8217;s Behind AJAX? Simple Use Cases Using XMLHttpRequest - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="I am sure you already heard about AJAX, the &ldquo;new&rdquo; way of building Web
+application where using HTML, Javascript, DOM, and XML you can
+& &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2005/05/09/web-ui-whats-behind-ajax-simple-use-cases-using-xmlhttprequest/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>My journey in Big Data, Hadoop, NoSQL and MapR</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Web UI: What&#8217;s Behind AJAX? Simple Use Cases Using XMLHttpRequest</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2005-05-09T20:50:03+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2005</span></span> <span class='time'>8:50 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I am sure you already heard about AJAX, the &ldquo;new&rdquo; way of building Web
+application where using HTML, Javascript, DOM, and XML you can
+&nbsp;build very interactive Web applications, some examples of
+this interactivity are Google (suggest, local, mail), MSN, Amazon, &hellip;..</p>
+
+<p>If the term &nbsp;Ajax is
+relatively new, the technologies used are quite old now. And you do not
+need anything new to be able to leverage this approach in your current
+development, and since it is mainly a client (browser) based technology
+this can be used whether you develop your application in Java, PHP, or
+or even PL/SQL for the Web. In the same time, you do not want to have
+to develop too much of the client side to handle user interaction, this
+is where new frameworks that provide support of this technologies,
+let&rsquo;s say AJAX based, are very interesting. It is now possible to
+create very interactive Web application without passing 80% of your
+time in the client side development - that could be generated from your
+server obviously.</p>
+
+<p>In the same time, before adopting such framework, it is important to
+understand what is happening. This is why I am creating this quick
+introduction based on 2 simple use cases:</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-2.html">loading message</a>:
+&nbsp;you often want to provide some
+feedback to your user when your browser is processing some data</li>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-3.html">dependent lists</a>:
+how you can easily create dependent lists, in lot of application you
+want to drive a selection list from another</li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Update May 30:</p>
+
+<p>If you have tested my sample on Safari, you can see that the first request works, but following subsequent requests do not, on work around is to modify the HTTP header adding the following value, has to be done before the send, just send a old date&hellip;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s1">&#39;If-Modified-Since&#39;</span><span class="p">,</span><span class="s1">&#39;Sun,3 Jun 1973 00:00:00 GMT&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>What do you need to know?</h3>
+
+<p>The first interesting part is the object XMLHttpRequest. This object is
+currently supported by most of the browsers. As usual with HTML and
+Javascript the cross browser/platform testing is one of the most
+important part of your project. XMLHttpRequest is not new since
+Microsoft has implemented it in Internet Explorer 5 as an ActiveX
+object. Also it has been later on integrate as a native component into
+Mozzila and Netscape (7.0), and into Apple Safari. If originally this
+object as been created to load data, as XML in the
+background, you can using it to load any data.</p>
+
+<h4>Creating XMLHttpRequest Object</h4>
+
+<p>As usual with Javascript, it begins with interoperability issue ;-),
+since in the MSFT world the XMLHttpRequest is implemented as an ActiveX
+and in the other world(s) it is an native object, you have different
+ways to create the object. The idea is too test if the current browser
+supports or not the object and depending of the result create the
+object.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">ActiveXObject</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// Microsoft Way</span>
+</span><span class='line'>  <span class="nx">httpRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="s2">&quot;Microsoft.XMLHTTP&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">XMLHttpRequest</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// Others...</span>
+</span><span class='line'>  <span class="nx">httpRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note: another way of choosing which code path to use depending of the
+version of the browser is to use <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/script56/html/js56jsconconditionalcompilation.asp">conditional compilation</a>
+for the Javascript engine.</p>
+
+<p>Also I would add that it is probably good to provide a degraded version
+of your application if you can not control which browser will be used
+by your client, or if you want to provide that to mobile people. This
+is for example what Google Mail is doing with its <a href="http://gmail.google.com/support/bin/answer.py?ctx=gmail&amp;amp;hl=en&amp;amp;answer=15049">Basic HTML</a>
+view.</p>
+
+<h4>Retrieving the data</h4>
+
+<p>asynchronously</p>
+
+<p>One of the most interesting features of the XMLHttpRequestObject is the
+fact that you get data from a URL in the background of the user
+activity. This is how you can give lot of interactivity to your
+applications.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;./getEmployeeList?deptno=10&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+</span><span class='line'><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">onreadystatechange</span><span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span><span class="nx">processRequest</span><span class="p">();</span> <span class="p">}</span> <span class="p">;</span>
+</span><span class='line'><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmmthopenixmlhttprequest.asp">open</a>
+method sets the different values that will be used by your request,
+such as the type of request, the URL, if it is synchronous or not.</p>
+
+<p>The &ldquo;magic&rdquo; comes from the&nbsp;<a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproonreadystatechangehttprequest.asp">onreadystatechange</a>&nbsp;property.
+This propery set an handler that will be called when the property <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproreadystaterequest.asp">readyState</a>
+changes, when the request is sent, loading, or completed&hellip; Meaning,
+this is in this event handler, the processRequest
+method in the sample, that you test if the response has been completed
+correctly, and process the data.</p>
+
+<p>Note: even if it is possible, I do not think that you should use the
+XMLHttpRequest in a synchronous mode since it will freeze the browser
+of the user, for the duration of the request.</p>
+
+<h4>Processing the response</h4>
+
+<p>As I said above the magic happens in the event handler associated with
+the state of the request. Let&rsquo;s see how you manipulate the request and
+response:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">processRequest</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// process data as XML</span>
+</span><span class='line'>      <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">responseXML</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// or Text</span>
+</span><span class='line'>      <span class="nx">alert</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;Error loading page\n&quot;</span><span class="o">+</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">status</span> <span class="o">+</span><span class="s2">&quot;:&quot;</span><span class="o">+</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">statusText</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproreadystaterequest.asp">readyState</a>
+propery is used to know if all the data of the response have been
+received or not, the different value for the state are:</p>
+
+<ul>
+<li>0 : uninitialized</li>
+<li>1 : loading</li>
+<li>2 :loaded</li>
+<li>3 : interactive</li>
+<li>4 : completed
+Most of the time, you will just test the status 4. In my example I wait
+for status==4 and then I check the status of the response. The <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmprostatusixmlhttprequest.asp">status</a>
+is the status returned by the server, for example 200 for OK, 404 for
+not found.</li>
+</ul>
+
+
+<p>Then you can treat the response as XML using the <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproresponsexmlixmlhttprequest.asp">responseXML</a>,
+in this case you can manipulate the XML using the client DOM API. But
+you can also directly take the content as a string using the <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/xmlsdk/html/xmproresponsetextixmlhttprequest.asp">responseText</a>
+property.</p>
+
+<h4>Manipulating the Data</h4>
+
+<p>You now have the data back from the request, as Text or XML, you just
+need using Javascript manipulate them and copy then into some part of
+your page. So all is based on the client side. Let&rsquo;s do a very simple
+example before moving to the use cases:</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/demo-1.html">Simple XMLHttpRequest sample</a> <em>What is happening?</em></li>
+</ul>
+
+
+<p>Since I have explained the call above, here is the simple code that is
+used to copy the content from the XMLHttpRequest object to the page:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">.....</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">contentViewer</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;contentViewer&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">contentViewer</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">....</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Most of the time, if you do &nbsp;not use XML you just have to copy
+the content of the result into a section of your page, so to do it you
+use:</p>
+
+<ul>
+<li>create a DIV tag in yourpage with a specific id. (or other&hellip;)</li>
+<li>get the object you want to copy into using the <code>document.getElementById()</code> method, that is the most simple way&hellip;&nbsp;</li>
+<li>then from the object just use the <code>innerHTML</code>
+property that represent the content of this DIV object. (You can also
+use the DOM API, to do the same thing, I am sure puris will say that
+this is the only way to do it correctly&hellip; )
+In most of the frameworks the data are exchanged in XML and some
+generic methods are calls on the client side to propulate data in the
+different components of the page.</li>
+</ul>
+
+
+<h3>Usecase 1: Loading Message</h3>
+
+<p>One common use case is to be able to have some feedback during
+  processing of a request. Using the same approach you can print a
+  message until the response is completely done.</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-2.html">Online Demonstration</a> <em>What is happening?</em></li>
+</ul>
+
+
+<p>The tip here is just to take a zone where you want to print the status
+  (&ldquo;Loading&hellip;&rdquo; for example). When the XMLHttpRequest status is different
+  than 4 (completed) &nbsp;just print the status in this section
+  using for example the innerHTML property. When the request is
+  completed, just move the content of this zone to blank, or in our case
+  the result of the request is printed into it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">....</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// print the content of the page</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">contentViewer</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;contentViewer&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">contentViewer</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">// Print the loading message....</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">contentViewer</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&quot;contentViewer&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">contentViewer</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s2">&quot;&lt;b style=&#39;color:red;&#39;&gt;Loading....&lt;b&gt;&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Usecase 2: Dependent Lists</h3>
+
+<p>In lot of applications, you have submission form when one drop down list is controlled by another one. You have several way to support that depending of the size of your data set. For example you can download
+  all the records (master and detail) and use some client side
+  programming to refresh the content of the detail list depending of the
+  value selected in the master one; or &nbsp;another solution is to
+  just reload the page.</p>
+
+<p>Using XMLHttpRequest, you can now just call the server to populate the
+  values of the detail list when the user select another value in the
+  master list. (and you can implement a client side cache if you want to
+  avoid a second call with the same parameters, but this is another
+  story&hellip;)</p>
+
+<ul>
+<li><a href="http://www.grallandco.com/blog/archives/ajax/demo-3.html">Online Demonstration</a> <em>What is happening?</em></li>
+</ul>
+
+
+<p>Nothing more complex than in the previous examples, on the <code>onChange</code>
+  of the master list (dept in the example) , you call a Javascript method
+  that create the XMLHttRequest, with the correct parameter.</p>
+
+<p>Then in the event handler of this request, you populate the data as XML
+  and add them to the detail list (emp in the example).</p>
+
+<p>In this specific example I used XML, but if you want for simpler code
+  you can write all in HTML and use the innerHTML property, but this is
+  just a choice of implementation isn&rsquo;t?</p>
+
+<h3>Summary</h3>
+
+<p>First of all, you have seen that what we have behind AJAX is not just
+  new technologies. The technologies exists now for a while, they have
+  been exposed to the masse by Google, MSN, and other Web sites. The term
+  itself is definitevely a recent one&hellip;</p>
+
+<p>Also, I have showed you simple examples that can help you for your
+  current developments, but you need to write some code on the client.
+  The real future of AJAX, is when this is bundle into a framework, into
+  the Faces components your are using. So before starting to implement
+  such code in your application you should take a look around to see if
+  any solution exists that can answer your need&hellip;</p>
+
+<p>  You can download the source of the demonstrations <a href="http://www.grallandco.com/blog/archives/ajax/xmlhttprequest-demos.zip">here</a>. I tried to keep the code as simple as possible by providing all the source in each single html file.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2005-05-09T20:50:03+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2005</span></span> <span class='time'>8:50 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ajax/'>ajax</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2005/05/09/web-ui-whats-behind-ajax-simple-use-cases-using-xmlhttprequest/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2005/05/09/web-ui-whats-behind-ajax-simple-use-cases-using-xmlhttprequest/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2005/05/03/which-kind-of-developer-are-you-a-software-terrorist/" title="Previous Post: Which kind of developer are you? A software terrorist?">&laquo; Which kind of developer are you? A software terrorist?</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2005/05/12/oracle-sql-developer-express/" title="Next Post: Oracle SQL Developer Express">Oracle SQL Developer Express &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2005/05/09/web-ui-whats-behind-ajax-simple-use-cases-using-xmlhttprequest/';
+        var disqus_url = 'http://tgrall.github.io/blog/2005/05/09/web-ui-whats-behind-ajax-simple-use-cases-using-xmlhttprequest/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

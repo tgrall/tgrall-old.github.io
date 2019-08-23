@@ -1,0 +1,1193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Couchbase | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/couchbase/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Moving My Beers From Couchbase to MongoDB]]></title>
+    <link href="http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/"/>
+    <updated>2015-02-01T15:37:46+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb</id>
+    <content type="html"><![CDATA[<p>Few days ago I have posted a <em>joke</em> on Twitter</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>Moving my Java from Couchbase to MongoDB <a href="http://t.co/Wnn3pXfMGi">pic.twitter.com/Wnn3pXfMGi</a></p>&mdash; Tugdual Grall (@tgrall) <a href="https://twitter.com/tgrall/status/559664540041117696">January 26, 2015</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>So I decided to move it from a simple picture to a <em>real</em> project. Let&rsquo;s look at the two phases of this so called project:</p>
+
+<ul>
+<li>Moving the data from Couchbase to MongoDB</li>
+<li>Updating the application code to use MongoDB</li>
+</ul>
+
+
+<p>Look at this screencast to see it in action:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/Fpl74Z0HbC0?color=white&theme=light"></iframe></p>
+
+<!-- more -->
+
+
+<h2>Moving the data</h2>
+
+<p>I have created a replication server, that uses the Couchbase XDCR protocol to get the document out and insert them into MongoDB. This server use the Couchbase CAPI Server project available <a href="https://github.com/couchbaselabs/couchbase-capi-server">here</a>.</p>
+
+<p>This server will receive all the mutations made in the Couchbase:</p>
+
+<ul>
+<li>When a document is inserted or updated the full document is sent</li>
+<li>When a document is deleted, only the medata are sent</li>
+<li>The <code>replication server</code>, save the data into MongoDB (inserts and/or updates - no delete), and then return the list to Couchbase as part of the XDCR Protocol.</li>
+</ul>
+
+
+<p>One of the challenges is the fact Couchbase does not have the notion of &ldquo;types&rdquo; or &ldquo;collections&rdquo;. You put everything in a <em>bucket</em> and the application code knows how to deal with the data. Not necessary a problem, just a choice of implementation, but make it sometime harder than expected when you want to write tools. So here the logic that I apply in my replication server, to organize the data in multiple collections when it makes sense <em>(and when it is possible)</em>:</p>
+
+<ul>
+<li>If the JSON document does not contains a <em>type field</em>, all the documents will be saved in a single collection</li>
+<li>If the JSON document contains a <em>type field</em> then a collection will be created for each type and documents will be inserted/updated in these collections</li>
+<li>MongoDB does not allow attributes key to have . and $ signs, so it is necessary to change the name with alternative characters. This is done automatically during the copy of the data.</li>
+</ul>
+
+
+<p>All this, and more is configurable in the tool.</p>
+
+<p>As you can see in the screencast this is straightforward.<em>(note that I have only tested very simple use cases and deployment)</em></p>
+
+<p>You can download the tool and the source code here:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/mongodb-cb-replicator">https://github.com/tgrall/mongodb-cb-replicator</a></li>
+<li>Download the <a href="http://goo.gl/WkuHBk">MongoCBReplicator.jar</a> file.</li>
+</ul>
+
+
+<h2>Updating the application code</h2>
+
+<p>The next step is to use these data in an application. For this I simply use the Beer Sample Java application available on <a href="https://github.com/couchbaselabs/beersample-java">Couchbase repository</a>.</p>
+
+<p>I just recreated the project and modified few things, to get the application up and running:</p>
+
+<ul>
+<li>Change the connection string</li>
+<li>Remove the code that generate views</li>
+<li>Replace set/get by MongoDB operations</li>
+<li>Replace call to the views by simple queries</li>
+</ul>
+
+
+<p>The code of the MongoDBeer application is available here:</p>
+
+<ul>
+<li>[<a href="https://github.com/tgrall/mongodbeer">https://github.com/tgrall/mongodbeer</a>]</li>
+</ul>
+
+
+<p>I did not change any business logic, or added features, or even replaced the way navigation and page rendition is made. I just focused on the database access, for example :</p>
+
+<pre><code class="java">
+// Couchbase Query
+View view = client.getView("beer", "by_name");
+    Query query = new Query();
+    query.setIncludeDocs(true).setLimit(20);
+    ViewResponse result = client.query(view, query);
+
+    ArrayList&lt;HashMap&lt;String, String&gt;&gt; beers =
+      new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+    for(ViewRow row : result) {
+      HashMap&lt;String, String&gt; parsedDoc = gson.fromJson(
+        (String)row.getDocument(), HashMap.class);
+
+      HashMap&lt;String, String&gt; beer = new HashMap&lt;String, String&gt;();
+      beer.put("id", row.getId());
+      beer.put("name", parsedDoc.get("name"));
+      beer.put("brewery", parsedDoc.get("brewery_id"));
+      beers.add(beer);
+    }
+    request.setAttribute("beers", beers);
+
+
+// MongoDB Query
+DBCursor cursor = db.getCollection("beer").find()
+                                                   .sort( BasicDBObjectBuilder.start("name",1).get() )
+                                                   .limit(20);
+     ArrayList&lt;HashMap&lt;String, String&gt;&gt; beers =
+             new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+     while (cursor.hasNext()) {
+         DBObject row = cursor.next();
+         HashMap&lt;String, String&gt; beer = new HashMap&lt;String, String&gt;();
+         beer.put("id", (String)row.get("_id"));
+         beer.put("name", (String)row.get("name"));
+         beer.put("brewery", (String)row.get("brewery_id"));
+         beers.add(beer);
+     }
+
+
+
+// Couchbase update
+client.set(beerId, 0, gson.toJson(beer));
+
+// MongoDB update
+db.getCollection("beer").save(new BasicDBObject(beer));
+</code></pre>
+
+<p>I did not attend to optimize the MongoDB code,  but just to replace as few lines of code as possible.</p>
+
+<p>Note: I have not created any index during the process. Obviously if your application have more and more data and you do intense work with it you must analyze your application/queries to see which indexes must be created.</p>
+
+<h2>Adding new features</h2>
+
+<p>Once you have the data into MongoDB you can do a lot more without anything more than MongoDB:</p>
+
+<h4>Full Text Search</h4>
+
+<p>You can create a Text index on various fields in the collection to provide advanced search capabilities to your users.</p>
+
+<pre><code class="json">db.brewery.ensureIndex(
+  {
+    "name" : "text",
+    "description" : "text"
+  },
+  {
+    "weights" :
+    {
+      "name" : 10,
+      "description" : 5
+    },
+    "name" : "TextIndex"
+  }
+
+);
+</code></pre>
+
+<p>Then you can query the database using the <code>$text</code> operation, for example all breweries with <em>Belgium</em> and without <em>Ale</em></p>
+
+<pre><code class="json">db.brewery.find( { "$text" : { "$search" : "belgium -ale" }   }  , { "name" : 1  } );
+{ "_id" : "daas", "name" : "Daas" }
+{ "_id" : "chimay_abbaye_notre_dame_de_scourmont", "name" : "Chimay (Abbaye Notre Dame de Scourmont)" }
+{ "_id" : "brasserie_de_cazeau", "name" : "Brasserie de Cazeau" }
+{ "_id" : "inbev", "name" : "InBev" }
+{ "_id" : "new_belgium_brewing", "name" : "New Belgium Brewing" }
+{ "_id" : "palm_breweries", "name" : "Palm Breweries" }
+</code></pre>
+
+<h4>Some analytics</h4>
+
+<p>Not sure these queries really make sense, but it is just to show that now you can leverage your documents without the need of any 3rd party tool.</p>
+
+<p>Number of beer by category, from the most common to the less one:</p>
+
+<pre><code class="json">db.beer.aggregate([
+  {"$group" : { "_id" : "$category","count" : {"$sum" : 1 } } },
+  {"$sort" : { "count" : -1 } },
+  {"$project" : {   "category" : "$_id", "count" : 1, "_id" : 0 } }
+]);
+
+{ "count" : 1996, "category" : "North American Ale" }
+{ "count" : 1468, "category" : null }
+{ "count" : 564, "category" : "North American Lager" }
+{ "count" : 441, "category" : "German Lager" }
+...
+...
+</code></pre>
+
+<p>Number of beer of a specific ABV by brewery, for example: top 3 breweries with the most beer with an abv greather or equals to a value, let&rsquo;s say 5:</p>
+
+<pre><code class="json">db.beer.aggregate([
+... { "$match" : { "abv" : { "$gte" : 5 }  } },
+... { "$group" : { "_id" : "$brewery_id", "count" : { "$sum" : 1} }},
+... { "$sort" : { "count" : -1 } },
+... { "$limit" : 3 }
+... ])
+
+{ "_id" : "midnight_sun_brewing_co", "count" : 53 }
+{ "_id" : "troegs_brewing", "count" : 33 }
+{ "_id" : "rogue_ales", "count" : 31 }
+</code></pre>
+
+<h4>Geospatial queries</h4>
+
+<p>The first thing to do with the data is to change the data structure to save the various data into a GeoJSON format, for this we can simply use a script into the MongoDB Shell:</p>
+
+<pre><code class="json">&gt;mongo
+
+use beers
+
+db.brewery.find().forEach(
+  function( doc ) {
+    var loc = { type : "Point" };
+    if (doc.geo &amp;&amp; doc.geo.lat &amp;&amp; doc.geo.lon) {
+      loc.coordinates = [ doc.geo.lon , doc.geo.lat  ];
+      db.brewery.update( { _id : doc._id } , {$set : { loc : loc } }  );
+    }
+  }
+);
+
+db.brewery.ensureIndex( { "loc" : "2dsphere" } );
+</code></pre>
+
+<p>This call take all the breweries and add a new attribute, name <code>loc</code> as a GeoJSON point. I could also chose to remove the old geo information using a &lsquo;$unset&rsquo;, but I did not; let&rsquo;s imagine that some API/applications are using it. This is a good example of flexible schema.</p>
+
+<p>Now I can search for all the brewery that are at less than 30km from the Golden Gate in San Francisco: [-122.478255,37.819929]</p>
+
+<pre><code class="json">db.brewery.find(
+  { "loc" :
+    { "$near" :
+      { "$geometry" :
+        {
+          "type" : "Point",
+          "coordinates" : [-122.478255,37.819929]
+        },
+        "$maxDistance" : 20000
+
+      }
+    }
+  }
+  , { name : 1 }  
+)
+</code></pre>
+
+<p>You can also use Geospatial indexes and operators in the aggregation queries used above</p>
+
+<h2>Conclusion</h2>
+
+<p>As as said in the introduction, this week end project started as a joke on Twitter, and finished with a small blog post and Gitub repositories.</p>
+
+<p>My goal here is not to compare the two solutions -I made my choice few months back-  but simply show how you can move from one to the other with almost no effort, not only the data but also the application code.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Pagination With Couchbase]]></title>
+    <link href="http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase/"/>
+    <updated>2013-10-01T02:00:00+02:00</updated>
+    <id>http://tgrall.github.io/blog/2013/10/01/pagination-with-couchbase</id>
+    <content type="html"><![CDATA[<p>If you have to deal with a large number of documents when doing queries against a Couchbase cluster it is important to use pagination to get rows by page. You can find some information in the documentation in the chapter &ldquo;<a href="http://docs.couchbase.com/couchbase-manual-2.2/#pagination">Pagination</a>&rdquo;, but I want to go in more details and sample code in this article.</p>
+
+<p>For this example I will start by creating a simple view based on the <code>beer-sample</code> dataset, the view is used to find brewery by country:</p>
+
+<pre><code class="js">function (doc, meta) {
+  if (doc.type == "brewery" &amp;amp;&amp;amp; doc.country){
+    emit(doc.country);
+  }
+}
+</code></pre>
+
+<p>This view list all the breweries by country, the index looks like:</p>
+
+<table>
+<tbody>
+<tr><th>Doc id</th><th>Key</th><th>Value</th></tr>
+<tr><td>bersaglier</td><td>Argentina</td><td>null</td></tr>
+<tr><td>cervecera_jerome</td><td>Argentina</td><td>null</td></tr>
+<tr><td>brouwerij_nacional_balashi</td><td>Aruba</td><td>null</td></tr>
+<tr><td>australian_brewing_corporation</td><td>Australia</td><td>null</td></tr>
+<tr><td>carlton_and_united_breweries</td><td>Australia</td><td>null</td></tr>
+<tr><td>coopers_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>foster_s_australia_ltd</td><td>Australia</td><td>null</td></tr>
+<tr><td>gold_coast_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>lion_nathan_australia_hunter_street</td><td>Australia</td><td>null</td></tr>
+<tr><td>little_creatures_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>malt_shovel_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>matilda_bay_brewing</td><td>Australia</td><td>null</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>yellowstone_valley_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>yuengling_son_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>zea_rotisserie_and_brewery</td><td>United States</td><td>null</td></tr>
+<tr><td>fosters_tien_gang</td><td>Viet Nam</td><td>null</td></tr>
+<tr><td>hue_brewery</td><td>Viet Nam</td><td>null</td></tr>
+</tbody></table>
+
+
+<p>So now you want to navigate in this index with a page size of 5 rows.</p>
+
+<!--more-->
+
+
+<h3>Using skip / limit Parameters</h3>
+
+<p>The most simplistic approach is to use <span style="font-family: Courier New, Courier, monospace;">limit</span> and <span style="font-family: Courier New, Courier, monospace;">skip</span> parameters for example:</p>
+
+<p>Page 1 : <code>?limit=5&amp;amp;skip0</code><br/>
+Page 2 : <code>?limit=5&amp;amp;skip=5</code>
+&hellip;
+Page x : <code>?limit=5&amp;amp;skip(limit*(page-1))</code></p>
+
+<p>You can obviously use any other parameters you need to do range or key queries (<code>startkey/endkey, key, keys</code>) and sort option (<code>descending</code>).</p>
+
+<p>This is simple but not the most efficient way, since the query engine has to read all the rows that match the query, until the skip value is reached.</p>
+
+<p>Some code sample in python that paginate using this view :</p>
+
+<p><div><script src='https://gist.github.com/6174762.js'></script>
+<noscript><pre><code>from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+  hasRow = False
+	skip = 0 if page == 0 else 1
+	page = page + 1
+	print &quot;-- Page %s --&quot; % (page)
+	rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+	for row in rows:
+		hasRow = True
+		print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+		currentStartkey = row.key
+		startDocId = row.docid
+	print &quot; -- -- -- -- \n&quot;
+
+
+
+</code></pre></noscript></div>
+</p>
+
+<p>This application loops on all the pages until the end of the index.</p>
+
+<p>As I said before this is not the best approach since the system must read all the values until the skip is reached. The following example shows a better way to deal with this.</p>
+
+<h3>Using startkey / startkey_docid parameters</h3>
+
+<p>To make this pagination more efficient it is possible to take another approach. This approach uses the  <code>startkey</code> and <code>startkey_docid</code>  to select the proper documents.</p>
+
+<ul>
+<li><code>The startkey</code> parameter will be the value of the key where the query should start to read (based on the last key of the &ldquo;previous page&rdquo;</li>
+<li>Since for a key for example &ldquo;Germany&rdquo; you may have one or more ids (documents) it is necessary to say to Couchbase query engine where to start, for this you need to use the <code>startkey_docid</code> parameter, and ignore this id since it is the last one of the previous page.</li>
+</ul>
+
+
+<p>So if we look at the index, and add a row number to explain the pagination</p>
+
+<table>
+<tbody>
+<tr><th>Row num</th><th>Doc id</th><th>Key</th><th>Value</th></tr>
+<tr><td colspan="4"><br />
+Query for page 1<br />
+<span style="font-family: Courier New, Courier, monospace;">?limit=5</span></td></tr>
+<tr><td>1</td><td></td><td>bersaglier</td><td>Argentina</td><td>null</td></tr>
+<tr><td>2</td><td></td><td>cervecera_jerome</td><td>Argentina</td><td>null</td></tr>
+<tr><td>3</td><td></td><td>brouwerij_nacional_balashi</td><td>Aruba</td><td>null</td></tr>
+<tr><td>4</td><td></td><td>australian_brewing_corporation</td><td>Australia</td><td>null</td></tr>
+<tr><td>5</td><td></td><td>carlton_and_united_breweries</td><td>Australia</td><td>null</td></tr>
+<tr><td colspan="4">
+Query for page 2<br />
+<span style="font-family: Courier New, Courier, monospace;">?limit=5&amp;startkey=&#8221;Australia&#8221;&amp;startkey_docid=carlton_and_united_breweries&amp;skip=1
+</td></tr>
+<tr><td>6</td><td></td><td>coopers_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>7</td><td></td><td>foster_s_australia_ltd</td><td>Australia</td><td>null</td></tr>
+<tr><td>8</td><td></td><td>gold_coast_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>9</td><td></td><td>lion_nathan_australia_hunter_street</td><td>Australia</td><td>null</td></tr>
+<tr><td>10</td><td></td><td>little_creatures_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td colspan="4"><br />
+Query for page 3<br />
+<span style="font-family: Courier New, Courier, monospace;">?limit=5&amp;startkey=&#8221;Australia&#8221;&amp;startkey_docid=little_creatures_brewery</span><span style="font-family: 'Courier New', Courier, monospace;">&amp;skip=1</span>
+</td></tr>
+<tr><td>11</td><td></td><td>malt_shovel_brewery</td><td>Australia</td><td>null</td></tr>
+<tr><td>12</td><td></td><td>matilda_bay_brewing</td><td>Australia</td><td>null</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td>&#8230;</td><td>&#8230;</td></tr>
+<tr><td>&#8230;</td><td></td><td>yellowstone_valley_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>yuengling_son_brewing</td><td>United States</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>zea_rotisserie_and_brewery</td><td>United States</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>fosters_tien_gang</td><td>Viet Nam</td><td>null</td></tr>
+<tr><td>&#8230;</td><td></td><td>hue_brewery</td><td>Viet Nam</td><td>null</td></tr>
+</tbody></table>
+
+
+<p>So as you can see in the examples above, the query uses the startkey, a document id, and just passes it using skip=1.</p>
+
+<p>Let&rsquo;s now look at the application code, once again in Python</p>
+
+<p><div><script src='https://gist.github.com/6176322.js'></script>
+<noscript><pre><code>
+from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+	hasRow = False
+	skip = 0 if page == 0 else 1
+	page = page + 1
+	print &quot;-- Page %s --&quot; % (page)
+	rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+	for row in rows:
+		hasRow = True
+		print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+		currentStartkey = row.key
+		startDocId = row.docid
+	print &quot; -- -- -- -- \n&quot;
+
+</code></pre></noscript></div>
+</p>
+
+<p>This application loops on all the pages until the end of the index</p>
+
+<p>Using this approach, the application start to read the index at a specific key (<code>startkey</code> parameter), and only loop on the necessary entry in the index. This is more efficient than using the simple skip approach.</p>
+
+<h4>Views with Reduce function</h4>
+
+<p>When your view is using a reduce function, if you want to paginate on the various keys only (with the reduce function) you need to use the <code>skip</code> and <code>limit</code> parameters.</p>
+
+<p>When you are using the  paramater <code>startkey_docid</code> with a reduce function it will calculate the reduce only to the subset of document ids that are part of your query.</p>
+
+<h3>Couchbase Java SDK Paginator</h3>
+
+<p>In the previous examples, I have showed how to do pagination using the various query parameters. The Java SDK provides a Paginator object to help developers to deal with pagination. The following example is using the same view with the Paginator API.</p>
+
+<p><div><script src='https://gist.github.com/6774932.js'></script>
+<noscript><pre><code>package com.couchbase.devday;
+
+import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class JavaPaginatorSample {
+
+public static void main(String[] args) {
+
+	configure();
+	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+	System.out.println(&quot;\tCouchbase - Paginator&quot;);
+	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+
+    List&lt;URI&gt; uris = new LinkedList&lt;URI&gt;();
+    uris.add(URI.create(&quot;http://127.0.0.1:8091/pools&quot;));
+
+    CouchbaseClient cb = null;
+    try {
+    	cb = new CouchbaseClient(uris, &quot;beer-sample&quot;, &quot;&quot;);
+	  	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+	  	System.out.println(&quot;Breweries (by_name) with docs &amp; JSON parsing&quot;);
+		View view = cb.getView(&quot;test&quot;, &quot;by_country&quot;);
+		Query query = new Query();
+		int docsPerPage = 5;
+
+		Paginator paginatedQuery = cb.paginatedQuery(view, query, docsPerPage);
+		int pageCount = 0;
+		while(paginatedQuery.hasNext()) {
+			pageCount++;
+			System.out.println(&quot; -- Page &quot;+ pageCount +&quot; -- &quot;);
+			ViewResponse response = paginatedQuery.next();
+			for (ViewRow row : response) {
+				System.out.println(row.getKey() + &quot; : &quot; + row.getId());
+			}
+			System.out.println(&quot; -- -- -- &quot;);
+		}
+		
+		System.out.println(&quot;\n\n&quot;);
+    	cb.shutdown(10, TimeUnit.SECONDS);
+    } catch (Exception e) {
+    	System.err.println(&quot;Error connecting to Couchbase: &quot; + e.getMessage());
+    }
+}
+
+
+
+private static void configure() {
+
+	for(Handler h : Logger.getLogger(&quot;com.couchbase.client&quot;).getParent().getHandlers()) {
+		if(h instanceof ConsoleHandler) {
+			h.setLevel(Level.OFF);
+		}
+	}
+	Properties systemProperties = System.getProperties();
+	systemProperties.put(&quot;net.spy.log.LoggerImpl&quot;, &quot;net.spy.memcached.compat.log.SunLogger&quot;);
+	System.setProperties(systemProperties);
+
+	Logger logger = Logger.getLogger(&quot;com.couchbase.client&quot;);
+	logger.setLevel(Level.OFF);
+	for(Handler h : logger.getParent().getHandlers()) {
+		if(h instanceof ConsoleHandler){
+			h.setLevel(Level.OFF);
+		}
+	}
+}
+
+}
+</code></pre></noscript></div>
+</p>
+
+<p>So as you can see you can easily paginate on the results of a Query using the Java Paginator.</p>
+
+<ul>
+<li>At the line #37, the Paginator is created from using the view and query objects and a page size is specified</li>
+<li>Then you just need to use the hasNext() and next() methods to navigate in the results.</li>
+</ul>
+
+
+<p>The Java Paginator  is aware of the fact that they query is using a reduce or not, so you can use it with all type of queries - Internally it will switch between the skip/limit approach and the doc_id approaches. You can <a href="https://github.com/couchbase/couchbase-java-client/blob/1.1.9/src/main/java/com/couchbase/client/protocol/views/Paginator.java#L176-L195">see how it is done in the Paginator class</a>.</p>
+
+<p>Note that if you want to do that in a Web application between HTTP request you must keep the Paginator object in the user session since the current API keeps the current page in its state.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this blog post you have  learned how to deal with pagination in Couchbase views; to summarize</p>
+
+<ul>
+<li>The pagination is based on some specific parameters that you send when executing a query.</li>
+<li>Java developers can use the <a href="http://www.couchbase.com/autodocs/couchbase-java-client-1.2.0/com/couchbase/client/protocol/views/Paginator.html">Paginator</a> class that simplifies pagination.</li>
+</ul>
+
+
+<p>I am inviting you to look at the new Couchbase Query Language N1QL, still under development, that will provide more options to developers including pagination, using LIMIT &amp; OFFSET parameters, for example:</p>
+
+<pre><code class="sql">SELECT fname, age
+FROM tutorial
+WHERE age &gt; 30
+LIMIT 2
+OFFSET 2
+</code></pre>
+
+<p>If you want to learn more about N1QL:</p>
+
+<ul>
+<li><a href="http://query.couchbase.com/">N1QL on Couchbase Community Portal</a></li>
+<li><a href="http://query.pub.couchbase.com/tutorial/">N1QL Online Tutorial</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to Implement Document Versioning With Couchbase]]></title>
+    <link href="http://tgrall.github.io/blog/2013/07/18/how-to-implement-document-versioning-with-couchbase/"/>
+    <updated>2013-07-18T08:59:50+02:00</updated>
+    <id>http://tgrall.github.io/blog/2013/07/18/how-to-implement-document-versioning-with-couchbase</id>
+    <content type="html"><![CDATA[<h3>Introduction</h3>
+
+<p>Developers are often asking me how to &ldquo;version&rdquo; documents with Couchbase 2.0. The short answer is: the clients and server do not expose such feature, but it is quite easy to implement.</p>
+
+<p>In this article I will use a basic approach, and you will be able to extend it depending of your business requirements.</p>
+
+<!-- more -->
+
+
+<h3>Design</h3>
+
+<p>The first thing to do is to select how to &ldquo;store/organize&rdquo; the versions of your document, and for this you have different designs:</p>
+
+<ul>
+<li>copy the versions the document into new documents</li>
+<li>copy the versions of the document into a list of embedded documents</li>
+<li>store the list of attributes that have been changed into a embedded element (or new documents)</li>
+<li>store the &ldquo;delta&rdquo;</li>
+<li>…</li>
+</ul>
+
+
+<p>You will have to chose the design based on your application requirements (business logic, size of the dataset, &hellip;).  For this article, let&rsquo;s use one of the most simplistic approach: create new document for each version with the following rules for the keys:</p>
+
+<ol>
+<li>The current version is is a simple Key/Document, no change to the key.</li>
+<li>The version is a copy of the document, and the version number is added to the key.</li>
+</ol>
+
+
+<p>This looks like:</p>
+
+<pre><code>Current Version   mykey
+Version 1         mykey::v1
+Version 2         mykey::v2
+...               ...
+</code></pre>
+
+<p>With this approach, existing applications will always use the current version of the document, since the key is not changed. But this approach creates new documents that will be indexed by existing views.</p>
+
+<p>For example, in the Beer Sample application, the following view is used to list the beer by name:</p>
+
+<pre><code class="js">function (doc, meta) {
+  if(doc.type &amp;amp;&amp;amp; doc.type == "beer") {
+    emit(doc.name);
+  }
+}
+</code></pre>
+
+<p>It is quite simple to &ldquo;support&rdquo; versioning without impacting the existing code, except the view itself. The new view needs to emit keys,value only for the current version of the document. This is the new view code:</p>
+
+<pre><code>function (doc, meta) {
+  if(doc.type &amp;amp;&amp;amp; doc.type == "beer" &amp;amp;&amp;amp; (meta.id).indexOf("::v") == -1   ) {
+    emit(doc.name);
+  }
+}
+</code></pre>
+
+<p>With this change the existing applications that are using this view will continue to work with the same behavior.</p>
+
+<h3>Implementing the versioning</h3>
+
+<p>Based on this design, when the application needs to version the document, the following logic should happen:</p>
+
+<ol>
+<li>Get the current version of the document</li>
+<li>Increment the version number (for example using another key that maintains the version number for each document)</li>
+<li>Create the version with the new key  &ldquo;mykey::v1&rdquo;</li>
+<li>Save the document current version</li>
+</ol>
+
+
+<p>Let&rsquo;s look at the code in Java</p>
+
+<pre><code class="java">Object obj = client.get(key);
+if (obj != null) {
+  // get the next version, create or use the key: mykey_version
+  long version = client.incr(key + "_version", 1, 1);
+  String keyForVersion = key + "::v" + version; // mykey::v1
+  try {
+    client.set(keyForVersion, obj).get();
+    } catch (Exception e) {
+      logger.severe("Cannot save version "+ version + " for key "+ key +" - Error:"+ e.getMessage() );
+    }
+  }
+  client.set(key, value);
+</code></pre>
+
+<p>Quite simple isn&rsquo;t?</p>
+
+<p>The application can access the document using the key, but also get one version or the list of all versions, this is one of the reasons why it is interesting to create a key (<span style="font-family: Courier New, Courier, monospace;">mykey_version</span>), and use it also to delete documents and related versions.</p>
+
+<p>Based on the previous comment, the delete operation looks like:</p>
+
+<pre><code class="java">Object obj = client.get(key);
+// need to delete all the version first
+Object vObject = this.get(key + "_version");
+if (vObject != null) {
+  long biggerVersion = Long.parseLong((String) vObject);
+  try {
+    // delete all the versions
+    for (int i = 1; i &lt;= biggerVersion; i++) {
+      String versionKey = key + "::v" + i;
+      client.delete(versionKey).get();
+    }
+    // delete the counter
+    client.delete(key + "_version").get();
+  } catch (InterruptedException e) {
+    e.printStackTrace();
+  } catch (ExecutionException e) {
+    e.printStackTrace();
+  }
+}
+client.delete(key);
+</code></pre>
+
+<h4>Use versioning</h4>
+
+<p>As an example, I have created a small library available on GitHub <a href="https://github.com/tgrall/couchbase-how-to-versioning">https://github.com/tgrall/couchbase-how-to-versioning</a>, this library extends the Couchbase Client and overrides some of the operations : set, replace and delete. (the basic one: no TLL, no durability) As I said before this is just an example.</p>
+
+<p><em>Build and Install</em></p>
+
+<pre><code>git clone https://github.com/tgrall/couchbase-how-to-versioning.git
+cd how-to-versioning
+mvn clean install
+</code></pre>
+
+<p>Then add this library to your project in addition to Couchbase Java Client, for example in your pom.xml</p>
+
+<pre><code class="xml">...
+&lt;dependency&gt;
+  &lt;groupid&gt;com.couchbase.howtos&lt;/groupid&gt;
+  &lt;artifactid&gt;couchbase-how-to-versioning&lt;/artifactid&gt;
+  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupid&gt;couchbase&lt;/groupid&gt;
+  &lt;artifactid&gt;couchbase-client&lt;/artifactid&gt;
+  &lt;version&gt;1.1.8&lt;/version&gt;
+&lt;/dependency&gt;
+
+...
+</code></pre>
+
+<p><em>Code your application</em></p>
+
+<p>Create a document and version it:</p>
+
+<pre><code class="java">List&lt;uri&gt; uris = new LinkedList&lt;uri&gt;();
+uris.add(URI.create("http://127.0.0.1:8091/pools"));
+CouchbaseClientWithVersioning client = null
+try {
+  client = new CouchbaseClientWithVersioning(uris, "default", "");
+  String key = "key-001";
+  client.set(key, "This is the original version");
+  System.out.printf("Original '%s' .\n", client.get(key));
+  client.set(key, "This is a new version", true); // create a new version
+  System.out.printf("Current Version '%s' .\n", client.get(key));
+  System.out.printf("Version 1 '%s' .\n", client.get(key, 1));
+  client.set(key, "This is another version", true); // create a new version
+  System.out.printf("All versions %s .\n", client.getAllVersions(key));
+  client.deleteVersion(key, 1); // create a new version
+  System.out.printf("All versions %s (after delete 1 version).\n", client.getAllVersions(key));
+  client.delete(key); // create a new version
+  System.out.printf("All versions %s (after delete the main key).\n", client.getAllVersions(key));
+} catch (Exception e) {
+  e.printStackTrace();
+}
+if (client !=null) {
+  client.shutdown();
+}
+</code></pre>
+
+<p>Quick explanation:</p>
+
+<ul>
+<li>Line 5: instead of using the <code>CouchbaseClient</code>, the application uses the extended <code>CouchbaseClientWithVersioning</code> class.</li>
+<li>Line 7: create a new entry</li>
+<li>Line 9: create a new version, the boolean value to &ldquo;true&rdquo; force the versioning of the document</li>
+<li>The application use other methods such as get a specific version (line 11), get all versions (line 13), delete a specific version (line 14), and finally delete the key and all versions (line 16).</li>
+</ul>
+
+
+<p>So using this approach the developer controls explicitly when to create a version, since he has to add the boolean parameter in the set operation. In this small sample library it is also possible to do auto versioning, in this case all set and replace calls will create a version, to achieve that the developer just needs to call the setAutoVersioning(true) method. Something like:</p>
+
+<pre><code class="java">client = new CouchbaseClientWithVersioning(uris, "default", "");
+client.setAutomaticVersionning(true);
+</code></pre>
+
+<p>With this approach you can provide versioning to your application with minimal code change. You can test it in the Beer Sample application, just do not forget to change the views as documenter above to only return <em>current</em> version of the documents.</p>
+
+<h3>Conclusion</h3>
+
+<p>As you can see doing versioning in Couchbase is not that complicated, but it is something that must be done by your application based on its requirements and constraints. You have many different solution and none of these options is perfect for all use cases.</p>
+
+<p>In this specific sample code, I am working with a simple design where I create a copy of the documents for each version. With this approach also, it is interesting to mention that you can version &ldquo;anything&rdquo;, not only JSON document but also any values.  As I said before, this is one possible approach, and like any design, it has some impact on the application or database, in this case most the database:</p>
+
+<ul>
+<li>Increase the number of keys and documents</li>
+<li>Double - or more- the number of operations, for example when updating a document, the application needs to get the current value, create a version, save the current version.</li>
+<li>Consistency management when adding new version and incrementing the version number (need to deal with errors when creating a new version, deleting the versions and counter&hellip;.)</li>
+</ul>
+
+
+<p>Many features could be added to this easily, for example:</p>
+
+<ul>
+<li>Limit to a specific number of version,</li>
+<li>Enable the versioning only of replace() operation</li>
+<li>Add specific attribute about versions in JSON document (for example date of the version)</li>
+<li>&hellip;.</li>
+</ul>
+
+
+<p>If you are using versioning in your Couchbase application feel free to comment or write a small article that describes the way your are doing it.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Deploy Your Node/Couchbase Application to the Cloud With Clever Cloud]]></title>
+    <link href="http://tgrall.github.io/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/"/>
+    <updated>2013-07-11T06:47:51+02:00</updated>
+    <id>http://tgrall.github.io/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud</id>
+    <content type="html"><![CDATA[<h3>Introduction</h3>
+
+<p><a href="http://www.clever-cloud.com/en/">Clever Cloud</a> is the first PaaS to provide Couchbase as a service allowing developers to run applications in a fully managed environment. This article shows how to deploy an existing application to Clever Cloud.</p>
+
+<p><img class="<a" src="href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a>&#8221;></p>
+
+<p>I am using a very simple Node application that I have documented in a previous article: “<a href="http://tugdualgrall.blogspot.fr/2013/03/easy-application-development-with.html">Easy application development with Couchbase, Angular and Node</a>”.</p>
+
+<p>Clever Cloud provides support for various databases MySQL, PostgreSQL, but also and this is most important for me <a href="http://www.clever-cloud.com/en/services/couchbase.html">Couchbase</a>. No only Clever Cloud allows you to use database services but also you can deploy and host your application that could be developed in the language/technology of your choice : Java, Node, Scala, Python, PHP, … and all this in a secure, scalable and managed environment.</p>
+
+<!-- more -->
+
+
+<h3>Setting up your Clever Cloud environment</h3>
+
+<h4>Create your account</h4>
+
+<ol>
+<li>Go to the Clever Cloud site :<a href="http://www.clever-cloud.com/"> http://www.clever-cloud.com/</a></li>
+<li>Click on “Login” link and follow the steps to create your account.</li>
+<li>After few seconds you will received an email and be redirected to the Clever Cloud Console.</li>
+</ol>
+
+
+<h4>Create a Couchbase instance</h4>
+
+<p>The <a href="https://console.clever-cloud.com/">Clever Cloud Console</a> allows you to create your Couchbase Bucket in few clicks:</p>
+
+<p>1-  Cick on “Services” in the left menu</p>
+
+<p>2-  Click on “Add a Service” in the left menu </span></p>
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a>&#8221;></p>
+
+<p>3- Click on “Couchbase” button.</p>
+
+<ol>
+<li>Select the size of the RAM quota for your bucket</li>
+</ol>
+
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a>&#8221;></p>
+
+<p>The size of the RAM Quota for your bucket will have an impact on performance but also on the pricing.</p>
+
+<p>5- Click “Add this Service”</p>
+
+<p>You are done, you should receive an email with all the information to access your newly created bucket.</p>
+
+<p>The mail from Clever Cloud contains the following information:</p>
+
+<pre><code>db_host = xxxxxxxx.couchbase.clvrcld.net    Location of the database, this is where the endpoint is located.
+db_name = yyyyyyyy  Name of the Couchbase bucket
+db_username = xxxxxxxx  Not used in Couchbase context
+db_password = zzzzzzzz  Password to connect to the Couchbase Bucket
+</code></pre>
+
+<p>So you are now ready to use your bucket.</p>
+
+<p>Note: In the current version of the Clever Cloud Couchbase Service you do not have access to a management console. If you want to get some information about the database or create views you need to do it from you application code.</p>
+
+<h4>Connect your Application to Couchbase@Clever-Cloud</h4>
+
+<p>The first step is to get some code, so let’s clone the “Couchbase Ideas Sample Application”, and install the dependencies, using the following commands:</p>
+
+<pre><code>git clone -b 03-vote-with-value https://github.com/tgrall/couchbase-node-ideas.git
+
+cd couchbase-node-ideas
+
+git branch mybranch
+
+git checkout mybranch
+
+npm install
+</code></pre>
+
+<p>Open the app.js and edit the connection info to point your application to the Couchbase instance and modify the HTTP port of your application to 8080 - this is a mandatory step documented <a href="http://doc.clever-cloud.com/nodejs/nodejs/#requirements">here</a> :</p>
+
+<pre><code class="js">dbConfiguration = {
+  "hosts": ["xxxxxxxxxxx.couchbase.clvrcld.net:8091"],
+  "bucket": "xxxxxxxxxxx",
+  "user": "xxxxxxxxxx",
+  "password": "yyyyyyyyyyyyyyyyyyyyyyyyy"
+};
+...
+...
+
+appServer = app.listen(8080, function() {
+  console.log("Express server listening on port %d in %s mode", appServer.address().port, app.settings.env);
+});
+</code></pre>
+
+<p>Launch your application using</p>
+
+<pre><code>node app.js
+</code></pre>
+
+<p>Go to <a href="http://localhost:8080">http://localhost:8080</a></p>
+
+<p>Your application is now using Couchbase on the cloud powered by Clever Cloud. Let’s now deploy the application itself on Clever Cloud</p>
+
+<h3>Deploy your application on Clever Cloud</h3>
+
+<p>The easiest way to deploy an application to Clever Cloud is using git. The first thing to do is to add your SSH public key into Clever Cloud Console. If you do not have any SSH yet, follow the steps described on Github : “<a href="https://help.github.com/articles/generating-ssh-keys">Generating SSH Keys</a>”.</p>
+
+<h4>Add your SSH key</h4>
+
+<p>Note: As you can guess this should be done only once</p>
+
+<p>Open the id_rsa.pub file with a text editor. This is your SSH key. Select all and copy to your clipboard.</p>
+
+<ol>
+<li>Go to the Clever Cloud Console</li>
+<li>Click on “Profile” entry in the left menu</li>
+<li>Click on “SSH Keys”</li>
+<li>Click on “Add a SSH Key”</li>
+<li>Enter a name (anything you want) and paste your key</li>
+<li>Click “Add” button</li>
+</ol>
+
+
+<p>You are now ready to deploy applications to Clever Cloud. The next thing to do, is to create a new node application in Clever Cloud.</p>
+
+<h4>Create your Application</h4>
+
+<ol>
+<li>Click “Add an app” in the Application menu in the top menu.</li>
+<li>Give a name and description to this application</li>
+<li>Select the Instance type, in this case “Node.js”</li>
+<li>Configure your instances, you can keep the default values for now, click “Next”</li>
+<li>Check the configuration, and click “Create”</li>
+</ol>
+
+
+<p>Your application is created, you are redirected to the generic information page, where you can find a Git URL that we will use to deploy the application.</p>
+
+<p>You can navigate into the entries in the left menu to see more information about your application. In addition to the Information page, you can look at the following entries:</p>
+
+<ol>
+<li>“Domain Names” to configure the URL to access your application</li>
+<li>“Logs” to view the application logs</li>
+</ol>
+
+
+<h4>Deploy the Application</h4>
+
+<p>So we are almost there!</p>
+
+<p>The deployment to Clever Cloud is done using a Git push command, so you need to add the deployment URL as a remote repository to your application, using the following command:</p>
+
+<pre><code>git remote add clever git+ssh://git@push.clever-cloud.com/app_[your_app_id].git
+
+git commit -a -m “Couchbase on Clever Cloud connection”
+
+git push clever mybranch:master
+</code></pre>
+
+<p>Once you have added the application as remote repository you can commit and push your application.</p>
+
+<p>The last command pushes the application  to Clever Cloud. It is important to note that Clever Cloud will always deploy the application on the “master” branch on the remote repository. The notation mybranch:master is used to mention it. If you work locally on your master branch just use “master”.</p>
+
+<p>You can now go to the Clever Cloud console and look in the log and click on the URL in the “Domain Names” section to test your application.</p>
+
+<p>You should be able to see your application, that is running on the Clever Cloud PaaS.</p>
+
+<p>When you update your application, you just need to do a  git push and git commit.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this tutorial you have learned how to:</p>
+
+<ul>
+<li>Create your Clever Cloud account</li>
+<li>Create a Couchbase instance</li>
+<li>Create and deploye a Node.js application</li>
+</ul>
+
+
+<p>Feel free to test this yourself, with Node or other technology, as you can see it is quite easy to setup.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SQL to NoSQL : Copy Your Data From MySQL to Couchbase]]></title>
+    <link href="http://tgrall.github.io/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase/"/>
+    <updated>2013-07-03T11:52:56+02:00</updated>
+    <id>http://tgrall.github.io/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase</id>
+    <content type="html"><![CDATA[<p><strong>TL;DR:</strong> Look at the <a href="https://github.com/tgrall/couchbase-sql-importer">project on Github</a>.</p>
+
+<h3>Introduction</h3>
+
+<p>During my last interactions with the Couchbase community, I had the question how can I easily import my data from my current database into Couchbase. And my answer was always the same:</p>
+
+<ul>
+<li>Take an ETL such as Talend to do it</li>
+<li>Just write a small program to copy the data from your RDBMS to Couchbase&hellip;</li>
+</ul>
+
+
+<p>So I have written this small program that allows you to import the content of a RDBMS into Couchbase. This tools could be used as it is, or you can look at the code to adapt it to your application.</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/xzqBjhYKCLY?color=white&theme=light"></iframe></p>
+
+<h3>The Tool: Couchbase SQL Importer</h3>
+
+<p>The Couchbase SQL Importer, available <a href="http://github.com/tgrall/couchbase-sql-importer">here</a>, allows you with a simple command line to copy all -or part of- your SQL schema into Couchbase. Before explaining how to run this command, let&rsquo;s see how the data are stored into Couchbase when they are imported:</p>
+
+<ul>
+<li>Each table row is imported a single JSON document
+
+<ul>
+<li>where each table column becomes a JSON attribute</li>
+</ul>
+</li>
+<li>Each document as a key made of the name of the table and a counter (increment)</li>
+</ul>
+
+
+<p>The following concrete example, based on the <a href="http://dev.mysql.com/doc/world-setup/en/index.html">MySQL World sample database</a>, will help you to understand how it works. This database contains 3 tables : City, Country, CountryLanguage. The City table looks like:</p>
+
+<pre><code>+-------------+----------+------+-----+---------+----------------+
+| Field       | Type     | Null | Key | Default | Extra          |
++-------------+----------+------+-----+---------+----------------+
+| ID          | int(11)  | NO   | PRI | NULL    | auto_increment |
+| Name        | char(35) | NO   |     |         |                |
+| CountryCode | char(3)  | NO   |     |         |                |
+| District    | char(20) | NO   |     |         |                |
+| Population  | int(11)  | NO   |     | 0       |                |
++-------------+----------+------+-----+---------+----------------+
+</code></pre>
+
+<p>The JSON document that matches this table looks like the following:</p>
+
+<pre><code class="json">city:3805
+{
+  "Name": "San Francisco",
+  "District": "California",
+  "ID": 3805,
+  "Population": 776733,
+  "CountryCode": "USA"
+}
+</code></pre>
+
+<p>You see that here I am simply taking all the rows and &ldquo;moving&rdquo; them into Couchbase. This is a good first step to play with your dataset into Couchbase, but it is probably not the final model you want to use for your application; most of the time you will have to see when to use embedded documents, list of values, .. into your JSON documents.</p>
+
+<p>In addition to the JSON document the tool create views based on the following logic:</p>
+
+<ul>
+<li>a view that list all imported documents with the name of the &ldquo;table&rdquo; (aka type) as key</li>
+<li>a view for each table with the primary key columns</li>
+</ul>
+
+
+<p>View: all/by_type</p>
+
+<pre><code class="json">{
+  "rows": [
+  {"key": "city", "value": 4079},
+  {"key": "country", "value": 239},
+  {"key": "countrylanguage", "value": 984}
+  ]
+}
+</code></pre>
+
+<p>As you can see this view allows you to get with a single Couchbase query the number of document by type.</p>
+
+<p>Also for each table/document type, a view is created where the key of the index is built from the table primary key. Let&rsquo;s for example query the &ldquo;City&rdquo; documents.</p>
+
+<p>View: city/by_pk?reduce=false&amp;limit=5</p>
+
+<pre><code class="json">{
+  "total_rows": 4079,
+  "rows": [
+  {"id": "city:1", "key": 1, "value": null},
+  {"id": "city:2", "key": 2, "value": null},
+  {"id": "city:3", "key": 3, "value": null},
+  {"id": "city:4", "key": 4, "value": null},
+  {"id": "city:5", "key": 5, "value": null}
+  ]
+}
+</code></pre>
+
+<p>The index key matches the value of the <code>City.ID</code> column.  When the primary key is made of multiple columns the key looks like:</p>
+
+<p>View: CountryLanguage/by_pk?reduce=false&amp;limit=5
+<code>json
+{
+  "total_rows": 984,
+  "rows": [
+  {"id": "countrylanguage:1", "key": ["ABW", "Dutch"], "value": null},
+  {"id": "countrylanguage:2", "key": ["ABW", "English"], "value": null},
+  {"id": "countrylanguage:3", "key": ["ABW", "Papiamento"], "value": null},
+  {"id": "countrylanguage:4", "key": ["ABW", "Spanish"], "value": null},
+  {"id": "countrylanguage:5", "key": ["AFG", "Balochi"], "value": null}
+  ]
+}
+</code></p>
+
+<p>This view is built from the CountryLanguage table primary key made of <code>CountryLanguage.CountryCode and </code>CountryLanguage.Language` columns.</p>
+
+<pre><code>+-------------+---------------+------+-----+---------+-------+
+| Field       | Type          | Null | Key | Default | Extra |
++-------------+---------------+------+-----+---------+-------+
+| CountryCode | char(3)       | NO   | PRI |         |       |
+| Language    | char(30)      | NO   | PRI |         |       |
+| IsOfficial  | enum('T','F') | NO   |     | F       |       |
+| Percentage  | float(4,1)    | NO   |     | 0.0     |       |
++-------------+---------------+------+-----+---------+-------+
+</code></pre>
+
+<p><strong>How to use Couchbase SQL Importer tool? </strong></p>
+
+<p>The importer is a simple Java based command line utility, quite simple to use:</p>
+
+<p>1- Download the <a href="http://goo.gl/IF89e">CouchbaseSqlImporter.jar file from here</a>. This file is contains all the dependencies to work with Couchbase: the Java Couchbase Client, and GSON.
+2- Download the JDBC driver for the database you are using as data source. For this example I am using MySQL and I have download the driver for MySQL Site.
+3- Configure the import using a properties file.</p>
+
+<pre><code>## SQL Information ##
+sql.connection=jdbc:mysql://192.168.99.19:3306/world
+sql.username=root
+sql.password=password
+
+## Couchbase Information ##
+cb.uris=http://localhost:8091/pools
+cb.bucket=default
+cb.password=
+
+## Import information
+import.tables=ALL
+import.createViews=true
+import.typefield=type
+import.fieldcase=lower
+</code></pre>
+
+<p>This sample properties file contains three sections :</p>
+
+<ul>
+<li>The two first sections are used to configure the connections to your SQL database and Couchbase cluster (note that the bucket must be created first)</li>
+<li>The third section allow you to configure the import itself</li>
+</ul>
+
+
+<p>4- Run the tool !</p>
+
+<pre><code>java -cp "./CouchbaseSqlImporter.jar:./mysql-connector-java-5.1.25-bin.jar" com.couchbase.util.SqlImporter import.properties
+</code></pre>
+
+<p>So you run the Java command with the proper classpath (-cp parameter).</p>
+
+<p>And you are done, you can get your data from your SQL database into Couchbase.</p>
+
+<p>If you are interested to see how it is working internally, you can take a look to the next paragraph.</p>
+
+<h3>The Code: How it works?</h3>
+
+<p>The main class of the tool is really simple  <a href="https://github.com/tgrall/couchbase-sql-importer/blob/master/sql-importer-lib/src/main/java/com/couchbase/util/SqlImporter.java">com.couchbase.util.SqlImporter</a>, the process is:</p>
+
+<ol>
+<li>Connect to the SQL database</li>
+<li>Connect to Couchbase</li>
+<li>Get the list of tables</li>
+<li>For each tables execute a &ldquo;select * from table&rdquo;
+ 4.1. Analyze the ResultSetMetadata to get the list of columns
+ 4.2. Create a Java map for each rows where the key is the name of the columns and the value…is the value
+ 4.3. Serialize this Map into a GSON document and save it into Couchbase</li>
+</ol>
+
+
+<p>The code is available in the <a href="https://github.com/tgrall/couchbase-sql-importer/blob/master/sql-importer-lib/src/main/java/com/couchbase/util/SqlImporter.java#L212">ImportTable(String table)</a> Java method.</p>
+
+<p>One interesting point is that you can use and extend the code to deal with your application.</p>
+
+<h3>Conclusion</h3>
+
+<p>I have created this tool quickly to help some people in the community, if you are using it and need new features, let me know, using comment or pull request.</p>
+]]></content>
+  </entry>
+  
+</feed>

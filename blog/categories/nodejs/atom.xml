@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Nodejs | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/nodejs/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Deploy Your Node/Couchbase Application to the Cloud With Clever Cloud]]></title>
+    <link href="http://tgrall.github.io/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/"/>
+    <updated>2013-07-11T06:47:51+02:00</updated>
+    <id>http://tgrall.github.io/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud</id>
+    <content type="html"><![CDATA[<h3>Introduction</h3>
+
+<p><a href="http://www.clever-cloud.com/en/">Clever Cloud</a> is the first PaaS to provide Couchbase as a service allowing developers to run applications in a fully managed environment. This article shows how to deploy an existing application to Clever Cloud.</p>
+
+<p><img class="<a" src="href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a>&#8221;></p>
+
+<p>I am using a very simple Node application that I have documented in a previous article: “<a href="http://tugdualgrall.blogspot.fr/2013/03/easy-application-development-with.html">Easy application development with Couchbase, Angular and Node</a>”.</p>
+
+<p>Clever Cloud provides support for various databases MySQL, PostgreSQL, but also and this is most important for me <a href="http://www.clever-cloud.com/en/services/couchbase.html">Couchbase</a>. No only Clever Cloud allows you to use database services but also you can deploy and host your application that could be developed in the language/technology of your choice : Java, Node, Scala, Python, PHP, … and all this in a secure, scalable and managed environment.</p>
+
+<!-- more -->
+
+
+<h3>Setting up your Clever Cloud environment</h3>
+
+<h4>Create your account</h4>
+
+<ol>
+<li>Go to the Clever Cloud site :<a href="http://www.clever-cloud.com/"> http://www.clever-cloud.com/</a></li>
+<li>Click on “Login” link and follow the steps to create your account.</li>
+<li>After few seconds you will received an email and be redirected to the Clever Cloud Console.</li>
+</ol>
+
+
+<h4>Create a Couchbase instance</h4>
+
+<p>The <a href="https://console.clever-cloud.com/">Clever Cloud Console</a> allows you to create your Couchbase Bucket in few clicks:</p>
+
+<p>1-  Cick on “Services” in the left menu</p>
+
+<p>2-  Click on “Add a Service” in the left menu </span></p>
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a>&#8221;></p>
+
+<p>3- Click on “Couchbase” button.</p>
+
+<ol>
+<li>Select the size of the RAM quota for your bucket</li>
+</ol>
+
+
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a>&#8221;></p>
+
+<p>The size of the RAM Quota for your bucket will have an impact on performance but also on the pricing.</p>
+
+<p>5- Click “Add this Service”</p>
+
+<p>You are done, you should receive an email with all the information to access your newly created bucket.</p>
+
+<p>The mail from Clever Cloud contains the following information:</p>
+
+<pre><code>db_host = xxxxxxxx.couchbase.clvrcld.net    Location of the database, this is where the endpoint is located.
+db_name = yyyyyyyy  Name of the Couchbase bucket
+db_username = xxxxxxxx  Not used in Couchbase context
+db_password = zzzzzzzz  Password to connect to the Couchbase Bucket
+</code></pre>
+
+<p>So you are now ready to use your bucket.</p>
+
+<p>Note: In the current version of the Clever Cloud Couchbase Service you do not have access to a management console. If you want to get some information about the database or create views you need to do it from you application code.</p>
+
+<h4>Connect your Application to Couchbase@Clever-Cloud</h4>
+
+<p>The first step is to get some code, so let’s clone the “Couchbase Ideas Sample Application”, and install the dependencies, using the following commands:</p>
+
+<pre><code>git clone -b 03-vote-with-value https://github.com/tgrall/couchbase-node-ideas.git
+
+cd couchbase-node-ideas
+
+git branch mybranch
+
+git checkout mybranch
+
+npm install
+</code></pre>
+
+<p>Open the app.js and edit the connection info to point your application to the Couchbase instance and modify the HTTP port of your application to 8080 - this is a mandatory step documented <a href="http://doc.clever-cloud.com/nodejs/nodejs/#requirements">here</a> :</p>
+
+<pre><code class="js">dbConfiguration = {
+  "hosts": ["xxxxxxxxxxx.couchbase.clvrcld.net:8091"],
+  "bucket": "xxxxxxxxxxx",
+  "user": "xxxxxxxxxx",
+  "password": "yyyyyyyyyyyyyyyyyyyyyyyyy"
+};
+...
+...
+
+appServer = app.listen(8080, function() {
+  console.log("Express server listening on port %d in %s mode", appServer.address().port, app.settings.env);
+});
+</code></pre>
+
+<p>Launch your application using</p>
+
+<pre><code>node app.js
+</code></pre>
+
+<p>Go to <a href="http://localhost:8080">http://localhost:8080</a></p>
+
+<p>Your application is now using Couchbase on the cloud powered by Clever Cloud. Let’s now deploy the application itself on Clever Cloud</p>
+
+<h3>Deploy your application on Clever Cloud</h3>
+
+<p>The easiest way to deploy an application to Clever Cloud is using git. The first thing to do is to add your SSH public key into Clever Cloud Console. If you do not have any SSH yet, follow the steps described on Github : “<a href="https://help.github.com/articles/generating-ssh-keys">Generating SSH Keys</a>”.</p>
+
+<h4>Add your SSH key</h4>
+
+<p>Note: As you can guess this should be done only once</p>
+
+<p>Open the id_rsa.pub file with a text editor. This is your SSH key. Select all and copy to your clipboard.</p>
+
+<ol>
+<li>Go to the Clever Cloud Console</li>
+<li>Click on “Profile” entry in the left menu</li>
+<li>Click on “SSH Keys”</li>
+<li>Click on “Add a SSH Key”</li>
+<li>Enter a name (anything you want) and paste your key</li>
+<li>Click “Add” button</li>
+</ol>
+
+
+<p>You are now ready to deploy applications to Clever Cloud. The next thing to do, is to create a new node application in Clever Cloud.</p>
+
+<h4>Create your Application</h4>
+
+<ol>
+<li>Click “Add an app” in the Application menu in the top menu.</li>
+<li>Give a name and description to this application</li>
+<li>Select the Instance type, in this case “Node.js”</li>
+<li>Configure your instances, you can keep the default values for now, click “Next”</li>
+<li>Check the configuration, and click “Create”</li>
+</ol>
+
+
+<p>Your application is created, you are redirected to the generic information page, where you can find a Git URL that we will use to deploy the application.</p>
+
+<p>You can navigate into the entries in the left menu to see more information about your application. In addition to the Information page, you can look at the following entries:</p>
+
+<ol>
+<li>“Domain Names” to configure the URL to access your application</li>
+<li>“Logs” to view the application logs</li>
+</ol>
+
+
+<h4>Deploy the Application</h4>
+
+<p>So we are almost there!</p>
+
+<p>The deployment to Clever Cloud is done using a Git push command, so you need to add the deployment URL as a remote repository to your application, using the following command:</p>
+
+<pre><code>git remote add clever git+ssh://git@push.clever-cloud.com/app_[your_app_id].git
+
+git commit -a -m “Couchbase on Clever Cloud connection”
+
+git push clever mybranch:master
+</code></pre>
+
+<p>Once you have added the application as remote repository you can commit and push your application.</p>
+
+<p>The last command pushes the application  to Clever Cloud. It is important to note that Clever Cloud will always deploy the application on the “master” branch on the remote repository. The notation mybranch:master is used to mention it. If you work locally on your master branch just use “master”.</p>
+
+<p>You can now go to the Clever Cloud console and look in the log and click on the URL in the “Domain Names” section to test your application.</p>
+
+<p>You should be able to see your application, that is running on the Clever Cloud PaaS.</p>
+
+<p>When you update your application, you just need to do a  git push and git commit.</p>
+
+<h3>Conclusion</h3>
+
+<p>In this tutorial you have learned how to:</p>
+
+<ul>
+<li>Create your Clever Cloud account</li>
+<li>Create a Couchbase instance</li>
+<li>Create and deploye a Node.js application</li>
+</ul>
+
+
+<p>Feel free to test this yourself, with Node or other technology, as you can see it is quite easy to setup.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With Couchbase and node.js on Windows]]></title>
+    <link href="http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows/"/>
+    <updated>2013-01-04T19:54:43+01:00</updated>
+    <id>http://tgrall.github.io/blog/2013/01/04/getting-started-with-couchbase-and-node-dot-js-on-windows</id>
+    <content type="html"><![CDATA[<p>In a previous post I have explained how to use Couchbase and Node.js on OS X. Since it is quite different on Windows here another article about it.</p>
+
+<h3>Install Couchbase Server 2.0</h3>
+
+<p>If you have not installed Couchbase Server already, do the following :</p>
+
+<ol>
+<li>Download Couchbase Server from <a href="http://www.couchbase.com/download">here</a></li>
+<li>Run the installer</li>
+<li>Configure the database at <a href="http://localhost:8091/">http://localhost:8091</a> (if you have issue take a look to <a href="http://tugdualgrall.blogspot.fr/2012/12/what-to-do-if-your-couchbase-server.html">this article</a>)</li>
+</ol>
+
+
+<p>These steps are documented in the <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-getting-started-install-win.html">Couchbase Server Manual</a>.</p>
+
+<h3>Install Node</h3>
+
+<p><strong>Install latest version of node</strong></p>
+
+<p>It is quite easy to install Node.js using the Windows installer provided at <a href="http://nodejs.org/">http://nodejs.org</a>.</p>
+
+<p>Once you have installed node, you can test is using the command line interface:</p>
+
+<pre><code class="sh">node
+&amp;gt; console.log(process.version);
+v0.8.16
+</code></pre>
+
+<p>Node is installed. So far so good !</p>
+
+<h3>Install Couchnode</h3>
+
+<p>Couchnode, the Couchbase Client Library for Node.js, is a native module. The tool used to install native modules is <code>node-gyp</code>.  So to install couchnode you need to install :</p>
+
+<ul>
+<li>node-gyp</li>
+<li>python</li>
+<li>Visual Studio to have access to a C/C++ compiler</li>
+</ul>
+
+
+<h4>Install node-gyp</h4>
+
+<p>The node-gyp module is easy to install and you can install it using npm using the following command:</p>
+
+<pre><code class="sh">npm install -g node-gyp
+</code></pre>
+
+<p>The <em>-g</em> parameter indicates that this module will be installed globally and added to your <code>%PATH%</code>.</p>
+
+<h4>Install Python</h4>
+
+<p>GYP uses Python to generate the project, so you need to install it on your environment. I have installed <a href="http://www.python.org/download/releases/2.7.3/">Python 2.7.3</a> using the Windows installer.</p>
+
+<p><strong>Install Visual Studio</strong></p>
+
+<p>Finally you need a C/C++ compiler, the best way to get it is to install Visual Studio. As you probably know I am not a Windows expert and I do not know a lot about Microsoft development tools. I have downloaded Visual Studio Express the free development tools from <a href="http://www.microsoft.com/visualstudio/eng/downloads">here</a>; it was sufficient.</p>
+
+<p><strong>Install Libcouchbase for Windows</strong></p>
+
+<p>Couchnode uses libcouchbase the C client library, so before running the npm install for Couchbase, you need to install libcouchbase itself.</p>
+
+<p>You can download it from <a href="http://www.couchbase.com/develop/c/current">Couchbase site</a>. The Windows versions are located in the left menu of the page. Download the zip file, that matches your environment. I have downloaded the &ldquo;Windows, 64-bit MSVC 10&rdquo;.</p>
+
+<p>Node-gyp will look for all the dependencies (DLL, library headers) into <code>c:\couchbase</code> directory, so you need to unzip the file in this folder. This location comes from the <a href="https://github.com/couchbase/couchnode/blob/master/binding.gyp#L7">binding.gyp</a> file of the couchnode project.</p>
+
+<p><strong>Install and Test Couchnode itself!</strong></p>
+
+<p>Let&rsquo;s check what we have done so far; we have installed:</p>
+
+<ul>
+<li>Node</li>
+<li>node-gyp</li>
+<li>Python</li>
+<li>Visual Studio</li>
+<li>Libcouchbase</li>
+</ul>
+
+
+<p>We are now ready to install and use couchnode itself. For this we can create a new node project.</p>
+
+<pre><code class="sh">mkdir my-app
+cd my-app
+npm install couchbase
+</code></pre>
+
+<p>The install command will:</p>
+
+<ul>
+<li>Create a node_modules folder and put couchbase client library in it</li>
+<li>When installing/building couchnode on Windows I had the following warning :</li>
+</ul>
+
+
+<p>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1138,5): warning MSB8012: TargetExt(.dll) does not match the Linker&rsquo;s Output
+File property value (.node). This may cause your project to build incorrectly.
+To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+[C:\Users\tgrall\node\node_modules\couchbase\build\couchbase_impl.vcxproj]</p>
+
+<p>This is only a warning and as far as I know, it is not a blocker. At the end of the log you should see:</p>
+
+<pre><code class="sh">couchbase@0.0.10 node_modules\couchbase
+├── bindings@1.0.0
+└── request@2.11.4
+</code></pre>
+
+<p>You have successfully installed couchnode.</p>
+
+<p>Let&rsquo;s now write a small test. Create a <code>test.js</code> file with the following content:</p>
+
+<pre><code class="js">var  driver = require('couchbase');
+
+driver.connect({
+  "username": "",
+  "password": "",
+  "hostname": "localhost:8091",
+  "bucket": "default"},
+  function(err, cb) {
+    if (err) {
+      throw (err)
+    }
+
+    var key = 'foo';
+    cb.set(key, '{"server" : "couchbase", "version" : 2 }' , function (err, meta) {
+      if (err) { console.log(err); }
+      cb.get(key, function(err, doc) {
+        if (err){ console.log(err);}
+        console.log(doc);
+      });  
+    });
+  });
+</code></pre>
+
+<p>Run this with the command:</p>
+
+<pre><code class="sh">node test.js
+</code></pre>
+
+<p>You should see the following text in your console :</p>
+
+<pre><code>{ server: 'couchbase', version: 2 }
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>In this article you have learned how to:</p>
+
+<ul>
+<li>Install Couchbase</li>
+<li>Install Node</li>
+<li>Install and configure node-gyp</li>
+<li>Install and use Couchbase and Node</li>
+</ul>
+
+
+<p>all this on Windows 7.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Create a Simple Node.js and Couchbase Application... On OS X]]></title>
+    <link href="http://tgrall.github.io/blog/2012/09/24/create-a-simple-node-dot-js-and-couchbase-application-dot-dot-dot-on-os-x/"/>
+    <updated>2012-09-24T20:13:14+02:00</updated>
+    <id>http://tgrall.github.io/blog/2012/09/24/create-a-simple-node-dot-js-and-couchbase-application-dot-dot-dot-on-os-x</id>
+    <content type="html"><![CDATA[<blockquote><p><strong>NOTE:</strong> The Couchbase Node.js Client Library is currently changing. I will update this article and source code once the API is stable.</p></blockquote>
+
+<p>I am currently playing a little bit with Node.js . It is quite fun! In this article I won&rsquo;t go in a a very complex application but just give you the basic steps to create your first Node.js+Couchbase application&hellip; on Mac OS X.</p>
+
+<h3>Installation</h3>
+
+<p><strong>Couchbase 2.0 Beta:</strong></p>
+
+<p>You can take a look the first steps of my <a href="http://tugdualgrall.blogspot.fr/2012/07/couchbase-101-install-store-and-query.html">previous article</a> to install Couchbase. The basics steps are:</p>
+
+<ul>
+<li>Download <a href="http://www.couchbase.com/couchbase-server/beta">Couchbase 2. 0 Beta</a></li>
+<li>Start the server (Run the &ldquo;Couchbase Server&rdquo; application)</li>
+<li>Configure the server</li>
+</ul>
+
+
+<p><strong>Other Components :</strong></p>
+
+<ul>
+<li>Node.js</li>
+<li>Couchbase Client Library (C version)</li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>To install these two components I am using homebrew (aka brew).</p>
+
+<p><em>_Hmmm, what is homebrew?</em></p>
+
+<p>Homebrew is a package manager for OS X that allows you to install, update and uninstall unix tools using very simple commands. You can find more information on the <a href="http://mxcl.github.com/homebrew/">homebrew site</a>. So let&rsquo;s start by installing homebrew itself.</p>
+
+<p>From a terminal window:</p>
+
+<pre><code class="sh">ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
+</code></pre>
+
+<p>Then let&rsquo;s install node</p>
+
+<pre><code class="sh">brew install node
+</code></pre>
+
+<p>and finally install Couchbase Client Library</p>
+
+<pre><code class="sh">brew install https://github.com/couchbase/homebrew/raw/preview/Library/Formula/libcouchbase.rb
+</code></pre>
+
+<h3>Coding</h3>
+
+<p>You are now ready to start the development of your application.</p>
+
+<h4>Create a very simple application</h4>
+
+<p>1- Create a folder for your application</p>
+
+<pre><code class="sh">mkdir sample-app
+cd sample-app
+</code></pre>
+
+<p>2- Create an <code>app.js</code> file and copy the following code:</p>
+
+<pre><code class="javascript">var http = require("http");
+
+function onRequest(request, response) {
+  response.writeHead(200, {"Content-Type": "text/plain"});
+  response.write("Hello World");
+  response.end();
+}
+
+var server = http.createServer(onRequest);
+server.listen(8080);
+
+console.log("&amp;gt; SERVER STARTED");
+</code></pre>
+
+<p>I won&rsquo;t go in all the details about a node application; for this I invite you to read <a href="http://www.nodebeginner.org/">The Node Beginnger Book</a>.</p>
+
+<p>3- Start your server</p>
+
+<pre><code class="javascript">node app.js
+</code></pre>
+
+<p>You should be able to access your application using <a href="http://localhost:8080">http://localhost:8080</a></p>
+
+<p>To stop your server just use ctrl+c.</p>
+
+<h4>Install and use Couchbase client for node.js</h4>
+
+<p>npm is the <a href="https://npmjs.org/">node package manager</a>, that allows you to easily install node.js modules and manage dependencies for your application (I will present the dependency management in another post)</p>
+
+<p>1- Install the Couchbase Client for node.js, using the following command</p>
+
+<pre><code class="sh">npm install couchbase
+</code></pre>
+
+<p>Couldn&rsquo;t be simpler! You can find more information about Couchbase Client for node on its <a href="https://npmjs.org/package/couchbase">npm page</a>.</p>
+
+<p>2- Lets now insert some data into Couchbase</p>
+
+<p>Create a simple function that inserts some documents, and call it after server startup:</p>
+
+<pre><code class="js">var http = require("http");
+
+// load the Couchbase driver and connect to the cluster
+var driver = require('couchbase');
+var cb = new driver.Couchbase("localhost:8091", null, null, "default");
+
+...
+...
+
+function insertData() {
+  // insert employees in Couchbase
+  var emps = [{
+    "type": "employee",
+    "id": 100,
+    "name": "Thomas",
+    "dept": "Sales",
+    "salary": 5000
+    }, {
+      "type": "employee",
+      "id": 200,
+      "name": "John",
+      "dept": "Development",
+      "salary": 4500
+      }, {
+        "type": "employee",
+        "id": 300,
+        "name": "Jane",
+        "dept": "Marketing",
+        "salary": 5000
+        }]
+
+        // Insert the data in Couchbase using the add method ()
+        for (index = 0; index &amp;lt; emps.length; index++) {
+          cb.add(JSON.stringify(emps[index].id), JSON.stringify(emps[index]), 0, undefined, function(data, err, key, cas) {
+            if (err &amp;amp;&amp;amp; err != 12) { // 12 : LCB_KEY_EEXISTS  
+              console.log("Failed to store object:\n" + err);
+            }
+            });
+          }
+        }
+
+        server.listen(8080, insertData());
+</code></pre>
+
+<ul>
+<li>Lines 4-5 : load the Couchbase driver and connect to the server. I am using the complete list of parameter <code>connect("server:port", "username", "password", "bucket"). But you can use the short version</code>connect(&ldquo;server:port&rdquo;)`</li>
+<li>Lines 12-30 : just create JSON object that will be pushed in Couchbase.</li>
+<li>Line 33 : the application just read each element of the array and insert them into Couchbase using the <code>couchbase.add()</code> function.</li>
+<li>Lines 34-38 : the <code>couchbase.add()</code> function set the value only if it does not exist. If the value exists the error code LCB_KEY_EEXISTS (12) is return by the callback function</li>
+</ul>
+
+
+<p>3- Start your server - <code>node app.js</code> - and check using the Admin Console that employees are inserted into your Couchbase instance. Note that node.js applications do not support hot deployment, so you need to bounce your application when changing the code.</p>
+
+<h4>Create and use Couchbase View</h4>
+
+<p>Let&rsquo;s now create and use a view to return the employee list.</p>
+
+<p>1- All Couchbase views are accessible using a simple REST API, but you can also use the node.js plugin : <a href="https://npmjs.org/package/baseview">baseview</a>; so let&rsquo;s install this module:</p>
+
+<pre><code class="sh">npm install baseview
+</code></pre>
+
+<ol>
+<li>Create a new view from your application</li>
+</ol>
+
+
+<p>You can use the Admin Console to create the view, but it is also possible to do it from your node.js code. So let&rsquo;s add the view programmatically in the insertData function.</p>
+
+<pre><code class="js">var http = require("http");
+
+// load the Couchbase driver and connect to the cluster
+var driver = require('couchbase');
+var cb = new driver.Couchbase("localhost:8091", null, null, "default");
+// load the baseview module
+var baseview = require('baseview')({url: 'http://localhost:8092', bucket: 'default'});
+
+...
+...
+
+function insertData() {
+
+  //create a new view
+  baseview.setDesign('design_employees', {
+    'basic_list': {
+      'map': "function (doc, meta) { if(doc.type == 'employee') {emit(meta.id, doc.name);}}"
+    }
+  },
+  function(err, res){
+    if (err != null) console.log(err);
+  }
+);
+
+...
+
+}
+...
+</code></pre>
+
+<p>This new code, create a new view in Couchbase server:</p>
+
+<ul>
+<li>line 7 : load the module and set the properties to call the view services</li>
+<li>line 16-17 : call the <code>basevie.setDesign()</code> method, that create a view.</li>
+<li>line 18 : set the map function that list all the employees</li>
+</ul>
+
+
+<p>3- Let&rsquo;s now call the view in the onRequest function.</p>
+
+<pre><code class="js">function onRequest(request, response) {
+  response.writeHead(200, {
+    "Content-Type": "text/plain"
+  });
+  response.write("See list of employees in the console");
+  var params =
+{ 'descending'  : 'true'
+, 'include_docs' : 'true'
+};
+baseview.view('design_employees', 'basic_list', params, function(error, data) {
+  for( var i = data.rows.length-1,length = data.rows.length ; i &gt;= 0; i-- ) {
+    var employee = data.rows[i].doc.json;
+    console.log(employee);
+  }
+});
+response.end();
+}
+</code></pre>
+
+<p>Calling the view is quite simple :</p>
+
+<ul>
+<li>lines 6-8 : create an object to send view parameters. In this example I am just using descending, and include_docs to get the full document as part of the response. You can find the list of all the parameters you can use in the <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-querying-rest-api.html">Couchbase documentation : Querying Using the REST API</a> (The <a href="https://github.com/PatrickHeneise/baseview/blob/master/baseview.js">baseview</a> module is using REST API to call the views).</li>
+<li>line 10-14 : just loop on the result content, returned in the data variable, and print the employee information in the console.</li>
+</ul>
+
+
+<p>Note: Because of the asynchronous nature of node.js, and my lack of experience with node, I was not able to send the list of employee to the HTTP response.</p>
+
+<p>In another article I will explain how to integrate Couchbase with an node.js application based on Express and Socket.io, where I list the Employee in my the Web page.</p>
+
+<p>Below, the complete code of this simple node.js application:</p>
+
+<pre><code class="js">var http = require("http");
+var driver = require('couchbase');
+var cb = new driver.Couchbase("localhost:8091", null, null, "default");
+var baseview = require('baseview')({url: 'http://127.0.0.1:8092',bucket: 'default'});
+
+function onRequest(request, response) {
+  response.writeHead(200, {
+    "Content-Type": "text/plain"
+  });
+  response.write("See list of employees in the console");
+  var params = {
+    'descending': 'true',
+    'include_docs': 'true'
+  };
+  baseview.view('design_employees', 'basic_list', params, function(error, data) {
+    for (var i = data.rows.length - 1, length = data.rows.length; i &gt;= 0; i--) {
+      var employee = data.rows[i].doc.json;
+      console.log(employee);
+    }
+  });
+  response.end();
+}
+
+function insertData() {
+  //create a new view
+  baseview.setDesign('design_employees', {
+    'basic_list': {
+      'map': "function (doc, meta) { if(doc.type == 'employee') {emit(meta.id, doc.name);}}"
+    }
+  }, function(err, res) {
+    if (err != null) console.log(err);
+  });
+
+  // insert employees in Couchbase
+  var emps = [{
+    "type": "employee",
+    "id": 100,
+    "name": "Thomas",
+    "dept": "Sales",
+    "salary": 5000
+  }, {
+    "type": "employee",
+    "id": 200,
+    "name": "John",
+    "dept": "Development",
+    "salary": 4500
+  }, {
+    "type": "employee",
+    "id": 300,
+    "name": "Jane",
+    "dept": "Marketing",
+    "salary": 5000
+    }]
+
+
+    // Insert the data in Couchbase using the add method ()
+    for (index = 0; index &lt; emps.length; index++) {
+      cb.add(JSON.stringify(emps[index].id), JSON.stringify(emps[index]), 0, undefined, function(data, err, key, cas) {
+        if (err &amp;&amp; err != 12) { // 12 : LCB_KEY_EEXISTS  
+          console.log("Failed to store object:\n" + err);
+        }
+        });
+      }
+    }
+
+    var server = http.createServer(onRequest);
+
+    server.listen(8080, insertData());
+
+    console.log("&gt; SERVER STARTED");
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

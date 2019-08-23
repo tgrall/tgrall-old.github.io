@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Jug | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/jug/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[NantesJUG: Next Meeting Friday November 13th About 'Google Technologies']]></title>
+    <link href="http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/"/>
+    <updated>2009-11-08T22:27:15+01:00</updated>
+    <id>http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies</id>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2">http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2</a>&#8221;></p>
+
+<p>This Friday , the Nantes JUG is pleased to organize a conference about &ldquo;Google Technologies&rdquo;. Didier Girard, <a href="http://twitter.com/dgirard">http://twitter.com/dgirard</a> , will be presenting and demoing cool stuff from Google:</p>
+
+<ul>
+<li>GWT 2</li>
+<li>Android</li>
+<li>Wave</li>
+<li>App Engine</li>
+</ul>
+
+
+<p>Want to come? Register for free <a href="http://jugevents.jugpadova.it/jugevents/event/registration.form?event.id=20744">here</a></p>
+
+<p>The event will occur at the &ldquo;<a href="http://maps.google.com/maps?f=q&amp;amp;source=s_q&amp;amp;hl=en&amp;amp;geocode=&amp;amp;q=ecole+des+mines+de+nantes&amp;amp;sll=47.176415,-1.340556&amp;amp;sspn=0.078063,0.181103&amp;amp;ie=UTF8&amp;amp;hq=%C3%89cole+des+mines+de+Nantes&amp;amp;hnear=%C3%89cole+des+mines+de+Nantes,+France&amp;amp;ll=47.283363,-1.520834&amp;amp;spn=0.019476,0.045276&amp;amp;t=h&amp;amp;z=15&amp;amp;iwloc=near">Ecole des Mines de Nantes</a>&rdquo; one of our sponsor from 7 to 9 pm.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Howto | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/howto/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Save MapR Streams Messages Into MapR DB JSON]]></title>
+    <link href="http://tgrall.github.io/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json/"/>
+    <updated>2016-03-31T09:00:07+02:00</updated>
+    <id>http://tgrall.github.io/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json</id>
+    <content type="html"><![CDATA[<p>In this article you will learn how to create a MapR Streams Consumer that saves all the messages into a <a href="http://maprdocs.mapr.com/51/#MapR-DB/JSON_DB/mapr_db_json_top.html">MapR-DB JSON Table</a>.</p>
+
+<!-- more -->
+
+
+<h3>Install and Run the sample MapR Streams application</h3>
+
+<p>The steps to install and run the applications are the same as the one defined in the following article:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">MapR Streams application</a></li>
+</ul>
+
+
+<p>Once you have the default producer and consumer running in your environment using the commands:</p>
+
+<p>Producer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run producer
+</code></pre>
+
+<p>Consumer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run consumer
+</code></pre>
+
+<h3>Save messages into MapR-DB JSON</h3>
+
+<p>The <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java">DBConsumer</a> class is a copy of the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/Consumer.java">Consumer</a> class with small changes to save the messages coming from the <code>/sample-stream:fast-messages</code> topic into a MapR-DB table named <code>/apps/fast-messages</code>.</p>
+
+<p><strong>1- Add MapR-DB Maven dependency to your project</strong></p>
+
+<p>Edit the <code>pom.xml</code> file and add the following entry in the <code>dependencies</code> tag:</p>
+
+<pre><code class="xml">   &lt;dependency&gt;
+      &lt;groupId&gt;com.mapr.db&lt;/groupId&gt;
+      &lt;artifactId&gt;maprdb&lt;/artifactId&gt;
+      &lt;version&gt;5.1.0-mapr&lt;/version&gt;
+   &lt;/dependency&gt;
+</code></pre>
+
+<p>This add support for:</p>
+
+<ul>
+<li><a href="http://ojai.io/">OJAI</a> Open JSON Application Interface</li>
+<li><a href="http://maprdocs.mapr.com/51/#MapR-DB/JSON_DB/crud_with_maprdb_ojai_java_api.html">MapR-DB JSON API</a></li>
+</ul>
+
+
+<p><strong>2- Create and Get a JSON Table</strong></p>
+
+<p>To save the messages, the application must access a JSON Table, for this just call the <code>MapRDB.getTable(TABLE_PATH)</code> method. If the table does not exist, create it with the <code>MapRDB.createTable(TABLE_PATH)</code>.</p>
+
+<p>This is what the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L113-L119"><code>DBConsumer.getTable(TABLE_PATH)</code></a> method is doing.</p>
+
+<pre><code class="java">  private static Table getTable(String tablePath) {
+    if ( ! MapRDB.tableExists(tablePath)) {
+      return MapRDB.createTable(tablePath);
+    } else {
+      return MapRDB.getTable(tablePath);
+    }
+  }
+</code></pre>
+
+<p>When the DBConsumer starts the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L41"><code>getTable("/apps/fast-messages")</code></a> method is called.</p>
+
+<pre><code>  Table fastMessagesTable = getTable("/apps/fast-messages");
+</code></pre>
+
+<p>The table <code>fastMessagesTable</code> is not available to the consumer.</p>
+
+<p><strong>3- Save messages into the JSON Table</strong></p>
+
+<p>Messages can be saved into the table using the <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L78-L81">MapR-DB JSON Java API</a>.</p>
+
+<p>The producer sends the message as JSON String that is converted into a JSON object names <code>msg</code>. This object can be used to create an OJAI Document:</p>
+
+<pre><code>  Document messageDocument = MapRDB.newDocument(msg);
+</code></pre>
+
+<p>To be saved into MapR-DB, a document must have a <code>_id</code> field. In this example let’s use the message number generated by the producer <em>(JSON field <code>k</code>)</em>.</p>
+
+<pre><code>  messageDocument.setId( Integer.toString(messageDocument.getInt("k")));
+</code></pre>
+
+<p>Let’s now save the document into the table:</p>
+
+<pre><code>  fastMessagesTable.insertOrReplace( messageDocument );       
+</code></pre>
+
+<p>Each time the producer will be executed, the message number counter will be initialized to 0. So the document _id will be the same, and the document into the table must be replaced; this is why the <code>insertOrReplace</code> method is used.</p>
+
+<p>Let’s run the new consumer.</p>
+
+<p><strong>4- Run the DBConsumer</strong></p>
+
+<p>To run the DBConsumer just pass the parameter <code>dbconsumer</code> as follow:</p>
+
+<p>Consumer:</p>
+
+<pre><code>$ java -cp $(mapr classpath):./mapr-streams-examples-1.0-SNAPSHOT-jar-with-dependencies.jar com.mapr.examples.Run dbconsumer
+</code></pre>
+
+<p>Note that a new <a href="https://github.com/mapr-demos/mapr-streams-sample-programs/blob/master/src/main/java/com/mapr/examples/DBConsumer.java#L48-L54">group is created</a> to be sure that messages are read by the two different consumers (Consumer and DBConsumer).</p>
+
+<p><strong>5- Query the messages saved into MapR-DB</strong></p>
+
+<p>Messages are saved into the <code>/apps/fast-messages</code> table, let’s used the MapR DBShell to query the data. On your cluster run the following commands, as <code>mapr</code>:</p>
+
+<pre><code>$ mapr dbshell
+maprdb mapr:&gt; find /apps/fast-messages --id 100
+{"_id":"100","type":"test","t":64986.787,"k":{"$numberLong":100}}
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>In this very simple example, the DBConsumer takes each message and saved it as a simple JSON Document into MapR-DB JSON. The table can be used to create any type of application, or using Apache Drill <em>(1.6 or later)</em> to do some analytics.</p>
+
+<p>In a real application the messages will probably be modified, enriched and/or aggregated and then the result be saved into MapR-DB Table. The goal of this sample is just to show that it is easy to integrate MapR Streams and MapR-DB.</p>
+
+<p>You have also other alternative to achieve the same thing using for example:</p>
+
+<ul>
+<li>Spark Streaming</li>
+<li>3rd Party ETL and Tools</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR Streams]]></title>
+    <link href="http://tgrall.github.io/blog/2016/03/10/getting-started-with-mapr-streams/"/>
+    <updated>2016-03-10T10:09:32+01:00</updated>
+    <id>http://tgrall.github.io/blog/2016/03/10/getting-started-with-mapr-streams</id>
+    <content type="html"><![CDATA[<p>You can find a new tutorial that explains how to deploy an Apache Kafka application to MapR Streams, the tutorial is available here:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">Getting Started with MapR Streams</a></li>
+</ul>
+
+
+<p>MapR Streams is a new distributed messaging system for streaming event data at scale, and it’s integrated into the MapR converged platform.
+MapR Streams uses the Apache Kafka API, so if you’re already familiar with Kafka, you’ll find it particularly easy to get started with MapR Streams.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With Sample Programs for Apache Kafka 0.9]]></title>
+    <link href="http://tgrall.github.io/blog/2016/02/10/getting-started-with-sample-programs-for-apache-kafka-0-dot-9/"/>
+    <updated>2016-02-10T10:25:44+01:00</updated>
+    <id>http://tgrall.github.io/blog/2016/02/10/getting-started-with-sample-programs-for-apache-kafka-0-dot-9</id>
+    <content type="html"><![CDATA[<p>Ted Dunning and I have worked on a tutorial that explains how to write your first Kafka application. In this tutorial you will learn how to:</p>
+
+<ul>
+<li>Install and start Kafka</li>
+<li>Create and Run a producer and a consumer</li>
+</ul>
+
+
+<p>You can find the tutorial on the MapR blog:</p>
+
+<ul>
+<li><a href="https://goo.gl/cWmbmY">Getting Started with Sample Programs for Apache Kafka 0.9</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

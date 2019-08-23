@@ -1,0 +1,1081 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Java | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/java/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MQTT and Java]]></title>
+    <link href="http://tgrall.github.io/blog/2017/01/02/getting-started-with-mqtt/"/>
+    <updated>2017-01-02T16:03:09+01:00</updated>
+    <id>http://tgrall.github.io/blog/2017/01/02/getting-started-with-mqtt</id>
+    <content type="html"><![CDATA[<p>MQTT (MQ Telemetry Transport) is a lightweight publish/subscribe messaging protocol.
+MQTT is used a lot in the Internet of Things applications, since it has been designed to
+run on remote locations with system with small footprint.</p>
+
+<p>The MQTT 3.1 is an OASIS standard, and you can find all the information at <a href="http://mqtt.org/">http://mqtt.org/</a></p>
+
+<p>This article will guide you into the various steps to run your first MQTT application:</p>
+
+<ol>
+<li>Install and Start a MQTT Broker</li>
+<li>Write an application that publishes messages</li>
+<li>Write an application that consumes messages</li>
+</ol>
+
+
+<p>The source code of the sample application is available on <a href="https://github.com/tgrall/mqtt-sample-java">GitHub</a>.</p>
+
+<!-- more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Apache Maven 3.x</li>
+<li>Git</li>
+</ul>
+
+
+<h3>Install and Start a MQTT Broker</h3>
+
+<p>You can find many MQTT Brokers, for this example I will use one of the most common broker <a href="https://mosquitto.org">Mosquitto</a>.</p>
+
+<p>You can download and install from the <a href="https://mosquitto.org/download/">binary package</a>. I have used <a href="http://brew.sh/">Homebrew</a> to install it on my Mac:</p>
+
+<pre><code>$ brew install mosquitto
+</code></pre>
+
+<p>Start the MQTT Broker with the default configuration</p>
+
+<pre><code>$ /usr/local/sbin/mosquitto
+</code></pre>
+
+<h3>Publish and Consume messages</h3>
+
+<p>Open two terminal windows and run the following commands :</p>
+
+<p>Consume</p>
+
+<pre><code>$ mosquitto_sub -h 127.0.0.1 -t iot_data
+</code></pre>
+
+<p>Publish</p>
+
+<pre><code>$ mosquitto_pub -h 127.0.0.1 -t iot_data -m "Hello world"
+</code></pre>
+
+<p>You should see the message <code>Hello world</code> in the consumer/subscriber window.</p>
+
+<h3>Write your first MQTT Application</h3>
+
+<p>For this example I will write a small Java application, since it is the language
+that I am using in my global project.</p>
+
+<h4>Maven Dependencies</h4>
+
+<p>Add the <a href="https://eclipse.org/paho/">Eclipse Paho</a> dependency to your Maven project</p>
+
+<pre><code class="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.paho&lt;/groupId&gt;
+  &lt;artifactId&gt;org.eclipse.paho.client.mqttv3&lt;/artifactId&gt;
+  &lt;version&gt;1.1.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<h4>Publishing a Message</h4>
+
+<p>Publishing a message is quite easy, create a MqttClient and use it to post on a topic.</p>
+
+<pre><code class="java">MqttClient client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId());
+client.connect();
+MqttMessage message = new MqttMessage();
+message.setPayload("Hello world from Java".getBytes());
+client.publish("iot_data", message);
+client.disconnect();
+</code></pre>
+
+<p>You have many other options, configurations that you can use when posting a message
+such as security, quality of service (QoS), and more; but in this post I want to simply
+show how easy is to publish and consume MQTT messages.</p>
+
+<h4>Consuming messages</h4>
+
+<p>To consume messages you need to implement a <code>org.eclipse.paho.client.mqttv3.MqttCallback</code> that will receive the message and used this Callback class in the MqttClient of the Subscriber application.</p>
+
+<p>The Callback class:</p>
+
+<pre><code class="java">public class SimpleMqttCallBack implements MqttCallback {
+
+  public void connectionLost(Throwable throwable) {
+    System.out.println("Connection to MQTT broker lost!");
+  }
+
+  public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+    System.out.println("Message received:\n\t"+ new String(mqttMessage.getPayload()) );
+  }
+
+  public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+    // not used in this example
+  }
+}
+</code></pre>
+
+<p>This Callback class is used in the Subscriber application as follow:</p>
+
+<pre><code class="java">MqttClient client=new MqttClient("tcp://localhost:1883", MqttClient.generateClientId());
+client.setCallback( new SimpleMqttCallBack() );
+client.connect();
+</code></pre>
+
+<p>Like for the publisher, I am using the broker and client without any option (QoS, security).</p>
+
+<h2>Build and Run the Application</h2>
+
+<p><strong>1- Get the Sample Code</strong></p>
+
+<p>Clone the project from GitHub</p>
+
+<pre><code>$ git clone https://github.com/tgrall/mqtt-sample-java.git
+</code></pre>
+
+<p><strong>2- Build the project with Apache Maven:</strong></p>
+
+<p>This project is a simple Java application that runs a publisher and subscriber using the <a href="https://eclipse.org/paho/">Eclipse Paho library</a>.</p>
+
+<pre><code>$ mvn clean package
+</code></pre>
+
+<p>For convenience, the example programs project is set up so that the maven package target produces a single executable,
+<code>/mqtt-sample</code>, that includes all of the example programs and dependencies.</p>
+
+<p><strong>3- Run the Subscriber</strong></p>
+
+<p>The subscriber will receive and print all messages published on the <code>iot_data</code> topic.</p>
+
+<pre><code>$ ./target/mqtt-sample subscriber
+</code></pre>
+
+<p><strong>4- Run the Publisher</strong></p>
+
+<p>Run the publisher with the following command, the second parameter is the message to publish</p>
+
+<pre><code>$ ./target/mqtt-sample publisher "My first MQTT message..."
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this article you have learned how to:</p>
+
+<ul>
+<li>Install and start a MQTT Broker, Mosquitto</li>
+<li>Create a publisher and subscriber developed in Java</li>
+</ul>
+
+
+<p>This article is very simple by choice, to quickly run your first MQTT Application. I wrote this article as part of a global IoT project I am working on that will capture devices data, publish them into MapR Converged Data Platform using MQTT and MapR Streams; this is why I used Java for the application. You can use any MQTT client library to build the publishers and subscribers.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Started With MapR Streams]]></title>
+    <link href="http://tgrall.github.io/blog/2016/03/10/getting-started-with-mapr-streams/"/>
+    <updated>2016-03-10T10:09:32+01:00</updated>
+    <id>http://tgrall.github.io/blog/2016/03/10/getting-started-with-mapr-streams</id>
+    <content type="html"><![CDATA[<p>You can find a new tutorial that explains how to deploy an Apache Kafka application to MapR Streams, the tutorial is available here:</p>
+
+<ul>
+<li><a href="https://www.mapr.com/blog/getting-started-sample-programs-mapr-streams">Getting Started with MapR Streams</a></li>
+</ul>
+
+
+<p>MapR Streams is a new distributed messaging system for streaming event data at scale, and it’s integrated into the MapR converged platform.
+MapR Streams uses the Apache Kafka API, so if you’re already familiar with Kafka, you’ll find it particularly easy to get started with MapR Streams.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Apache Drill : How to Create a New Function?]]></title>
+    <link href="http://tgrall.github.io/blog/2015/07/22/apache-drill-how-to-create-a-new-function/"/>
+    <updated>2015-07-22T02:32:54+02:00</updated>
+    <id>http://tgrall.github.io/blog/2015/07/22/apache-drill-how-to-create-a-new-function</id>
+    <content type="html"><![CDATA[<p><a href="https://drill.apache.org/">Apache Drill</a> allows users to explore <em>any type of</em> data using ANSI SQL. This is great, but Drill goes even further than that and allows you to create custom functions to extend the query engine. These custom functions have all the performance of any of the Drill primitive operations, but allowing that performance makes writing these functions a little trickier than you might expect.</p>
+
+<p>In this article, I&rsquo;ll explain step by step how to create and deploy a new function using a very basic example. Note that you can find lot of information about <a href="https://drill.apache.org/docs/develop-custom-functions-introduction/">Drill Custom Functions in the documentation</a>.</p>
+
+<p>Let&rsquo;s create a new function that allows you to mask some characters in a string, and let&rsquo;s make it very simple. The new function will allow user to hide <em>x</em> number of characters from the start and replace then by any characters of their choice. This will look like:</p>
+
+<pre><code>MASK( 'PASSWORD' , '#' , 4 ) =&gt; ####WORD
+</code></pre>
+
+<p>You can find the full project in the following <a href="https://github.com/tgrall/drill-simple-mask-function">Github Repository</a>.</p>
+
+<p>As mentioned before, we could imagine many advanced features to this, but my goal is to focus on the steps to write a custom function, not
+so much on what the function does.</p>
+
+<!--more-->
+
+
+<h2>Prerequisites</h2>
+
+<p>For this you will need:</p>
+
+<ul>
+<li>Java Developer Kit 7 or later</li>
+<li>Apache Drill 1.1 or later</li>
+<li>Maven 3.0 or later</li>
+</ul>
+
+
+<h2>Dependencies</h2>
+
+<p>The following Drill dependency should be added to your maven project</p>
+
+<pre><code class="xml">&lt;dependency&gt;
+      &lt;groupId&gt;org.apache.drill.exec&lt;/groupId&gt;
+      &lt;artifactId&gt;drill-java-exec&lt;/artifactId&gt;
+      &lt;version&gt;1.1.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<h2>Source</h2>
+
+<p>The <code>Mask</code> function is an implementation of the <a href="https://github.com/apache/drill/blob/master/exec/java-exec/src/main/java/org/apache/drill/exec/expr/DrillSimpleFunc.java"><code>DrillSimpleFunc</code></a>.</p>
+
+<p>Developers can create 2 types of custom functions:</p>
+
+<ul>
+<li>Simple Functions: these functions have a single row as input and produce a single value as output</li>
+<li>Aggregation Functions: that will accept multiple rows as input and produce one value as output</li>
+</ul>
+
+
+<p>Simple functions are often referred to as UDF&rsquo;s which stands for user defined function.  Aggregation functions are referred to as UDAF which
+stands for user defined aggregation function.</p>
+
+<p>In this example, we just need to transform the value of a column on each row, so a simple function is enough.</p>
+
+<h4>Create the function</h4>
+
+<p>The first step is to implement the <a href="https://github.com/apache/drill/blob/master/exec/java-exec/src/main/java/org/apache/drill/exec/expr/DrillSimpleFunc.java"><code>DrillSimpleFunc</code></a> interface.</p>
+
+<pre><code class="java">package org.apache.drill.contrib.function;
+
+import org.apache.drill.exec.expr.DrillSimpleFunc;
+import org.apache.drill.exec.expr.annotations.FunctionTemplate;
+
+@FunctionTemplate(
+        name="mask",
+        scope= FunctionTemplate.FunctionScope.SIMPLE,
+        nulls = FunctionTemplate.NullHandling.NULL_IF_NULL
+)
+public class SimpleMaskFunc implements DrillSimpleFunc{
+
+    public void setup() {
+
+    }
+
+    public void eval() {
+
+    }
+}
+</code></pre>
+
+<p>The behavior of the function is driven by annotations (line 6-10)
+  * <em>Name</em> of the function
+  * <em>Scope</em> of the function, in our case Simple
+  * What to do when the value is NULL, in this case Reverse will just returns NULL</p>
+
+<p>Now we need to implement the logic of the function using <code>setup()</code> and <code>eval()</code> methods.</p>
+
+<ul>
+<li><code>setup</code> is self-explanatory, and in our case we do not need to setup anything.</li>
+<li><code>eval</code> that is the core of the function. As you can see this method does not have any parameter, and return void. So how does it work?</li>
+</ul>
+
+
+<p>In fact the function will be generated dynamically (see <a href="https://github.com/apache/drill/blob/master/exec/java-exec/src/main/java/org/apache/drill/exec/expr/fn/DrillSimpleFuncHolder.java#L42">DrillSimpleFuncHolder</a>), and the input parameters and output holders are defined using holders by annotations. Let&rsquo;s look into this.</p>
+
+<pre><code class="java">import io.netty.buffer.DrillBuf;
+import org.apache.drill.exec.expr.DrillSimpleFunc;
+import org.apache.drill.exec.expr.annotations.FunctionTemplate;
+import org.apache.drill.exec.expr.annotations.Output;
+import org.apache.drill.exec.expr.annotations.Param;
+import org.apache.drill.exec.expr.holders.IntHolder;
+import org.apache.drill.exec.expr.holders.NullableVarCharHolder;
+import org.apache.drill.exec.expr.holders.VarCharHolder;
+
+import javax.inject.Inject;
+
+
+@FunctionTemplate(
+        name = "mask",
+        scope = FunctionTemplate.FunctionScope.SIMPLE,
+        nulls = FunctionTemplate.NullHandling.NULL_IF_NULL
+)
+public class SimpleMaskFunc implements DrillSimpleFunc {
+
+    @Param
+    NullableVarCharHolder input;
+
+    @Param(constant = true)
+    VarCharHolder mask;
+
+    @Param(constant = true)
+    IntHolder toReplace;
+
+    @Output
+    VarCharHolder out;
+
+    @Inject
+    DrillBuf buffer;
+
+    public void setup() {
+    }
+
+    public void eval() {
+
+    }
+
+}
+</code></pre>
+
+<p>We need to define the parameters of the function. In this case we have 3 parameters, each defined using the <code>@Param</code> annotation.  In addition, we also have to define the returned value using the <code>@Output</code> annotation.</p>
+
+<p>The parameters of our mask function are:</p>
+
+<ul>
+<li>A nullable string</li>
+<li>The mask char or string</li>
+<li>The number of characters to replace starting from the first</li>
+</ul>
+
+
+<p>The function returns :</p>
+
+<ul>
+<li>A string</li>
+</ul>
+
+
+<p>For each of these parameters you have to use an holder class. For the <code>String</code>, this is managed by a <code>VarCharHolder</code> or <code>NullableVarCharHolder</code> -lines 21, 24,30- that provides a buffer to manage larger objects in a efficient way. Since we are manipulating a <code>VarChar</code> you also have to inject another buffer that will be used for the output -line 33-. Note that Drill doesn&rsquo;t actually use the Java heap for data being processed in a query but instead keeps this data off the heap and manages the life-cycle for us without using the Java
+garbage collector.</p>
+
+<p>We are almost done since we have the proper class, the input/output object, we just need to implement the <code>eval()</code> method itself, and use these objects.</p>
+
+<pre><code class="java">public void eval() {
+
+    // get the value and replace with
+    String maskValue = org.apache.drill.exec.expr.fn.impl.StringFunctionHelpers.getStringFromVarCharHolder(mask);
+    String stringValue = org.apache.drill.exec.expr.fn.impl.StringFunctionHelpers.toStringFromUTF8(input.start, input.end, input.buffer);
+
+    int numberOfCharToReplace = Math.min(toReplace.value, stringValue.length());
+
+    // build the mask substring
+    String maskSubString = com.google.common.base.Strings.repeat(maskValue, numberOfCharToReplace);
+    String outputValue = (new StringBuilder(maskSubString)).append(stringValue.substring(numberOfCharToReplace)).toString();
+
+    // put the output value in the out buffer
+    out.buffer = buffer;
+    out.start = 0;
+    out.end = outputValue.getBytes().length;
+    buffer.setBytes(0, outputValue.getBytes());
+}
+</code></pre>
+
+<p>The code is quite simple:</p>
+
+<ul>
+<li>Get the mask itself - line 4</li>
+<li>Get the value - line 5</li>
+<li>Get the number of character to replace - line 7</li>
+<li>Generate a new string with masked values - lines 10/11</li>
+<li>Create and populate the output buffer - lines 14 to 17</li>
+</ul>
+
+
+<p>This code does, however, look a bit strange to somebody used to reading Java code. This strangeness arises because the final code that is executed in a query will actually be generated on the fly. This allows Drill to leverage Java&rsquo;s just-in-time (JIT) compiler for maximum speed. To make this work, you have to respect some basic rules:</p>
+
+<ul>
+<li><strong>Do not use imports, but instead use the fully qualified class name</strong>, this is what is done on line 10 with the <code>Strings</code> class. (coming from the Google Guava API packaged in Apache Drill)</li>
+<li>The <code>ValueHolders</code> classes, in our case <code>VarCharHolder</code> and <code>IntHolder</code> should be manipulated like structs, so you must call helper methods, for example <code>getStringFromVarCharHolder</code> and <code>toStringFromUTF8</code>. Calling methods like <code>toString</code> will result in very bad problems.</li>
+</ul>
+
+
+<p>Starting in Apache Drill 1.3.x, it is mandatory to specify the package name of your function in the <code>./resources/drill-module.conf</code> file as follow:</p>
+
+<pre><code>drill {
+  classpath.scanning {
+    packages : ${?drill.classpath.scanning.packages} [
+      org.apache.drill.contrib.function
+    ]
+  }
+}
+</code></pre>
+
+<p>We are now ready to deploy and test this new function.</p>
+
+<h3>Package</h3>
+
+<p>Once again since, Drill will generate source, <em><strong>you must prepare your package in a way that classes and sources of the function are present in the classpath</strong></em>. This is different from the way that Java code is normally packaged but is necessary for Drill to be able to do the necessary code generation. Drill uses the compiled code to access the annotations and uses the source code to do code generation.</p>
+
+<p>An easy way to do that is to use maven to build your project, and, in particular, use the <a href="https://maven.apache.org/plugins/maven-source-plugin/">maven-source-plugin</a> like this in your <code>pom.xml</code> file:</p>
+
+<pre><code class="xml">&lt;plugin&gt;
+    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-source-plugin&lt;/artifactId&gt;
+    &lt;version&gt;2.4&lt;/version&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;id&gt;attach-sources&lt;/id&gt;
+            &lt;phase&gt;package&lt;/phase&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;jar-no-fork&lt;/goal&gt;
+            &lt;/goals&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;
+</code></pre>
+
+<p>Now, when you build using <code>mvn package</code>, Maven will generate 2 jars:</p>
+
+<ul>
+<li>The default jar with the classes and resources (<em>drill-simple-mask-1.0.jar</em>)</li>
+<li>A second jar with the sources (<em>drill-simple-mask-1.0-sources.jar</em>)</li>
+</ul>
+
+
+<p>Finally you must add a <code>drill-module.conf</code> file in the resources folder of your project, to tell Drill that your jar contains a custom function. If you have no specific configuration to set for your function you can keep this file empty.</p>
+
+<p>We are all set, you can now package and deploy the new function, just package and copy the Jars into the Drill 3rd party folder; $DRILL_HOME/jars/3rdparty , where $DRILL_HOME being your Drill installation folder.</p>
+
+<pre><code>mvn clean package
+
+cp target/*.jar  $DRILL_HOME/jars/3rdparty
+</code></pre>
+
+<p>Restart drill.</p>
+
+<h3>Run !</h3>
+
+<p>You should now be able to use your function in your queries:</p>
+
+<pre><code>SELECT MASK(first_name, '*' , 3) FIRST , MASK(last_name, '#', 7) LAST  FROM cp.`employee.json` LIMIT 5;
++----------+------------+
+|  FIRST   |    LAST    |
++----------+------------+
+| ***ri    | ######     |
+| ***rick  | #######    |
+| ***hael  | ######     |
+| ***a     | #######ez  |
+| ***erta  | #######    |
++----------+------------+
+</code></pre>
+
+<h2>Conclusion</h2>
+
+<p>In this simple project you have learned how to write, deploy and use a custom Apache Drill Function. You can now extend this to create your own function.</p>
+
+<p>One important thing to remember when extending Apache Drill (using a custom function, storage plugin or format), is that Drill runtime is generating dynamically lot of code. This means you may have to use a very specific pattern when writing and deploying your extensions. With our basic function this meant we had to:</p>
+
+<ul>
+<li>deploy <strong>classes AND sources</strong></li>
+<li>use <strong>fully Qualified Class Names</strong></li>
+<li>use value holder classes and helper methods to manipulate parameters
+*</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Moving My Beers From Couchbase to MongoDB]]></title>
+    <link href="http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb/"/>
+    <updated>2015-02-01T15:37:46+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/02/01/moving-my-beers-from-couchbase-to-mongodb</id>
+    <content type="html"><![CDATA[<p>Few days ago I have posted a <em>joke</em> on Twitter</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>Moving my Java from Couchbase to MongoDB <a href="http://t.co/Wnn3pXfMGi">pic.twitter.com/Wnn3pXfMGi</a></p>&mdash; Tugdual Grall (@tgrall) <a href="https://twitter.com/tgrall/status/559664540041117696">January 26, 2015</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>So I decided to move it from a simple picture to a <em>real</em> project. Let&rsquo;s look at the two phases of this so called project:</p>
+
+<ul>
+<li>Moving the data from Couchbase to MongoDB</li>
+<li>Updating the application code to use MongoDB</li>
+</ul>
+
+
+<p>Look at this screencast to see it in action:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/Fpl74Z0HbC0?color=white&theme=light"></iframe></p>
+
+<!-- more -->
+
+
+<h2>Moving the data</h2>
+
+<p>I have created a replication server, that uses the Couchbase XDCR protocol to get the document out and insert them into MongoDB. This server use the Couchbase CAPI Server project available <a href="https://github.com/couchbaselabs/couchbase-capi-server">here</a>.</p>
+
+<p>This server will receive all the mutations made in the Couchbase:</p>
+
+<ul>
+<li>When a document is inserted or updated the full document is sent</li>
+<li>When a document is deleted, only the medata are sent</li>
+<li>The <code>replication server</code>, save the data into MongoDB (inserts and/or updates - no delete), and then return the list to Couchbase as part of the XDCR Protocol.</li>
+</ul>
+
+
+<p>One of the challenges is the fact Couchbase does not have the notion of &ldquo;types&rdquo; or &ldquo;collections&rdquo;. You put everything in a <em>bucket</em> and the application code knows how to deal with the data. Not necessary a problem, just a choice of implementation, but make it sometime harder than expected when you want to write tools. So here the logic that I apply in my replication server, to organize the data in multiple collections when it makes sense <em>(and when it is possible)</em>:</p>
+
+<ul>
+<li>If the JSON document does not contains a <em>type field</em>, all the documents will be saved in a single collection</li>
+<li>If the JSON document contains a <em>type field</em> then a collection will be created for each type and documents will be inserted/updated in these collections</li>
+<li>MongoDB does not allow attributes key to have . and $ signs, so it is necessary to change the name with alternative characters. This is done automatically during the copy of the data.</li>
+</ul>
+
+
+<p>All this, and more is configurable in the tool.</p>
+
+<p>As you can see in the screencast this is straightforward.<em>(note that I have only tested very simple use cases and deployment)</em></p>
+
+<p>You can download the tool and the source code here:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/mongodb-cb-replicator">https://github.com/tgrall/mongodb-cb-replicator</a></li>
+<li>Download the <a href="http://goo.gl/WkuHBk">MongoCBReplicator.jar</a> file.</li>
+</ul>
+
+
+<h2>Updating the application code</h2>
+
+<p>The next step is to use these data in an application. For this I simply use the Beer Sample Java application available on <a href="https://github.com/couchbaselabs/beersample-java">Couchbase repository</a>.</p>
+
+<p>I just recreated the project and modified few things, to get the application up and running:</p>
+
+<ul>
+<li>Change the connection string</li>
+<li>Remove the code that generate views</li>
+<li>Replace set/get by MongoDB operations</li>
+<li>Replace call to the views by simple queries</li>
+</ul>
+
+
+<p>The code of the MongoDBeer application is available here:</p>
+
+<ul>
+<li>[<a href="https://github.com/tgrall/mongodbeer">https://github.com/tgrall/mongodbeer</a>]</li>
+</ul>
+
+
+<p>I did not change any business logic, or added features, or even replaced the way navigation and page rendition is made. I just focused on the database access, for example :</p>
+
+<pre><code class="java">
+// Couchbase Query
+View view = client.getView("beer", "by_name");
+    Query query = new Query();
+    query.setIncludeDocs(true).setLimit(20);
+    ViewResponse result = client.query(view, query);
+
+    ArrayList&lt;HashMap&lt;String, String&gt;&gt; beers =
+      new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+    for(ViewRow row : result) {
+      HashMap&lt;String, String&gt; parsedDoc = gson.fromJson(
+        (String)row.getDocument(), HashMap.class);
+
+      HashMap&lt;String, String&gt; beer = new HashMap&lt;String, String&gt;();
+      beer.put("id", row.getId());
+      beer.put("name", parsedDoc.get("name"));
+      beer.put("brewery", parsedDoc.get("brewery_id"));
+      beers.add(beer);
+    }
+    request.setAttribute("beers", beers);
+
+
+// MongoDB Query
+DBCursor cursor = db.getCollection("beer").find()
+                                                   .sort( BasicDBObjectBuilder.start("name",1).get() )
+                                                   .limit(20);
+     ArrayList&lt;HashMap&lt;String, String&gt;&gt; beers =
+             new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
+     while (cursor.hasNext()) {
+         DBObject row = cursor.next();
+         HashMap&lt;String, String&gt; beer = new HashMap&lt;String, String&gt;();
+         beer.put("id", (String)row.get("_id"));
+         beer.put("name", (String)row.get("name"));
+         beer.put("brewery", (String)row.get("brewery_id"));
+         beers.add(beer);
+     }
+
+
+
+// Couchbase update
+client.set(beerId, 0, gson.toJson(beer));
+
+// MongoDB update
+db.getCollection("beer").save(new BasicDBObject(beer));
+</code></pre>
+
+<p>I did not attend to optimize the MongoDB code,  but just to replace as few lines of code as possible.</p>
+
+<p>Note: I have not created any index during the process. Obviously if your application have more and more data and you do intense work with it you must analyze your application/queries to see which indexes must be created.</p>
+
+<h2>Adding new features</h2>
+
+<p>Once you have the data into MongoDB you can do a lot more without anything more than MongoDB:</p>
+
+<h4>Full Text Search</h4>
+
+<p>You can create a Text index on various fields in the collection to provide advanced search capabilities to your users.</p>
+
+<pre><code class="json">db.brewery.ensureIndex(
+  {
+    "name" : "text",
+    "description" : "text"
+  },
+  {
+    "weights" :
+    {
+      "name" : 10,
+      "description" : 5
+    },
+    "name" : "TextIndex"
+  }
+
+);
+</code></pre>
+
+<p>Then you can query the database using the <code>$text</code> operation, for example all breweries with <em>Belgium</em> and without <em>Ale</em></p>
+
+<pre><code class="json">db.brewery.find( { "$text" : { "$search" : "belgium -ale" }   }  , { "name" : 1  } );
+{ "_id" : "daas", "name" : "Daas" }
+{ "_id" : "chimay_abbaye_notre_dame_de_scourmont", "name" : "Chimay (Abbaye Notre Dame de Scourmont)" }
+{ "_id" : "brasserie_de_cazeau", "name" : "Brasserie de Cazeau" }
+{ "_id" : "inbev", "name" : "InBev" }
+{ "_id" : "new_belgium_brewing", "name" : "New Belgium Brewing" }
+{ "_id" : "palm_breweries", "name" : "Palm Breweries" }
+</code></pre>
+
+<h4>Some analytics</h4>
+
+<p>Not sure these queries really make sense, but it is just to show that now you can leverage your documents without the need of any 3rd party tool.</p>
+
+<p>Number of beer by category, from the most common to the less one:</p>
+
+<pre><code class="json">db.beer.aggregate([
+  {"$group" : { "_id" : "$category","count" : {"$sum" : 1 } } },
+  {"$sort" : { "count" : -1 } },
+  {"$project" : {   "category" : "$_id", "count" : 1, "_id" : 0 } }
+]);
+
+{ "count" : 1996, "category" : "North American Ale" }
+{ "count" : 1468, "category" : null }
+{ "count" : 564, "category" : "North American Lager" }
+{ "count" : 441, "category" : "German Lager" }
+...
+...
+</code></pre>
+
+<p>Number of beer of a specific ABV by brewery, for example: top 3 breweries with the most beer with an abv greather or equals to a value, let&rsquo;s say 5:</p>
+
+<pre><code class="json">db.beer.aggregate([
+... { "$match" : { "abv" : { "$gte" : 5 }  } },
+... { "$group" : { "_id" : "$brewery_id", "count" : { "$sum" : 1} }},
+... { "$sort" : { "count" : -1 } },
+... { "$limit" : 3 }
+... ])
+
+{ "_id" : "midnight_sun_brewing_co", "count" : 53 }
+{ "_id" : "troegs_brewing", "count" : 33 }
+{ "_id" : "rogue_ales", "count" : 31 }
+</code></pre>
+
+<h4>Geospatial queries</h4>
+
+<p>The first thing to do with the data is to change the data structure to save the various data into a GeoJSON format, for this we can simply use a script into the MongoDB Shell:</p>
+
+<pre><code class="json">&gt;mongo
+
+use beers
+
+db.brewery.find().forEach(
+  function( doc ) {
+    var loc = { type : "Point" };
+    if (doc.geo &amp;&amp; doc.geo.lat &amp;&amp; doc.geo.lon) {
+      loc.coordinates = [ doc.geo.lon , doc.geo.lat  ];
+      db.brewery.update( { _id : doc._id } , {$set : { loc : loc } }  );
+    }
+  }
+);
+
+db.brewery.ensureIndex( { "loc" : "2dsphere" } );
+</code></pre>
+
+<p>This call take all the breweries and add a new attribute, name <code>loc</code> as a GeoJSON point. I could also chose to remove the old geo information using a &lsquo;$unset&rsquo;, but I did not; let&rsquo;s imagine that some API/applications are using it. This is a good example of flexible schema.</p>
+
+<p>Now I can search for all the brewery that are at less than 30km from the Golden Gate in San Francisco: [-122.478255,37.819929]</p>
+
+<pre><code class="json">db.brewery.find(
+  { "loc" :
+    { "$near" :
+      { "$geometry" :
+        {
+          "type" : "Point",
+          "coordinates" : [-122.478255,37.819929]
+        },
+        "$maxDistance" : 20000
+
+      }
+    }
+  }
+  , { name : 1 }  
+)
+</code></pre>
+
+<p>You can also use Geospatial indexes and operators in the aggregation queries used above</p>
+
+<h2>Conclusion</h2>
+
+<p>As as said in the introduction, this week end project started as a joke on Twitter, and finished with a small blog post and Gitub repositories.</p>
+
+<p>My goal here is not to compare the two solutions -I made my choice few months back-  but simply show how you can move from one to the other with almost no effort, not only the data but also the application code.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to Create a Pub/sub Application With MongoDB ? Introduction]]></title>
+    <link href="http://tgrall.github.io/blog/2015/01/12/how-to-create-a-pub-slash-sub-application-with-mongodb-introduction/"/>
+    <updated>2015-01-12T09:21:03+01:00</updated>
+    <id>http://tgrall.github.io/blog/2015/01/12/how-to-create-a-pub-slash-sub-application-with-mongodb-introduction</id>
+    <content type="html"><![CDATA[<p>In this article we will see how to create a pub/sub application (messaging, chat, notification), and this fully based on MongoDB (without any message broker like RabbitMQ, JMS, &hellip; ).</p>
+
+<p>So, what needs to be done to achieve such thing:</p>
+
+<ul>
+<li>an application &ldquo;publish&rdquo; a message. In our case, we simply save a document into MongoDB</li>
+<li>another application, or thread, subscribe to these events and will received message automatically. In our case this means that the application should automatically receive newly created document out of MongoDB</li>
+</ul>
+
+
+<p>All this is possible with some very cool MongoDB features: <a href="http://docs.mongodb.org/manual/core/capped-collections/">capped collections</a> and <a href="http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/">tailable cursors</a>,</p>
+
+<!-- more -->
+
+
+<h2>Collections and Tailable Cursors</h2>
+
+<p>As you can see in the documentation, Capped Collections are fixed sized collections, that work in a way similar to circular buffers: once a collection fills its allocated space, it makes room for new documents by overwriting the oldest documents.</p>
+
+<p>MongoDB Capped Collections can be queried using Tailable Cursors, that are similar to the unix <code>tail -f</code> command. Your application continue to retrieve documents as they are inserted into the collection. I also like to call this a &ldquo;continuous query&rdquo;.</p>
+
+<p>Now that we have seen the basics, let&rsquo;s implement it.</p>
+
+<h2>Building a very basic application</h2>
+
+<h4>Create the collection</h4>
+
+<p>The first thing to do is to create a new capped collection:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=capped-collection'></script>
+<noscript><pre><code>$&gt; mongo
+
+use chat
+
+db.messages.drop()
+
+db.createCollection(&#39;messages&#39;, { capped: true, size: 10000 })
+
+db.messages.insert({&quot;type&quot;:&quot;init&quot;});
+
+</code></pre></noscript></div>
+</p>
+
+<p>For simplicity, I am using the MongoDB Shell to create the <code>messages</code> collection in the <code>chat</code> database.</p>
+
+<p>You can see on line #7 how to create a capped collection, with 2 options:</p>
+
+<ul>
+<li><code>capped : true</code> : this one is obvious</li>
+<li><code>size : 10000</code> : this is a mandatory option when you create a capped collection. This is the maximum size in bytes. (will be raised to a multiple of 256)</li>
+</ul>
+
+
+<p>Finally, on line #9, I insert a dummy document, this is also mandatory to be able to get the tailable cursor to work.</p>
+
+<h4>Write an application</h4>
+
+<p>Now that we have the collection, let&rsquo;s write some code. First in <em>node.js</em>:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=app.js'></script>
+<noscript><pre><code>var mongo = require(&quot;mongodb&quot;);
+
+var mongodbUri = &quot;mongodb://127.0.0.1/chat&quot;;
+
+mongo.MongoClient.connect (mongodbUri, function (err, db) {
+
+  db.collection(&#39;messages&#39;, function(err, collection) {
+    // open a tailable cursor
+    console.log(&quot;== open tailable cursor&quot;);
+    collection.find({}, {tailable:true, awaitdata:true, numberOfRetries:-1})
+                      .sort({ $natural: 1 })
+                      .each(function(err, doc) {
+      console.log(doc);
+    })
+  });
+
+});</code></pre></noscript></div>
+</p>
+
+<p>From lines #1 to 5 I just connect to my local mongoDB instance.</p>
+
+<p>Then on line #7, I get the <code>messages</code> collection.</p>
+
+<p>And on line #10, I execute a find, using a tailable cursor, using specific options:</p>
+
+<ul>
+<li><code>{}</code> : no filter, so all documents will be returned</span></li></li>
+<li><code>tailable : true</code> : this one is clear, to say that we want to create a tailable cursor</li>
+<li><code>awaitdata : true</code> : to say that we wait for data before returning no data to the client</li>
+<li><code>numberOfRetries : -1</code> : The number of times to retry on time out, -1 is infinite, so the application will keep trying</li>
+</ul>
+
+
+<p>Line #11 just force the sort to the natural order.</p>
+
+<p>Then on line #12, the cursor returns the data, and the document is printed in the console each time it is inserted.</p>
+
+<h4>Test the Application</h4>
+
+<p>Start the application</p>
+
+<p><code>node app.js</code></p>
+
+<p>Insert documents in the messages collection, from the shell or any other tool.</p>
+
+<p>You can find below a screencast showing this very basic application working:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/uSuiYvssKuo?color=white&theme=light"></iframe></p>
+
+<p>The source code of this sample application in this Github repository, take the step-01 branch; clone this branch using:</p>
+
+<p><code>git clone -b step-01 https://github.com/tgrall/mongodb-realtime-pubsub.git</code></p>
+
+<p>I have also created a gist showing the same behavior in <em>Java</em>:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=MyApp.java'></script>
+<noscript><pre><code>package org.mongodb.demos.tailable;
+
+import com.mongodb.*;
+
+public class MyApp {
+
+    public static void main(String[] args) throws Exception {
+
+        MongoClient mongoClient = new MongoClient();
+        DBCollection coll = mongoClient.getDB(&quot;chat&quot;).getCollection(&quot;messages&quot;);
+
+        DBCursor cur = coll.find().sort(BasicDBObjectBuilder.start(&quot;$natural&quot;, 1).get())
+                .addOption(Bytes.QUERYOPTION_TAILABLE | Bytes.QUERYOPTION_AWAITDATA);
+
+        System.out.println(&quot;== open cursor ==&quot;);
+
+        Runnable task = () -&gt; {
+            System.out.println(&quot;\tWaiting for events&quot;);
+            while (cur.hasNext()) {
+                DBObject obj = cur.next();
+                System.out.println( obj );
+
+            }
+        };
+        new Thread(task).start();
+        
+    }
+    
+}</code></pre></noscript></div>
+</p>
+
+<p>Mathieu Ancelin has written it in <em>Scala</em>:</p>
+
+<p><div><script src='https://gist.github.com/f16b1d3b5bcc12a4270a.js?file=App.scala'></script>
+<noscript><pre><code>package org.mongodb.demos.tailable
+
+import reactivemongo.api._
+import reactivemongo.bson._
+import play.api.libs.iteratee.Iteratee
+import scala.concurrent.ExecutionContext.Implicits.global
+import reactivemongo.api.collections.default.BSONCollection
+
+object Capped extends App {
+
+  val driver = new MongoDriver
+  val connection = driver.connection(List(&quot;localhost&quot;))
+  val db = connection(&quot;chat&quot;)
+  val collection = db.collection[BSONCollection](&quot;messages&quot;)
+
+  val cursor = collection
+        .find(BSONDocument())
+          .options(QueryOpts().tailable.awaitData)
+            .cursor[BSONDocument]
+
+  println(&quot;== open tailable cursor&quot;)
+  
+  cursor.enumerate().apply(Iteratee.foreach { doc =&gt;
+    println(s&quot;Document inserted: ${BSONDocument.pretty(doc)}&quot;)
+  })
+}</code></pre></noscript></div>
+</p>
+
+<h3>Add some user interface</h3>
+
+<p>We have the basics of a publish subscribe based application:</p>
+
+<ul>
+<li>publish by inserting document into MongoDB</li>
+<li>subscribe by reading document using a tailable cursor</li>
+</ul>
+
+
+<p>Let&rsquo;s now push the messages to a user using for example socket.io. For this we need to:</p>
+
+<ul>
+<li>add socket.io dependency to our node project</li>
+<li>add HTML page to show messages</li>
+</ul>
+
+
+<p>The following gists shows the updated version of the app.js and index.html, let&rsquo;s take a look:</p>
+
+<p><div><script src='https://gist.github.com/d8c2acfdc416abcc5d18.js?file=app.js'></script>
+<noscript><pre><code>&quot;use strict&quot;;
+
+var mongo = require(&quot;mongodb&quot;),
+    fs = require(&quot;fs&quot;),         // to read static files
+    io = require(&quot;socket.io&quot;),  // socket io server
+    http = require(&quot;http&quot;);
+
+var mongodbUri = &quot;mongodb://127.0.0.1/chat&quot;;
+
+var app = http.createServer(handler);
+io = io.listen(app);
+app.listen(3000);
+console.log(&quot;http server on port 3000&quot;);
+
+function handler(req, res){
+  fs.readFile(__dirname + &quot;/index.html&quot;,
+  function (err, data) {
+    res.writeHead(200);
+    res.end(data);
+  });
+}
+
+mongo.MongoClient.connect (mongodbUri, function (err, db) {
+
+  db.collection(&#39;messages&#39;, function(err, collection) {
+
+    // open socket
+    io.sockets.on(&quot;connection&quot;, function (socket) {
+      // open a tailable cursor
+      console.log(&quot;== open tailable cursor&quot;);
+      collection.find({}, {tailable:true, awaitdata:true, numberOfRetries:-1}).sort({ $natural: 1 }).each(function(err, doc) {
+        console.log(doc);
+        // send message to client
+        if (doc.type == &quot;message&quot;) {
+          socket.emit(&quot;message&quot;,doc);
+        }
+      })
+
+    });
+
+  });
+
+});
+</code></pre></noscript></div>
+</p>
+
+<p>The node application has been updated with the following features:</p>
+
+<ul>
+<li>lines #4-7: import of http, file system and socket.io</li>
+<li>lines #10-21: configure and start the http server. You can see that I have created a simple handler to serve static html file</li>
+<li>lines #28-39: I have added support to Web socket using socket.io where I open the tailable cursor, and push/emit the messages on the socket.</li>
+</ul>
+
+
+<p>As you can see, the code that I have added is simple. I do not use any advanced framework, nor manage exceptions, this for simplicity and readability.</p>
+
+<p>Let&rsquo;s now look at the client (html page).</p>
+
+<p><div><script src='https://gist.github.com/d8c2acfdc416abcc5d18.js?file=index.html'></script>
+<noscript><pre><code>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;MongoDB pub/sub&lt;/title&gt;
+  &lt;style&gt;
+  * { margin: 0; padding: 10px; box-sizing: border-box; }
+  body { font: 13px Helvetica, Arial; }
+  #messages { list-style-type: none; margin: 0; padding: 0; }
+  #messages li { padding: 5px 10px; }
+  #messages li:nth-child(odd) { background: #eee; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h2&gt;MongoDB/Socket.io demonstration&lt;/h2&gt;
+
+  &lt;ul id=&quot;messages&quot;&gt;&lt;/ul&gt;
+
+  &lt;script src=&quot;https://cdn.socket.io/socket.io-1.2.0.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://code.jquery.com/jquery-2.1.3.min.js&quot;&gt;&lt;/script&gt;
+  &lt;script&gt;
+  var socket = io();
+  socket.on(&#39;message&#39;, function(doc){
+    $(&#39;#messages&#39;).append($(&#39;&lt;li&gt;&#39;).text(doc.text));
+  });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></noscript></div>
+</p>
+
+<p>Same as the server, it is really simple and does not use any advanced libraries except socket.io client (line #18) and JQuery (line #19), and used:</p>
+
+<ul>
+<li>on line #22 to received messages ans print them in the page using JQuery on line #23</li>
+</ul>
+
+
+<p>I have created a screencast of this version of the application:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/N9fDxuohdy8?color=white&theme=light"></iframe></p>
+
+<p>You can find the source code in this Github repository, take the step-02 branch; clone this branch using:</div></p>
+
+<p><code>git clone -b step-02 https://github.com/tgrall/mongodb-realtime-pubsub.git</code></p>
+
+<h3>Conclusion</h3>
+
+<p>In this first post, we have:</p>
+
+<ul>
+<li>learned about tailable cursor and capped collection</li>
+<li>see how it can be used to develop a pub/sub application</li>
+<li>expose this into a basic web socket based application</li>
+</ul>
+
+
+<p>In the next article we will continue to develop a bigger application using these features.</p>
+]]></content>
+  </entry>
+  
+</feed>

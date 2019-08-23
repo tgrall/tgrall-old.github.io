@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Javaee | Tug's Blog]]></title>
+  <link href="http://tgrall.github.io/blog/categories/javaee/atom.xml" rel="self"/>
+  <link href="http://tgrall.github.io/"/>
+  <updated>2019-08-23T10:35:14+02:00</updated>
+  <id>http://tgrall.github.io/</id>
+  <author>
+    <name><![CDATA[Tug Grall]]></name>
+    <email><![CDATA[tugdual@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[JavaEE 5 Features of OracleAS 10gR3]]></title>
+    <link href="http://tgrall.github.io/blog/2007/03/07/javaee-5-features-of-oracleas-10gr3/"/>
+    <updated>2007-03-07T09:00:12+01:00</updated>
+    <id>http://tgrall.github.io/blog/2007/03/07/javaee-5-features-of-oracleas-10gr3</id>
+    <content type="html"><![CDATA[<p><a href="http://otn.oracle.com/products/oc4j">OracleAS 10g R3 (10.1.3.x)</a> is a certified J2EE 1.4 container, but OracleAS provides already support to some of the features of the Java Enterprise Edition 5: JavaEE 5. One of the key driver of the new EE version was simplification of the development and deployment applications. Here is the list of the JavaEE 5 features that are supported in OracleAS 10gR3 that will simplify the development of applications <em>(in comparison to a standard J2EE 1.x development)</em>:</p>
+
+<ul>
+<li><p>Java Persistence API (JPA) and EJB 3.0 (<a href="http://download-uk.oracle.com/docs/cd/B32110_01/web.1013/b28221/toc.htm">documention</a>)</p></li>
+<li><p>Support of shared library at the EAR level (<code>&amp;lt;library-directory&amp;gt; / applib</code>). (<a href="http://download.oracle.com/docs/cd/B31017_01/web.1013/b28952/classload.htm#BABGAABD">documentation</a>). This comes in addition to the OracleAS 10gR3 classloader framework that allows administrators to create, and version shared libraries that can be used into applications by referencing them in the deployment plan.</p></li>
+<li><p>Annotations Based Web Services (JSR181)  that could be used for Java classes and EJB3 Session Beans (<a href="http://download.oracle.com/docs/cd/B32110_01/web.1013/b28974/devannotation.htm#CHDFJBEH">documentation</a>)</p></li>
+<li><p>Referencing resources using annotations in the Web container: <code>@EJB, @Resource, @Resources, @PostConstruct, @PreDestroy, @PersistenceUnit, @PersistenceContext, @WebServiceRef, @DeclaresRoles, @RunAs</code>  (<a href="http://download.oracle.com/docs/cd/B32110_01/web.1013/b28959/annotations.htm#sthref248">documentation</a>)
+Hope that this small summary will give you the opportunity to test some of the features of OracleAS 10g.</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[SourceLabs SASH Certified on Oracle Fusion Middleware]]></title>
+    <link href="http://tgrall.github.io/blog/2006/02/10/sourcelabs-sash-certified-on-oracle-fusion-middleware/"/>
+    <updated>2006-02-10T20:26:11+01:00</updated>
+    <id>http://tgrall.github.io/blog/2006/02/10/sourcelabs-sash-certified-on-oracle-fusion-middleware</id>
+    <content type="html"><![CDATA[<p>Oracle Fusion Middleware is now a certified platform for the SourceLabs &ldquo;SASH&rdquo; stack: Apache Struts, Apache Axis, the Spring Framework, and Hibernate. <a href="http://www.oracle.com/technology/tech/java/sash.html">Visit this page to download free SASH software</a>!</p>
+
+<p>SASH is a distribution from SourceLabs that:</p>
+
+<ol>
+<li>Reconciles library versions and dependencies across the entire stack.</li>
+<li>Includes dependability fixes for the baseline open source projects</li>
+<li>Is rigorously tested according to the CERT7 method.</li>
+<li>Is commercially supported.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Javaworld: Jason Hunter's 'New Features Added to Servlet 2.5']]></title>
+    <link href="http://tgrall.github.io/blog/2006/01/04/javaworld-jason-hunters-new-features-added-to-servlet-2-dot-5/"/>
+    <updated>2006-01-04T20:25:54+01:00</updated>
+    <id>http://tgrall.github.io/blog/2006/01/04/javaworld-jason-hunters-new-features-added-to-servlet-2-dot-5</id>
+    <content type="html"><![CDATA[<p>Jason Hunter has published an interesting article about <a href="http://www.javaworld.com/javaworld/jw-01-2006/jw-0102-servlet.html">new features added to servlet 2.5</a>. The focus of this article is like most of the JEE 5 goals all about simplification, easy of use, this is done by leveraging Java5 annotations (resources refences, life cycle support,&hellip;), some improvements around the web.xml, and cross context sessions support.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Good Bye JAX-RPC, Weclome to JAX-WS]]></title>
+    <link href="http://tgrall.github.io/blog/2005/05/29/good-bye-jax-rpc-weclome-to-jax-ws/"/>
+    <updated>2005-05-29T20:52:02+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/05/29/good-bye-jax-rpc-weclome-to-jax-ws</id>
+    <content type="html"><![CDATA[<p>Finally the Java specification about Web Service will  have a name that makes sense&hellip; moving away from JAX-RPC to JAX-WS (JAX Web Services)&hellip;</p>
+
+<blockquote><p>The JAX-RPC name, which stands for Java API for XML-based RPC, is misleading because developers assume it is only about RPC, according to Doug Kohlert, a Sun staff engineer, in his blog this week. “By renaming JAX-RPC to JAX-WS, we can eliminate this confusion,” Kohlert wrote. JAX-WS stands for Java API for XML Web Services.</p></blockquote>
+
+<p><a href="http://www.infoworld.com/article/05/05/25/HNjaxrpc_1.html">This infoworld article will give you more details</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[J2EE Application Development for Forms and Designer Developers]]></title>
+    <link href="http://tgrall.github.io/blog/2005/04/28/j2ee-application-development-for-forms-and-designer-developers/"/>
+    <updated>2005-04-28T20:49:05+02:00</updated>
+    <id>http://tgrall.github.io/blog/2005/04/28/j2ee-application-development-for-forms-and-designer-developers</id>
+    <content type="html"><![CDATA[<p>Back in France, and in Oracle consulting, I was very often called to present, introduce J2EE to Oracle Forms developers, since we all know that J2EE is the way to go!</p>
+
+<p>Sue Harper and Grant Ronald have made this task easier by creating a specific OTN page for <a href="http://otn.oracle.com/formsdesignerj2ee">Oracle Forms and Designer Developers</a> that are moving to J2EE.</p>
+
+<p>This is also a subject that will be often discussed in the <a href="http://www.odtug.com/2005_j2EE.htm">J2EE SIG</a> that the different Oracle user groups
+<a href="http://www.odtug.com">ODTUG</a>, <a href="http://www.ioug.org">IOUG</a>,<a href="http://www.oaug.com">OAUG</a> and <a href="http://otn.oracle.com">Oracle</a> have created.</p>
+
+<p>I am sure that will be a very succesful subject during the next <a href="http://www.odtug.com/2005_conference_home.asp">ODTUG (Oracle Developer Tools User Group) Conference</a> mid june in New Orleans. During this event I am presenting 3 papers:
+* J2EE 1.4 Overview
+* Oracle Application Server 10g: Best Application Server for the Oracle Database
+* J2EE Persistence Using OracleAS TopLink ( will probably let our guru Doug Clarke doing it if he is coming&hellip;)</p>
+
+<p>It is still time to register for this event, <a href="http://www.odtug.com/2005_conference_agenda.htm">take a look to the agenda</a>, this year will be a very good one !</p>
+]]></content>
+  </entry>
+  
+</feed>
