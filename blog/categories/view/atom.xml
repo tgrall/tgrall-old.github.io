@@ -4,7 +4,7 @@
   <title><![CDATA[Category: View | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/view/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -29,7 +29,7 @@
 
 
 <p>This is necessary for example to create application view like the following:
-  <img class="<a" src="href="http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png">http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png</a>&#8221;></p>
+  {% img <a href="http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png">http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png</a> %}</p>
 
 <p>With Couchbase, and many of the document oriented databases you have different ways to deal with this, you can:</p>
 
@@ -114,21 +114,7 @@ DEPT_20, Ford
 
 <p>So the map function of the view looks like the following:</p>
 
-<p><div><script src='https://gist.github.com/bfb625e0ff175b1778bc.js'></script>
-<noscript><pre><code>function (doc, meta) {
-  if (doc.type == &quot;emp&quot; || doc.type == &quot;dept&quot;) {
-    switch(doc.type) {
-      case &quot;dept&quot; :
-        emit( [meta.id, 0, doc.name], 0 );
-        break;
-      case &quot;emp&quot; :
-        emit( [doc.dept_id, 1, doc.name ], doc.salary + ((doc.comm)?doc.comm:0) );
-        break;
-    }
-  }
-}
-</code></pre></noscript></div>
-</p>
+<p>{% gist bfb625e0ff175b1778bc %}</p>
 
 <p>The key is composed of:</p>
 
@@ -141,7 +127,7 @@ DEPT_20, Ford
 
 <p>In addition to the key, this view is used to emit some information about the salary of the employees. The salary is simply the sum of the salary plus thecommission when exists. The result of the view looks like:</p>
 
-<p><img class="<a" src="href="http://2.bp.blogspot.com/-wLmoUPfo-f8/URtierY_qBI/AAAAAAAAAaw/i3DMCvilCcU/s400/Screen+Shot+2013-02-13+at+10.52.30+AM.png">http://2.bp.blogspot.com/-wLmoUPfo-f8/URtierY_qBI/AAAAAAAAAaw/i3DMCvilCcU/s400/Screen+Shot+2013-02-13+at+10.52.30+AM.png</a>&#8221;></p>
+<p>{% img <a href="http://2.bp.blogspot.com/-wLmoUPfo-f8/URtierY_qBI/AAAAAAAAAaw/i3DMCvilCcU/s400/Screen+Shot+2013-02-13+at+10.52.30+AM.png">http://2.bp.blogspot.com/-wLmoUPfo-f8/URtierY_qBI/AAAAAAAAAaw/i3DMCvilCcU/s400/Screen+Shot+2013-02-13+at+10.52.30+AM.png</a> %}</p>
 
 <p>With this view you can now use the result of the view to build report for your application. It is also possible to use parameters in your query to see only a part of the data, for example by departement, using for example <code>startkey=["dept__20",0]&amp;amp;endkey=["dept__20",2]</code> to view only the data -Department and Employees- of the deparment 20-Research.</p>
 
@@ -149,20 +135,7 @@ DEPT_20, Ford
 
 <p>You can create an equivalent view for the beer sample application where you print all the breweries and beers in the same report. The view is called &ldquo;<code>all_with_beers</code>&rdquo; in the design document &ldquo;<code>brewery</code>&rdquo;. The view looks like:</p>
 
-<p><div><script src='https://gist.github.com/4944154.js'></script>
-<noscript><pre><code>function(doc, meta) {
-  switch(doc.type) {
-    case &quot;brewery&quot;:
-      emit([meta.id, 0, doc.name]);
-      break;
-    case &quot;beer&quot;:
-      if (doc.name &amp;&amp; doc.brewery_id) {
-        emit([doc.brewery_id, 1, doc.name], null);
-      }
-  }                    
-}
-</code></pre></noscript></div>
-</p>
+<p>{% gist 4944154 %}</p>
 
 <p>Once you have publish it in production you can use it in the Beer Sample application, for this example I have modified the Java sample application.</p>
 
@@ -170,70 +143,15 @@ DEPT_20, Ford
 
 <p>The &ldquo;BreweryAndBeerServlet&rdquo; that calls the view using the following code :</p>
 
-<p><div><script src='https://gist.github.com/4944142.js'></script>
-<noscript><pre><code>        View view = client.getView(&quot;brewery&quot;, &quot;all_with_beers&quot;);
-        Query query = new Query();
-        query.setIncludeDocs(true).setLimit(100);
-        ViewResponse result = client.query(view, query);
-
-        ArrayList&lt;HashMap&lt;String, String&gt;&gt; items =
-                new ArrayList&lt;HashMap&lt;String, String&gt;&gt;();
-        for(ViewRow row : result) {
-            HashMap&lt;String, String&gt; parsedDoc = gson.fromJson(
-                    (String)row.getDocument(), HashMap.class);
-
-            HashMap&lt;String, String&gt; item = new HashMap&lt;String, String&gt;();
-            item.put(&quot;id&quot;, row.getId());
-            item.put(&quot;name&quot;, parsedDoc.get(&quot;name&quot;));
-            item.put(&quot;type&quot;, parsedDoc.get(&quot;type&quot;));
-
-
-            items.add(item);
-        }
-        request.setAttribute(&quot;items&quot;, items);
-
-        request.getRequestDispatcher(&quot;/WEB-INF/breweries/all.jsp&quot;)
-                .forward(request, response);</code></pre></noscript></div>
-</p>
+<p>{% gist 4944142 %}</p>
 
 <p>The result of the query is set into the HttpRequest and the all.jsp page is executed. The JSP uses JSTL to print the information using the following code:</p>
 
-<p><div><script src='https://gist.github.com/c163f57778d663632e87.js'></script>
-<noscript><pre><code>        &lt;table id=&quot;brewery-table&quot; class=&quot;table table-striped&quot;&gt;
-            &lt;thead&gt;
-            &lt;tr&gt;
-                &lt;th&gt;Name&lt;/th&gt;
-                &lt;th&gt;&lt;/th&gt;
-                &lt;th&gt;&lt;/th&gt;
-            &lt;/tr&gt;
-            &lt;/thead&gt;
-            &lt;tbody&gt;
-            &lt;c:forEach items=&quot;${items}&quot; var=&quot;item&quot;&gt;
-                &lt;c:if test=&quot;${ item.type == &#39;brewery&#39; }&quot;&gt;
-                    &lt;tr&gt;
-                        &lt;td colspan=&quot;2&quot;&gt;&lt;strong&gt;&lt;a href=&quot;/breweries/show/${item.id}&quot;&gt;${item.name}&lt;/a&gt;&lt;/strong&gt;&lt;/td&gt;
-                        &lt;td&gt;&lt;a class=&quot;btn btn-small btn-danger&quot; href=&quot;/breweries/delete/${item.id}&quot;&gt;Delete&lt;/a&gt;
-                        &lt;/td&gt;
-                    &lt;/tr&gt;
-                &lt;/c:if&gt;
-                &lt;c:if test=&quot;${ item.type == &#39;beer&#39; }&quot;&gt;
-                    &lt;tr&gt;
-                        &lt;td&gt;&lt;/td&gt;
-                        &lt;td&gt;&lt;a href=&quot;/beers/show/${item.id}&quot;&gt;${item.name}&lt;/a&gt;&lt;/td&gt;
-                        &lt;td&gt;
-                            &lt;a class=&quot;btn btn-small btn-danger&quot; href=&quot;/beers/delete/${item.id}&quot;&gt;Delete&lt;/a&gt;
-                            &lt;a class=&quot;btn btn-small btn-warning&quot; href=&quot;/beers/edit/${item.id}&quot;&gt;Edit&lt;/a&gt;
-                        &lt;/td&gt;
-                    &lt;/tr&gt;
-                &lt;/c:if&gt;
-            &lt;/c:forEach&gt;
-            &lt;/tbody&gt;
-        &lt;/table&gt;</code></pre></noscript></div>
-</p>
+<p>{% gist c163f57778d663632e87 %}</p>
 
 <p>The JSP gets the items from the HTTP Request and loops on each items, then based on the type of the item the information is printed. The final result looks like :</p>
 
-<p><img class="<a" src="href="http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png">http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png</a>&#8221;></p>
+<p>{% img <a href="http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png">http://1.bp.blogspot.com/-vdpPEX_Wfm0/URt23LU3r1I/AAAAAAAAAbA/rDykow-eQY4/s320/Screen+Shot+2013-02-13+at+12.19.11+PM.png</a> %}</p>
 
 <p>This extension to the Beer Sample application is available here :<a href="https://github.com/tgrall/beersample-java/tree/BreweriesAndBeers">https://github.com/tgrall/beersample-java/tree/BreweriesAndBeers</a></p>
 ]]></content>

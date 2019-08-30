@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Security | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/security/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -27,7 +27,7 @@
 </ul>
 
 
-<p><img class="center" src="/images/posts/intro-mongodb-security/password.jpg"></p>
+<p>{%img center /images/posts/intro-mongodb-security/password.jpg %}</p>
 
 <p>In this post, <em>I won&rsquo;t go</em> into the detail about how to deploy your database in a secured environment (DMZ/Network/IP/Location/&hellip;)</p>
 

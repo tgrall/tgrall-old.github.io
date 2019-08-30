@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ops | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/ops/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -24,7 +24,7 @@
 
 <h3>What! I still need DBA?</h3>
 
-<p><img class="<a" src="href="http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg">http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg</a>&#8221;></p>
+<p>{% img <a href="http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg">http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg</a> %}</p>
 
 <p>This is a good opportunity to raise a point, or comment a wrong idea: the fact that you are using MongoDB, or any other NoSQL datastore does not mean that you do not need a DBA… Like any project, an administrator is not mandatory, but if you have one it is better. So even when MongoDB is pushed by development team it is very important to understand the way the database works, and how to administer, monitor it.</p>
 

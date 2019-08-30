@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Javaone | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/javaone/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -18,7 +18,7 @@
     <link href="http://tgrall.github.io/blog/2006/05/11/more-groovy-at-javaone/"/>
     <updated>2006-05-11T21:37:50+02:00</updated>
     <id>http://tgrall.github.io/blog/2006/05/11/more-groovy-at-javaone</id>
-    <content type="html"><![CDATA[<p><img class="<a" src="href="http://groovy.codehaus.org/images/groovy-logo.png">http://groovy.codehaus.org/images/groovy-logo.png</a>&#8221;>
+    <content type="html"><![CDATA[<p>{% img <a href="http://groovy.codehaus.org/images/groovy-logo.png">http://groovy.codehaus.org/images/groovy-logo.png</a> %}
 If like me you like scripting technologies and in particular Groovy and
 Grails, JavaOne 2006 will be a very good moment to learn more about it.</p>
 

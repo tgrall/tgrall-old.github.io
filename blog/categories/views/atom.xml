@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Views | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/views/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -22,24 +22,11 @@
 
 <p>First of all you need to be sure your documents have an attribute that contains a date ;), something like :</p>
 
-<p><div><script src='https://gist.github.com/178061fa19ca5fc81508.js'></script>
-<noscript><pre><code>{
-  &quot;type&quot; : &quot;emp&quot;,
-  &quot;id&quot;:&quot;001&quot;,
-  &quot;name&quot;:&quot;John Doe&quot;,
-  &quot;hiredate&quot;:&quot;Jan 1, 2013 8:32:00 AM&quot;
-}</code></pre></noscript></div>
-</p>
+<p>{% gist 178061fa19ca5fc81508 %}</p>
 
 <p>To get the &ldquo;latest hired employee&rdquo; you need to create a view, and emit the hire date as key. The important part is to check that this date is emitted in a format that is sorted properly, for example an array of value using dateToArray function, or the time as numerical value. In the following view I am using the date as an array like that I will be able to do some grouping but this is another topic. The view looks like the following:</p>
 
-<p><div><script src='https://gist.github.com/02fb7123c5e444b5107c.js'></script>
-<noscript><pre><code>function (doc, meta) {
-  if (doc.hiredate) {
-    emit( dateToArray(doc.hiredate) );
-  }
-}</code></pre></noscript></div>
-</p>
+<p>{% gist 02fb7123c5e444b5107c %}</p>
 
 <p>Now that you have a view. You can now query it using the parameters:</p>
 
@@ -51,25 +38,7 @@
 
 <p>If you use Java SDK the code will look like the following :</p>
 
-<p><div><script src='https://gist.github.com/3e872557d8a5af454c2b.js'></script>
-<noscript><pre><code>import com.couchbase.client.protocol.views.Query;
-import com.couchbase.client.protocol.views.View;
-import com.couchbase.client.protocol.views.ViewResponse;
-import com.couchbase.client.protocol.views.ViewRow;
-...
-...
-...
-
-  View view = cb.getView(&quot;employees&quot;, &quot;by_hiredate&quot;);
-  Query query = new Query();
-  query.setIncludeDocs(true);
-  query.setLimit(1);
-  query.setDescending(true);
-  ViewResponse viewResponse = cb.query(view, query);
-  for (ViewRow row : viewResponse) {
-    String documentJson = row.getDocument();
-  }</code></pre></noscript></div>
-</p>
+<p>{% gist 3e872557d8a5af454c2b %}</p>
 
 <p>Finally it is important when you work with views to understand how the index are managed by the server so be sure your read the chapter &ldquo;<a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-views-writing-stale.html">Index Updates and the stale Parameter</a>&rdquo;.</p>
 ]]></content>

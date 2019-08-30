@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Hackathon | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/hackathon/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -42,7 +42,7 @@
 
 <p>In case you do not know Sage is a 30+ years old ERP vendor. I have to say that I could not imagine that coming from such company… Let me tell me more about it.</p>
 
-<p><img class="center" src="/images/posts/everybody-says-hackathon/00-logo.png"></p>
+<p>{% img center /images/posts/everybody-says-hackathon/00-logo.png %}</p>
 
 <!-- more -->
 
@@ -80,12 +80,12 @@
 
 <p>The event started with a very short presentation of the teams, projects, and jury.</p>
 
-<p><img class="center" src="/images/posts/everybody-says-hackathon/01-sage-hack-intro.png" title="Presentation" ></p>
+<p>{% img center /images/posts/everybody-says-hackathon/01-sage-hack-intro.png Presentation %}</p>
 
 <p>Quickly the teams started to draw things on whiteboard, discuss architecture, and design&hellip; The organizers, included myself, were
 very happy to see that everybody was diving into it.</p>
 
-<p><img src="/images/posts/everybody-says-hackathon/02-team-work.png" title="Team Work" > <img src="/images/posts/everybody-says-hackathon/03-motto.png"></p>
+<p>{% img /images/posts/everybody-says-hackathon/02-team-work.png Team Work %} {% img /images/posts/everybody-says-hackathon/03-motto.png %}</p>
 
 <p>MongoDB (<a href="http://twitter.com/alainhelaili">Alain</a> and I), and Sage architects were here to help; so we did. I pushed hard to be sure all the teams start to develop, design
 as early as possible. I also gave many advices around document design and other things around MongoDB and node.</p>
@@ -94,11 +94,11 @@ as early as possible. I also gave many advices around document design and other 
 
 <p>Let&rsquo;s go back to the code thing, so all the teams were working like crazy on their project. I had lot of interesting discussions with all of them.</p>
 
-<p><img src="/images/posts/everybody-says-hackathon/04-night-coding.png" title="Night Coding" > <img src="/images/posts/everybody-says-hackathon/05-night-coding.png" title="Night Coding" ></p>
+<p>{% img /images/posts/everybody-says-hackathon/04-night-coding.png Night Coding %} {% img /images/posts/everybody-says-hackathon/05-night-coding.png Night Coding %}</p>
 
 <p>I went to bed at 11:30pm, <em>yeah, I am a loser!</em>, while everybody was still working.</p>
 
-<p><img src="/images/posts/everybody-says-hackathon/06-night-coding.png" title="Night Coding" ><img src="/images/posts/everybody-says-hackathon/07-night-coding.png" title="Night Coding" ></p>
+<p>{% img /images/posts/everybody-says-hackathon/06-night-coding.png Night Coding %}{% img /images/posts/everybody-says-hackathon/07-night-coding.png Night Coding %}</p>
 
 <p>I as back in the <em>war room</em> around 6:00am, and helped some team to finish their project.</p>
 
@@ -109,7 +109,7 @@ as early as possible. I also gave many advices around document design and other 
 <p>At noon each team started to demonstrate their feature in 5mn. All the teams did a live demonstration, with the feature well integrated to the Sage X3 screens.
 It was really cool. A team even created a small video clip to explain the feature and vision.</p>
 
-<p><img src="/images/posts/everybody-says-hackathon/08-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/10-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/11-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/12-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/13-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/14-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/15-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/09-demonstration.png"></p>
+<p>{% img /images/posts/everybody-says-hackathon/08-demonstration.png %} {% img /images/posts/everybody-says-hackathon/10-demonstration.png %} {% img /images/posts/everybody-says-hackathon/11-demonstration.png %} {% img /images/posts/everybody-says-hackathon/12-demonstration.png %} {% img /images/posts/everybody-says-hackathon/13-demonstration.png %} {% img /images/posts/everybody-says-hackathon/14-demonstration.png %} {% img /images/posts/everybody-says-hackathon/15-demonstration.png %} {% img /images/posts/everybody-says-hackathon/09-demonstration.png %}</p>
 
 <p>It was very hard to chose a winner, but we agreed on a very rich and promising notification platform.</p>
 

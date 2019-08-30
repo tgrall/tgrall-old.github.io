@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Jdeveloper | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/jdeveloper/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -18,7 +18,7 @@
     <link href="http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/"/>
     <updated>2007-11-08T06:39:38+01:00</updated>
     <id>http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11</id>
-    <content type="html"><![CDATA[<p><img class="<a" src="href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a>&#8221;></p>
+    <content type="html"><![CDATA[<p>{% img <a href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a> %}</p>
 
 <p>Steve Muench has published in Oracle Magazine an article about the use of Groovy in Oracle ADF. In this article you learn how you can do validation and calculation in you business service layer.</p>
 

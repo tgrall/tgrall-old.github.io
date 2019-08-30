@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ajax | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/ajax/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -22,7 +22,7 @@
 
 <p>Sebastien Gruhier, aka Mr Proto, and others have done a terrific job allowing developers to integrate exciting features with few lines of code. Find more on the <a href="http://prototype-window.xilinus.com/">PWC site</a> or on <a href="http://blog.xilinus.com/pwc">Mr Proto&rsquo;s blog</a>.</p>
 
-<p><img class="<a" src="href="http://3.bp.blogspot.com/_aoQgQ1obiyE/Ruvo6E3lYfI/AAAAAAAAAB0/fk6OCadNOCA/s400/pwcdemo.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/Ruvo6E3lYfI/AAAAAAAAAB0/fk6OCadNOCA/s400/pwcdemo.png</a>&#8221;></p>
+<p>{% img <a href="http://3.bp.blogspot.com/_aoQgQ1obiyE/Ruvo6E3lYfI/AAAAAAAAAB0/fk6OCadNOCA/s400/pwcdemo.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/Ruvo6E3lYfI/AAAAAAAAAB0/fk6OCadNOCA/s400/pwcdemo.png</a> %}</p>
 
 <p>In addition to the Windows API, you can also take a look to the Tranparent Message, Prototype Carousel and Prototype Graphics projects</p>
 ]]></content>
@@ -46,7 +46,7 @@
     <link href="http://tgrall.github.io/blog/2005/06/13/pushlets-are-adopting-ajax/"/>
     <updated>2005-06-13T20:58:56+02:00</updated>
     <id>http://tgrall.github.io/blog/2005/06/13/pushlets-are-adopting-ajax</id>
-    <content type="html"><![CDATA[<p><img class="<a" src="href="http://www.pushlets.com/assets/pushlet-logo.gif">http://www.pushlets.com/assets/pushlet-logo.gif</a>&#8220;>Back in consulting I did some small projects using the <a href="http://www.pushlets.com">Pushlets framework</a>. A nice and simple solution to create easily Web eventing applications&hellip;</p>
+    <content type="html"><![CDATA[<p>{% img <a href="http://www.pushlets.com/assets/pushlet-logo.gif">http://www.pushlets.com/assets/pushlet-logo.gif</a> %}Back in consulting I did some small projects using the <a href="http://www.pushlets.com">Pushlets framework</a>. A nice and simple solution to create easily Web eventing applications&hellip;</p>
 
 <p>The Pushlet team has created a small demonstration of integration of Pushlet and XMLHttpRequest together&hellip;</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ws | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/ws/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -33,7 +33,7 @@
 
 <p>Here the archtecture schema of OracleAS Database Web Services:</p>
 
-<p><img class="<a" src="href="http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif">http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif</a>&#8221;></p>
+<p>{% img <a href="http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif">http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif</a> %}</p>
 
 <p>It is important to mention that such service can leverage the WS-* support of OracleAS and any JAX-RPC handler you want to add to the service.</p>
 

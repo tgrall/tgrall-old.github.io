@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Cms | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/cms/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -24,10 +24,10 @@
 
 <p>In this how to you will learn how you can create and use template that are used in the &ldquo;Content List&rdquo; portlet. For example in the ACME sample site you can show the content in 1 or 2 columns just by selecting different templates.</p>
 
-<p><img class="<a" src="href="http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png">http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png</a>&#8221;>
+<p>{% img <a href="http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png">http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png</a> %}
 One Column View</p>
 
-<p><img class="<a" src="href="http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png">http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png</a>&#8221;>
+<p>{% img <a href="http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png">http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png</a> %}
 Two Columns View</p>
 
 <h3>Creating a new Content List Template</h3>
@@ -104,13 +104,13 @@ You can see the list of all the templates available for the Content List portlet
 
 9-  Switch to Edit more by selecting Edit in the top right drop down list.
 
-<img src="http://3.bp.blogspot.com/-EsSUDUdUo_8/TbbRJZlZlHI/AAAAAAAAAPk/5iTn-NoC-JE/s200/edit-mode.png">
+{% img http://3.bp.blogspot.com/-EsSUDUdUo_8/TbbRJZlZlHI/AAAAAAAAAPk/5iTn-NoC-JE/s200/edit-mode.png %}
 
-10-  Move you mouse at the top of the list of news and click on the preference button: <img src="http://1.bp.blogspot.com/-ksljDe3llf4/TbbSIOl0DII/AAAAAAAAAPs/C0eBv-SJ25I/s200/PreferencesIcon.png">
+10-  Move you mouse at the top of the list of news and click on the preference button: {%img http://1.bp.blogspot.com/-ksljDe3llf4/TbbSIOl0DII/AAAAAAAAAPs/C0eBv-SJ25I/s200/PreferencesIcon.png %}
 
 11-  In the list of templates, select the "MyNewTemplate", and click save.
 
-<img src="http://2.bp.blogspot.com/-7hT5osGXK1w/TbbTTJ7ZKSI/AAAAAAAAAP0/--VCTefhrSI/s320/select-template.png">
+{% img http://2.bp.blogspot.com/-7hT5osGXK1w/TbbTTJ7ZKSI/AAAAAAAAAP0/--VCTefhrSI/s320/select-template.png %}
 
 We have created our new template, and use it on a page. We should now add some more interesting code to the template to really loop over the content based on the portlet configuration. But before this it is important to talk about caching and code modification.
 
@@ -127,7 +127,7 @@ Since working with no cache at all is not an option, here is the MBean you have 
 
 I do use JConsole for this, but you can use any method to call your MBeans operation.
 
-<img src="http://1.bp.blogspot.com/-ZuMQz-VHBYY/TbldhSRY2NI/AAAAAAAAAP8/pb09UoA9_b4/s200/TemplateServiceCacheMbean.png">
+{% img http://1.bp.blogspot.com/-ZuMQz-VHBYY/TbldhSRY2NI/AAAAAAAAAP8/pb09UoA9_b4/s200/TemplateServiceCacheMbean.png %}
 
 Do not forget to call this operation each time you modify your template to be sure eXo recompile the template.
 
@@ -168,7 +168,7 @@ def isShowSummary = uicomponent.isShowField(UICLVPortlet.PREFERENCE_SHOW_SUMMARY
 <pre><code>
 The &lt;span style="font-family: &amp;quot;Courier New&amp;quot;,Courier,monospace;"&gt;uicomponent&lt;/span&gt; object is defined by the container class of the portlet that calls the template. This class contains many utility methods. In the code above I retrieve all the preferences of the portlet, since the name are self-explanatory it is not necessary to detail them, especially when you look at the preferences screen below:
 
-<img src="http://3.bp.blogspot.com/-bDIJtSVaD9A/TblkjTr2wMI/AAAAAAAAAQE/6mRLmEYqpsE/s320/preference-screen.png">
+{% img http://3.bp.blogspot.com/-bDIJtSVaD9A/TblkjTr2wMI/AAAAAAAAAQE/6mRLmEYqpsE/s320/preference-screen.png %}
 
 Now that the template has all the preferences, it is time to loop on the content on print the information.
 
@@ -239,7 +239,7 @@ for (viewNode in uicomponent.getCurrentPageData()) {
 
 <p>The Web site should look like the following image:</p>
 
-<p><img class="<a" src="href="http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png">http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png</a>&#8221;></p>
+<p>{% img <a href="http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png">http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png</a> %}</p>
 
 <p>The last important point is to add the support for the in context editing that allows the user to edit the content directly from the template. Once again this is done with a method of the <code>uicomponent</code> object, that create a DIV around the content. Let&rsquo;s add this to the template:</p>
 

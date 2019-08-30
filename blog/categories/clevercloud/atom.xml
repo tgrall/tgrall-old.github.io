@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Clevercloud | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/clevercloud/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -22,7 +22,7 @@
 
 <p><a href="http://www.clever-cloud.com/en/">Clever Cloud</a> is the first PaaS to provide Couchbase as a service allowing developers to run applications in a fully managed environment. This article shows how to deploy an existing application to Clever Cloud.</p>
 
-<p><img class="<a" src="href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a>&#8221;></p>
+<p>{% img <a href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a> %}</p>
 
 <p>I am using a very simple Node application that I have documented in a previous article: “<a href="http://tugdualgrall.blogspot.fr/2013/03/easy-application-development-with.html">Easy application development with Couchbase, Angular and Node</a>”.</p>
 
@@ -50,7 +50,7 @@
 
 <p>2-  Click on “Add a Service” in the left menu </span></p>
 
-<p><img class="<a" src="href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a>&#8221;></p>
+<p>{% img <a href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a> %}</p>
 
 <p>3- Click on “Couchbase” button.</p>
 
@@ -59,7 +59,7 @@
 </ol>
 
 
-<p><img class="<a" src="href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a>&#8221;></p>
+<p>{% img <a href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a> %}</p>
 
 <p>The size of the RAM Quota for your bucket will have an impact on performance but also on the pricing.</p>
 

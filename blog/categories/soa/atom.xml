@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Soa | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/soa/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -35,7 +35,7 @@
 
 <p>The overall architecture could be represented using the following schema :</p>
 
-<p><img class="<a" src="href="http://3.bp.blogspot.com/_aoQgQ1obiyE/R11pWKMLwEI/AAAAAAAAACU/Bvo623h0JCA/s400/soa-appliance.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/R11pWKMLwEI/AAAAAAAAACU/Bvo623h0JCA/s400/soa-appliance.png</a>&#8221;></p>
+<p>{% img <a href="http://3.bp.blogspot.com/_aoQgQ1obiyE/R11pWKMLwEI/AAAAAAAAACU/Bvo623h0JCA/s400/soa-appliance.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/R11pWKMLwEI/AAAAAAAAACU/Bvo623h0JCA/s400/soa-appliance.png</a> %}</p>
 
 <p>The role of the XML/SOA Appliance varies a lot depending of your project:</p>
 
@@ -166,7 +166,7 @@ article I explain how you can configure the server to be able to do it.</p>
 
 <p>Just run the command <code>&amp;lt;BPEL_HOME&amp;gt;\bin\obtunnel.bat</code> You will see the following application:</p>
 
-<p><img class="<a" src="href="http://static.flickr.com/46/133968437_aa0d5804f6_o.png">http://static.flickr.com/46/133968437_aa0d5804f6_o.png</a>&#8221;></p>
+<p>{% img <a href="http://static.flickr.com/46/133968437_aa0d5804f6_o.png">http://static.flickr.com/46/133968437_aa0d5804f6_o.png</a> %}</p>
 
 <p>By default the TCPMonitor launched from BPEL listens on the port 1234
 and proxies for the default Oracle BPEL port 9700. So in this context
@@ -238,9 +238,9 @@ see the request coming from the BPEL to a local partner link (and I am
 
 <p>Now you can see all the SOAP requests and responses between the LoanFlow BPEL and its partnerlinks.</p>
 
-<p><img class="<a" src="href="http://static.flickr.com/46/133968438_d0dc761af0.jpg?v=0">http://static.flickr.com/46/133968438_d0dc761af0.jpg?v=0</a>&#8221;></p>
+<p>{% img <a href="http://static.flickr.com/46/133968438_d0dc761af0.jpg?v=0">http://static.flickr.com/46/133968438_d0dc761af0.jpg?v=0</a> %}</p>
 
-<p><img class="<a" src="href="http://static.flickr.com/46/133968438_d0dc761af0_o.png">http://static.flickr.com/46/133968438_d0dc761af0_o.png</a>&#8221;></p>
+<p>{% img <a href="http://static.flickr.com/46/133968438_d0dc761af0_o.png">http://static.flickr.com/46/133968438_d0dc761af0_o.png</a> %}</p>
 
 <p><em>Update on 08/02/2007</em></p>
 

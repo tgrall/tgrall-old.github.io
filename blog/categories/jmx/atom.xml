@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Jmx | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/jmx/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -69,11 +69,11 @@ to monitor and administer your OC4J instance</li>
 </ol>
 
 
-<p><img class="<a" src="href="http://farm1.static.flickr.com/139/388744041_9cbbb6734f_o.png">http://farm1.static.flickr.com/139/388744041_9cbbb6734f_o.png</a>&#8221;></p>
+<p>{%img <a href="http://farm1.static.flickr.com/139/388744041_9cbbb6734f_o.png">http://farm1.static.flickr.com/139/388744041_9cbbb6734f_o.png</a> %}</p>
 
 <p>Connection to the OC4J MBean Server</p>
 
-<p><img class="<a" src="href="http://farm1.static.flickr.com/148/388744045_1bb6e9c149_o.png">http://farm1.static.flickr.com/148/388744045_1bb6e9c149_o.png</a>&#8221;></p>
+<p>{% img <a href="http://farm1.static.flickr.com/148/388744045_1bb6e9c149_o.png">http://farm1.static.flickr.com/148/388744045_1bb6e9c149_o.png</a> %}</p>
 
 <p>Java 5 JConsole browsing the OC4J MBeans</p>
 ]]></content>

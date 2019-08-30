@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Conference | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/conference/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-23T11:28:38+02:00</updated>
+  <updated>2019-08-30T17:16:20+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -24,7 +24,7 @@
 
 <p>Here the slides that I have used during this presentation:</p>
 
-<p><iframe src="http://www.slideshare.net/slideshow/embed_code/95672 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
+<p>{% slideshare 95672 %}</p>
 
 <p><strong><a href="http://www.slideshare.net/tgrall/sap-cloud-inside-develop-and-deploy-on-the-cloud" title="SAP Cloud Inside : Develop and Run on the Cloud">SAP Cloud Inside : Develop and Run on the Cloud</a></strong></p>
 
@@ -37,7 +37,7 @@
     <link href="http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/"/>
     <updated>2009-11-08T22:27:15+01:00</updated>
     <id>http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies</id>
-    <content type="html"><![CDATA[<p><img class="<a" src="href="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2">http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2</a>&#8221;></p>
+    <content type="html"><![CDATA[<p>{% img <a href="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2">http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2</a> %}</p>
 
 <p>This Friday , the Nantes JUG is pleased to organize a conference about &ldquo;Google Technologies&rdquo;. Didier Girard, <a href="http://twitter.com/dgirard">http://twitter.com/dgirard</a> , will be presenting and demoing cool stuff from Google:</p>
 
@@ -78,7 +78,7 @@
 </ul>
 
 
-<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1678352 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> 
+<p>{% slideshare 1678352 %}
 <a href="http://www.slideshare.net/tgrall/wiki-vs-cms-1678352" title="Wiki vs CMS ">Wiki vs CMS </a></p>
 ]]></content>
   </entry>
@@ -115,7 +115,7 @@
     <link href="http://tgrall.github.io/blog/2008/05/16/javaone-2008-groovy-and-grails-presentations-and-code/"/>
     <updated>2008-05-16T12:47:00+02:00</updated>
     <id>http://tgrall.github.io/blog/2008/05/16/javaone-2008-groovy-and-grails-presentations-and-code</id>
-    <content type="html"><![CDATA[<p><img class="<a" src="href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a>&#8220;>Andres and Guillaume have posted on the Groovy Users list the pointers to many (if not all) the Groovy and Grails sessions of JavaOne 2008&hellip; You want to learn more, this is a great opportunity to do it so:</p>
+    <content type="html"><![CDATA[<p>{% img <a href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a> %}Andres and Guillaume have posted on the Groovy Users list the pointers to many (if not all) the Groovy and Grails sessions of JavaOne 2008&hellip; You want to learn more, this is a great opportunity to do it so:</p>
 
 <ul>
 <li><a href="http://permalink.gmane.org/gmane.comp.lang.groovy.user/32891">JavaOne 2008: Groovy and Grails presentations and code</a></li>
