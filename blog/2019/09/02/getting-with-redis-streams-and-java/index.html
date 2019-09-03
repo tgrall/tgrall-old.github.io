@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Getting With Redis Streams &amp; Java - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="As you may have seen, I have joined Redis Labs a month ago; one of the first task as a new hire is to learn more about Redis. So I learned, and I am &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>Redis, NoSQL and more&#8230;</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/talks">Talks</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Getting With Redis Streams &amp; Java</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-09-02T09:24:24+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2019</span></span> <span class='time'>9:24 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>As you may have seen, I have joined <a href="https://www.redislabs.com">Redis Labs</a> a month ago; one of the first task as a new hire is to learn more about Redis. So I learned, and I am still learning.</p>
+
+<p>This is when I discovered <a href="https://redis.io/topics/streams-intro">Redis Streams</a>. I am a big fan of streaming-based applications so it is natural that I start with a small blog post explaining how to use Redis Streams and Java.</p>
+
+<p><strong><em>What is Redis Streams?</em></strong></p>
+
+<p>Redis Streams is a Redis Data Type, that represents a log so you can add new information/message in an append-only mode <em>(this is not 100% accurate since you can remove messages from the log)</em>. Using Redis Streams you can build &ldquo;Kafka Like&rdquo; applications, what I mean by that you can:</p>
+
+<ul>
+<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redi Pub/Sub)</li>
+<li>consume messages that are published even when your client application (consumer) is not running. This is a big difference with Redis Pub/Sub</li>
+<li>consume messages starting a specific offset, for example, read the whole history, or only new messages</li>
+</ul>
+
+
+<p>In addition to this, Redis Streams has the concept of <strong>Consumer Groups</strong>. Redis Streams Consumer Groups, like Apache Kafka ones, allows the client applications to consume messages in a distributed fashion (multiple clients), providing an easy way to scale and create highly available systems.</p>
+
+<p><img class="center" src="/images/posts/getting-with-redis-streams-and-java/redis-streams-101-img-1.png"></p>
+
+<p>Enroll in the <a href="https://university.redislabs.com/courses/course-v1:redislabs+RU202+2019_03/about">Redis University: Redis Streams</a> to learn more and get certified.</p>
+
+<p><strong><em>Sample Application</em></strong></p>
+
+<p>The <a href="https://github.com/tgrall/redis-streams-101-java">redis-streams-101-java GitHub Repository</a> contains sample code that shows how to</p>
+
+<ul>
+<li>post messages to a streams</li>
+<li>consume messages using a consumer group</li>
+</ul>
+
+
+<!--more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Redis 5.x, you have here multiple options:
+
+<ul>
+<li><a href="https://redis.io">Download</a> and install Redis Community</li>
+<li>Install and Run a Docker image: <a href="https://hub.docker.com/_/redis">Community</a> or <a href="https://hub.docker.com/r/redislabs/redis">Redis Enterprise</a></li>
+<li>Create a online instance on <a href="https://redislabs.com/redis-enterprise/essentials/">Redis Labs Cloud</a> (30mb for free)</li>
+</ul>
+</li>
+<li>Java 8 or later</li>
+<li>Apache Maven 3.5.x</li>
+<li>Git</li>
+</ul>
+
+
+<h3>Java &amp; Redis Streams</h3>
+
+<p>Redis has many Java clients developed by the community, as you can see on the <a href="https://redis.io/clients#java">Redis.io site</a>.</p>
+
+<p>It looks, based on my short experience with Redis so far, that the most complete one around Redis Streams support is <a href="https://lettuce.io">Lettuce</a>, this is the one I will be using in the following code.</p>
+
+<h4>1- Adding Lettuce to Your Maven Project</h4>
+
+<p>Add the following dependency to your project file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>    <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;groupId&gt;</span>io.lettuce<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;artifactId&gt;</span>lettuce-core<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;version&gt;</span>5.1.8.RELEASE<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>2- Connecting to Redis</h4>
+
+<p>Import the following classes</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">io.lettuce.core.*</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">io.lettuce.core.api.StatefulRedisConnection</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">io.lettuce.core.api.sync.RedisCommands</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then connect with:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">RedisClient</span> <span class="n">redisClient</span> <span class="o">=</span> <span class="n">RedisClient</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">&quot;redis://password@host:port&quot;</span><span class="o">);</span> <span class="c1">// change to reflect your environment</span>
+</span><span class='line'><span class="n">StatefulRedisConnection</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">connection</span> <span class="o">=</span> <span class="n">redisClient</span><span class="o">.</span><span class="na">connect</span><span class="o">();</span>
+</span><span class='line'><span class="n">RedisCommands</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">syncCommands</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">sync</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When your application is done with the connection you should disconnect with the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'><span class="n">redisClient</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>3- Sending Message to Streams</h4>
+
+<p>Once you have a connection you can send a message. In this example, I will let Redis generate the message ID, which is time-based, and the body will be built using a Map representing IoT data, for example, a weather data capturing Wind speed and direction in real-time.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">RedisClient</span> <span class="n">redisClient</span> <span class="o">=</span> <span class="n">RedisClient</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">&quot;redis://localhost:6379&quot;</span><span class="o">);</span> <span class="c1">// change to reflect your environment</span>
+</span><span class='line'>    <span class="n">StatefulRedisConnection</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">connection</span> <span class="o">=</span> <span class="n">redisClient</span><span class="o">.</span><span class="na">connect</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">RedisCommands</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">syncCommands</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">sync</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">messageBody</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+</span><span class='line'>    <span class="n">messageBody</span><span class="o">.</span><span class="na">put</span><span class="o">(</span> <span class="s">&quot;speed&quot;</span><span class="o">,</span> <span class="s">&quot;15&quot;</span> <span class="o">);</span>
+</span><span class='line'>    <span class="n">messageBody</span><span class="o">.</span><span class="na">put</span><span class="o">(</span> <span class="s">&quot;direction&quot;</span><span class="o">,</span> <span class="s">&quot;270&quot;</span> <span class="o">);</span>
+</span><span class='line'>    <span class="n">messageBody</span><span class="o">.</span><span class="na">put</span><span class="o">(</span> <span class="s">&quot;sensor_ts&quot;</span><span class="o">,</span> <span class="n">String</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">())</span> <span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">String</span> <span class="n">messageId</span> <span class="o">=</span> <span class="n">syncCommands</span><span class="o">.</span><span class="na">xadd</span><span class="o">(</span>
+</span><span class='line'>            <span class="s">&quot;weather_sensor:wind&quot;</span><span class="o">,</span>
+</span><span class='line'>            <span class="n">messageBody</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;Message %s : %s posted&quot;</span><span class="o">,</span> <span class="n">messageId</span><span class="o">,</span> <span class="n">messageBody</span><span class="o">)</span> <span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">redisClient</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let me explain the code:</p>
+
+<ul>
+<li>Lines 3-5 are used to connect to Redis</li>
+<li>Lines 7-10 are used to create the message body, using a Map, since Redis Streams messages are string key/values.</li>
+<li>Lines 12-14 call the <code>syncCommands.xadd()</code> method using the streams key &ldquo;weather_sensor:wind&rdquo; and the message body itself
+
+<ul>
+<li>this method returns the message ID.</li>
+</ul>
+</li>
+<li>line 16 just print the message ID and content</li>
+<li>the lines 18-19 close the connection and client.</li>
+</ul>
+
+
+<p>The complete producer code is available <a href="https://github.com/tgrall/redis-streams-101-java/blob/master/src/main/java/com/kanibl/redis/streams/simple/RedisStreams101Producer.java">here</a>.</p>
+
+<h4>4- Consuming Messages</h4>
+
+<p>Redis Streams offers various way to consume/read messages using the commands: <a href="https://redis.io/commands/xrange">XRANGE</a>, <a href="https://redis.io/commands/xrevrange">XREVRANGE</a>, <a href="https://redis.io/commands/xread">XREAD</a>, <a href="https://redis.io/commands/xreadgroup">XREADGROUP</a>.</p>
+
+<p>I want to keep the article short and close to the way you would build an application with Apache Kafka, this is why I will use the <a href="https://redis.io/commands/xreadgroup">XREADGROUP</a> command from Lettuce.</p>
+
+<p>The Consumer Groups allow developers to create a group of clients that will cooperate to consume messages from the streams (for scale and high availability); it is also a way to associate the client to specific applications roles; for example:</p>
+
+<ul>
+<li>a consumer group called &ldquo;data warehouse&rdquo; will consume messages and send them to a data warehouse</li>
+<li>another consumer group called &ldquo;aggregator&rdquo; will consume the messages and aggregate the data and send them to another sink (another stream or storage)</li>
+</ul>
+
+
+<p>Each of this group will act independently, and each of this group could have multiple &ldquo;consumers&rdquo; (client).</p>
+
+<p>Let&rsquo;s see how you use this in Java.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>            <span class="c1">// WARNING: Streams must exist before creating the group</span>
+</span><span class='line'>            <span class="c1">//          This will not be necessary in Lettuce 5.2, see https://github.com/lettuce-io/lettuce-core/issues/898</span>
+</span><span class='line'>            <span class="n">syncCommands</span><span class="o">.</span><span class="na">xgroupCreate</span><span class="o">(</span> <span class="n">XReadArgs</span><span class="o">.</span><span class="na">StreamOffset</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="s">&quot;weather_sensor:wind&quot;</span><span class="o">,</span> <span class="s">&quot;0-0&quot;</span><span class="o">),</span> <span class="s">&quot;application_1&quot;</span>  <span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">catch</span> <span class="o">(</span><span class="n">RedisBusyException</span> <span class="n">redisBusyException</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;\t Group &#39;%s already&#39; exists&quot;</span><span class="o">,</span><span class="s">&quot;application_1&quot;</span><span class="o">));</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Waiting for new messages&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">while</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">List</span><span class="o">&lt;</span><span class="n">StreamMessage</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">messages</span> <span class="o">=</span> <span class="n">syncCommands</span><span class="o">.</span><span class="na">xreadgroup</span><span class="o">(</span>
+</span><span class='line'>                    <span class="n">Consumer</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="s">&quot;application_1&quot;</span><span class="o">,</span> <span class="s">&quot;consumer_1&quot;</span><span class="o">),</span>
+</span><span class='line'>                    <span class="n">XReadArgs</span><span class="o">.</span><span class="na">StreamOffset</span><span class="o">.</span><span class="na">lastConsumed</span><span class="o">(</span><span class="s">&quot;weather_sensor:wind&quot;</span><span class="o">)</span>
+</span><span class='line'>            <span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(!</span><span class="n">messages</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span> <span class="n">messages</span> <span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code is a subset of the <code>main()</code> method I have removed the connection management part, to add readability. Let&rsquo;s take a look to the code:</p>
+
+<ul>
+<li>line 3 to 10, using the method <code>xgroupCreate()</code>, that matches the <a href="https://redis.io/commands/xgroup">XGROUP CREATE</a> command,
+
+<ul>
+<li>is used to create a new group called <code>application_1</code>,</li>
+<li>consume messages from the stream <code>weather_sensor:wind</code></li>
+<li>starting at the first message in the stream, this is indicated using the message ID <code>0-0</code>. <em>Note that it is also possible to indicate to the group to start to read at a specific message ID, or only the new messages that arrive after the creating of the consumer group using <code>$</code> special ID (or the helper method <code>XReadArgs.StreamOffset.latest()</code></em>.</li>
+</ul>
+</li>
+<li>line 15 to 27, in this example we use an infinite loop (<code>while(true)</code>) to wait for any new messages published to the streams</li>
+<li>line 17 to 20, the method <code>xreadgroup()</code> returns the messages based on the group configuration
+
+<ul>
+<li>line 18 define the consumer named <code>consumer_1</code> that is associated with the group <code>application_1</code>: you can create new group do distribute the read to multiple clients</li>
+<li>line 19 indicates where to start, in this case, <code>StreamOffset.lastConsumed("weather_sensor:wind")</code> the consumer will consume messages that have not been read already. With the current configuration of the group (offset <code>0-0</code>), when the consumer will start for the first time, it will read all the existing messages.</li>
+<li>the <a href="https://redis.io/commands/xreadgroup">XREADGROUP</a> command by default sends an acknowledgment for each consumed message.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>The complete consumer code is available <a href="https://github.com/tgrall/redis-streams-101-java/blob/master/src/main/java/com/kanibl/redis/streams/simple/RedisStreams101Consumer.java">here</a>.</p>
+
+<h3>Build &amp; Run the Simple Java Application</h3>
+
+<p>Now that you have a better understanding of the code, let&rsquo;s run the producer and consumer. You can run this from your IDE, or using Maven.</p>
+
+<p>Let&rsquo;s do it using Maven CLI, for this open 2 terminals:</p>
+
+<ul>
+<li>one to produce messages</li>
+<li>one to consume them</li>
+</ul>
+
+
+<p><em>1- Clone and Build the project</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; git clone https://github.com/tgrall/redis-streams-101-java.git
+</span><span class='line'>
+</span><span class='line'>&gt; <span class="nb">cd </span>redis-streams-101-java
+</span><span class='line'>
+</span><span class='line'>&gt; mvn clean verify
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>2- Post a new message</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; mvn <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span><span class="s2">&quot;com.kanibl.redis.streams.simple.RedisStreams101Producer&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>3- Consume messages</em></p>
+
+<p>Open a new terminal and run the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; mvn <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span><span class="s2">&quot;com.kanibl.redis.streams.simple.RedisStreams101Consumer&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The consumer will start and consume the message you just posted, and wait for any new messages.</p>
+
+<p><em>4- In the first terminal post 100 new messages</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; mvn <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span><span class="s2">&quot;com.kanibl.redis.streams.simple.RedisStreams101Producer&quot;</span> -Dexec.args<span class="o">=</span><span class="s2">&quot;100&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The consumer will receive and print all the messages.</p>
+
+<p><em>5- Kill the consumer and post more messages</em></p>
+
+<p>Let&rsquo;s now do another test, stop the consumer using a simple <code>ctrl+C</code>.</p>
+
+<p>Then post 5 new messages.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; mvn <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span><span class="s2">&quot;com.kanibl.redis.streams.simple.RedisStreams101Producer&quot;</span> -Dexec.args<span class="o">=</span><span class="s2">&quot;5&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The messages are not yet consumed by any application, but still store in Redis Streams.</p>
+
+<p>So when you start the consumer, it will consumes these new messages.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; mvn <span class="nb">exec</span>:java -Dexec.mainClass<span class="o">=</span><span class="s2">&quot;com.kanibl.redis.streams.simple.RedisStreams101Consumer&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a one of the differences between <a href="https://redis.io/topics/streams-intro">Redis Streams</a> and <a href="https://redis.io/topics/pubsub">Redis PubSub</a>. The producer application has publish many messages while the consumer application was not running. Since the consumer is ran with <code>StreamOffset.lastConsumed()</code>, when the consumer is starting, it looks to the last consumed ID, and start to read the streams from there. This method generate a XGROUPREAD command with the group</p>
+
+<h3>Conclusion</h3>
+
+<p>In this small project, you have learned, how to use Lettuce, a Java client for Redis to:</p>
+
+<ul>
+<li>publish messages to a stream</li>
+<li>create a consumer group</li>
+<li>consume messages using the consumer group.</li>
+</ul>
+
+
+<p>This is a very basic example, and in a next post I will show you how to work with multiple consumers, and to configure the Consumer Group and Consumers to control which messages you want to read</p>
+
+<p>More to come!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2019-09-02T09:24:24+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2019</span></span> <span class='time'>9:24 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/java/'>java</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>, <a class='category' href='/blog/categories/redis/'>redis</a>, <a class='category' href='/blog/categories/stream/'>stream</a>, <a class='category' href='/blog/categories/streaming/'>streaming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/" title="Previous Post: Getting Started With MapR-DB JSON REST API">&laquo; Getting Started With MapR-DB JSON REST API</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting With Redis Streams &amp; Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java/';
+        var disqus_url = 'http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

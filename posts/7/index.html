@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="I am writing this post as an answer to Christian Faure&rsquo;s blog post, (in French), about interest of enterprise portals. Let me take each point, &hellip;">
+  <meta name="description" content="When deploying your Web Service client you often need to change the endpoint of the service that &nbsp;has been set during the code generation. This &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,113 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/">JAX-WS: How to Configure the Service End Point at Runtime?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2009-02-17T19:52:56+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>7:52 pm</span></time>
+        
+           | <a href="/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When deploying your Web Service client you often need to change the endpoint of the service that &nbsp;has been set during the code generation. This short post explains how you can set change it at runtime in the client code.</p>
+
+<p>You have two approaches to do that:</p>
+
+<ul>
+<li>set the endpoint in the <code>Port</code> using the <code>BindingProvider</code></li>
+<li>get the endpoint <code>URL</code> from the WSDL itself at runtime</li>
+</ul>
+
+
+<h3>Use the Binding Provider to set the endpoint URL</h3>
+
+<p>The first approach is to change the
+BindingProvider.ENDPOINT_ADDRESS_PROPERTY property value of the
+BindingProvider (Port) using the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">EmployeeServiceService</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">EmployeeServiceService</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">EmployeeService</span> <span class="n">port</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getEmployeeServicePort</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">BindingProvider</span> <span class="n">bp</span> <span class="o">=</span> <span class="o">(</span><span class="n">BindingProvider</span><span class="o">)</span><span class="n">port</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">bp</span><span class="o">.</span><span class="na">getRequestContext</span><span class="o">().</span><span class="na">put</span><span class="o">(</span><span class="n">BindingProvider</span><span class="o">.</span><span class="na">ENDPOINT_ADDRESS_PROPERTY</span><span class="o">,</span> <span class="s">&quot;http://server1.grallandco.com:8282/HumanRessources/EmployeeServiceService&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">Employee</span> <span class="n">emp</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="na">getEmployee</span><span class="o">(</span><span class="mi">123</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Result = &quot;</span><span class="o">+</span> <span class="n">emp</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{...}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Use the WSDL to get the endpoint URL</h3>
+
+<p>Another part is to set the WSDL when you are creating the Service. The
+service will be using the value that is located in the WSDL port -SOAP
+Endpoint-. This is simply done using the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">EmployeeServiceService</span> <span class="n">service</span> <span class="o">=</span>
+</span><span class='line'>  <span class="k">new</span> <span class="n">org</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">EmployeeServiceService</span>
+</span><span class='line'>  <span class="o">(</span><span class="k">new</span> <span class="nf">URL</span><span class="o">(</span><span class="s">&quot;http://server1.grallandco.com:8282/HumanRessources/EmployeeServiceService?wsdl&quot;</span><span class="o">),</span>
+</span><span class='line'>  <span class="k">new</span> <span class="nf">QName</span><span class="o">(</span><span class="s">&quot;http://service.demo.org/&quot;</span><span class="o">,</span><span class="s">&quot;EmployeeServiceService&quot;</span><span class="o">));</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">EmployeeService</span> <span class="n">port</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getEmployeeServicePort</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">Employee</span> <span class="n">emp</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="na">getEmployee</span><span class="o">(</span><span class="mi">123</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Result = &quot;</span><span class="o">+</span> <span class="n">emp</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span> <span class="o">...</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that, in Glassfish, like lot of Web Service environments the WSDL can generate dynamically the Endpoint URL based on the URL used
+    &nbsp;to get the WSDL. With this approach you can also dynamically
+    change the Soap endpoint. (If compatible with the network configuration
+      of the production environment.)</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -591,47 +698,6 @@ Like many of you I am following <a href="http://www.techcrunch.com/">TechCrunch<
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/05/21/what-is-twitter-it-is-a-simple-tool-to-turn-off-lights/">What Is Twitter? It Is a Simple Tool to Turn Off Lights</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2008-05-21T12:50:15+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2008</span></span> <span class='time'>12:50 pm</span></time>
-        
-           | <a href="/blog/2008/05/21/what-is-twitter-it-is-a-simple-tool-to-turn-off-lights/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2008/05/21/what-is-twitter-it-is-a-simple-tool-to-turn-off-lights/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Lately, I have been presenting Web 2.0 tools to my coworkers, and explaining how it could be used to improve the way we do &ldquo;things&rdquo; (especially business). Here a list of some of the tools I am talking about blogs, wikis, second life, social networking/bookmarking/tagging/rating,, facebook, friendfeed, youtube, seesmic, feeddo, flock and many others depending of the questions and the mood of the moment&hellip;</p>
-
-<p>One of the tool that I love to present is Twitter&hellip; and now I have an good example of why we all need to be on Twitter ;)</p>
-
-<object height="225" width="400">   <param name="allowfullscreen" value="true"> <param name="allowscriptaccess" value="always"> <param name="movie" value="http://www.vimeo.com/moogaloop.swf?clip_id=1025711&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1"> <embed src="http://www.vimeo.com/moogaloop.swf?clip_id=1025711&amp;server=www.vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" height="225" width="400"></object>
-
-
-<p><a href="http://www.vimeo.com/1025711?pg=embed&amp;amp;sec=1025711">Control Lights with Twitter</a> from <a href="http://www.vimeo.com/user284499?pg=embed&amp;amp;sec=1025711">Justin Wickett</a> on <a href="http://vimeo.com?pg=embed&amp;amp;sec=1025711">Vimeo</a>.</p>
-
-<p>Thanks to Justin from Twitter&hellip;</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/8">&larr; Older</a>
@@ -649,6 +715,10 @@ Like many of you I am following <a href="http://www.techcrunch.com/">TechCrunch<
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting With Redis Streams &amp; Java</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
@@ -662,10 +732,6 @@ Like many of you I am following <a href="http://www.techcrunch.com/">TechCrunch<
     
       <li class="post">
         <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
       </li>
     
   </ul>

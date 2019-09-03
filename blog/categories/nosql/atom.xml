@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nosql | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/nosql/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-08-30T17:16:20+02:00</updated>
+  <updated>2019-09-03T10:24:38+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -12,6 +12,302 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Getting With Redis Streams &amp; Java]]></title>
+    <link href="http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java/"/>
+    <updated>2019-09-02T09:24:24+02:00</updated>
+    <id>http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java</id>
+    <content type="html"><![CDATA[<p>As you may have seen, I have joined <a href="https://www.redislabs.com">Redis Labs</a> a month ago; one of the first task as a new hire is to learn more about Redis. So I learned, and I am still learning.</p>
+
+<p>This is when I discovered <a href="https://redis.io/topics/streams-intro">Redis Streams</a>. I am a big fan of streaming-based applications so it is natural that I start with a small blog post explaining how to use Redis Streams and Java.</p>
+
+<p><strong><em>What is Redis Streams?</em></strong></p>
+
+<p>Redis Streams is a Redis Data Type, that represents a log so you can add new information/message in an append-only mode <em>(this is not 100% accurate since you can remove messages from the log)</em>. Using Redis Streams you can build &ldquo;Kafka Like&rdquo; applications, what I mean by that you can:</p>
+
+<ul>
+<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redi Pub/Sub)</li>
+<li>consume messages that are published even when your client application (consumer) is not running. This is a big difference with Redis Pub/Sub</li>
+<li>consume messages starting a specific offset, for example, read the whole history, or only new messages</li>
+</ul>
+
+
+<p>In addition to this, Redis Streams has the concept of <strong>Consumer Groups</strong>. Redis Streams Consumer Groups, like Apache Kafka ones, allows the client applications to consume messages in a distributed fashion (multiple clients), providing an easy way to scale and create highly available systems.</p>
+
+<p>{%img center /images/posts/getting-with-redis-streams-and-java/redis-streams-101-img-1.png %}</p>
+
+<p>Enroll in the <a href="https://university.redislabs.com/courses/course-v1:redislabs+RU202+2019_03/about">Redis University: Redis Streams</a> to learn more and get certified.</p>
+
+<p><strong><em>Sample Application</em></strong></p>
+
+<p>The <a href="https://github.com/tgrall/redis-streams-101-java">redis-streams-101-java GitHub Repository</a> contains sample code that shows how to</p>
+
+<ul>
+<li>post messages to a streams</li>
+<li>consume messages using a consumer group</li>
+</ul>
+
+
+<!--more -->
+
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li>Redis 5.x, you have here multiple options:
+
+<ul>
+<li><a href="https://redis.io">Download</a> and install Redis Community</li>
+<li>Install and Run a Docker image: <a href="https://hub.docker.com/_/redis">Community</a> or <a href="https://hub.docker.com/r/redislabs/redis">Redis Enterprise</a></li>
+<li>Create a online instance on <a href="https://redislabs.com/redis-enterprise/essentials/">Redis Labs Cloud</a> (30mb for free)</li>
+</ul>
+</li>
+<li>Java 8 or later</li>
+<li>Apache Maven 3.5.x</li>
+<li>Git</li>
+</ul>
+
+
+<h3>Java &amp; Redis Streams</h3>
+
+<p>Redis has many Java clients developed by the community, as you can see on the <a href="https://redis.io/clients#java">Redis.io site</a>.</p>
+
+<p>It looks, based on my short experience with Redis so far, that the most complete one around Redis Streams support is <a href="https://lettuce.io">Lettuce</a>, this is the one I will be using in the following code.</p>
+
+<h4>1- Adding Lettuce to Your Maven Project</h4>
+
+<p>Add the following dependency to your project file:</p>
+
+<pre><code class="xml">        &lt;dependency&gt;
+            &lt;groupId&gt;io.lettuce&lt;/groupId&gt;
+            &lt;artifactId&gt;lettuce-core&lt;/artifactId&gt;
+            &lt;version&gt;5.1.8.RELEASE&lt;/version&gt;
+        &lt;/dependency&gt;
+</code></pre>
+
+<h4>2- Connecting to Redis</h4>
+
+<p>Import the following classes</p>
+
+<pre><code class="java">import io.lettuce.core.*;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
+</code></pre>
+
+<p>Then connect with:</p>
+
+<pre><code class="java">RedisClient redisClient = RedisClient.create("redis://password@host:port"); // change to reflect your environment
+StatefulRedisConnection&lt;String, String&gt; connection = redisClient.connect();
+RedisCommands&lt;String, String&gt; syncCommands = connection.sync();
+</code></pre>
+
+<p>When your application is done with the connection you should disconnect with the following code:</p>
+
+<pre><code class="java">connection.close();
+redisClient.shutdown();
+</code></pre>
+
+<h4>3- Sending Message to Streams</h4>
+
+<p>Once you have a connection you can send a message. In this example, I will let Redis generate the message ID, which is time-based, and the body will be built using a Map representing IoT data, for example, a weather data capturing Wind speed and direction in real-time.</p>
+
+<pre><code class="java">    public static void main(String[] args) {
+
+        RedisClient redisClient = RedisClient.create("redis://localhost:6379"); // change to reflect your environment
+        StatefulRedisConnection&lt;String, String&gt; connection = redisClient.connect();
+        RedisCommands&lt;String, String&gt; syncCommands = connection.sync();
+
+        Map&lt;String, String&gt; messageBody = new HashMap&lt;&gt;();
+        messageBody.put( "speed", "15" );
+        messageBody.put( "direction", "270" );
+        messageBody.put( "sensor_ts", String.valueOf(System.currentTimeMillis()) );
+
+        String messageId = syncCommands.xadd(
+                "weather_sensor:wind",
+                messageBody);
+
+        System.out.println( String.format("Message %s : %s posted", messageId, messageBody) );
+
+        connection.close();
+        redisClient.shutdown();
+
+    }
+</code></pre>
+
+<p>Let me explain the code:</p>
+
+<ul>
+<li>Lines 3-5 are used to connect to Redis</li>
+<li>Lines 7-10 are used to create the message body, using a Map, since Redis Streams messages are string key/values.</li>
+<li>Lines 12-14 call the <code>syncCommands.xadd()</code> method using the streams key &ldquo;weather_sensor:wind&rdquo; and the message body itself
+
+<ul>
+<li>this method returns the message ID.</li>
+</ul>
+</li>
+<li>line 16 just print the message ID and content</li>
+<li>the lines 18-19 close the connection and client.</li>
+</ul>
+
+
+<p>The complete producer code is available <a href="https://github.com/tgrall/redis-streams-101-java/blob/master/src/main/java/com/kanibl/redis/streams/simple/RedisStreams101Producer.java">here</a>.</p>
+
+<h4>4- Consuming Messages</h4>
+
+<p>Redis Streams offers various way to consume/read messages using the commands: <a href="https://redis.io/commands/xrange">XRANGE</a>, <a href="https://redis.io/commands/xrevrange">XREVRANGE</a>, <a href="https://redis.io/commands/xread">XREAD</a>, <a href="https://redis.io/commands/xreadgroup">XREADGROUP</a>.</p>
+
+<p>I want to keep the article short and close to the way you would build an application with Apache Kafka, this is why I will use the <a href="https://redis.io/commands/xreadgroup">XREADGROUP</a> command from Lettuce.</p>
+
+<p>The Consumer Groups allow developers to create a group of clients that will cooperate to consume messages from the streams (for scale and high availability); it is also a way to associate the client to specific applications roles; for example:</p>
+
+<ul>
+<li>a consumer group called &ldquo;data warehouse&rdquo; will consume messages and send them to a data warehouse</li>
+<li>another consumer group called &ldquo;aggregator&rdquo; will consume the messages and aggregate the data and send them to another sink (another stream or storage)</li>
+</ul>
+
+
+<p>Each of this group will act independently, and each of this group could have multiple &ldquo;consumers&rdquo; (client).</p>
+
+<p>Let&rsquo;s see how you use this in Java.</p>
+
+<pre><code class="java">...
+
+        try {
+            // WARNING: Streams must exist before creating the group
+            //          This will not be necessary in Lettuce 5.2, see https://github.com/lettuce-io/lettuce-core/issues/898
+            syncCommands.xgroupCreate( XReadArgs.StreamOffset.from("weather_sensor:wind", "0-0"), "application_1"  );
+        }
+        catch (RedisBusyException redisBusyException) {
+            System.out.println( String.format("\t Group '%s already' exists","application_1"));
+        }
+
+
+        System.out.println("Waiting for new messages");
+
+        while(true) {
+
+            List&lt;StreamMessage&lt;String, String&gt;&gt; messages = syncCommands.xreadgroup(
+                    Consumer.from("application_1", "consumer_1"),
+                    XReadArgs.StreamOffset.lastConsumed("weather_sensor:wind")
+            );
+
+            if (!messages.isEmpty()) {
+                System.out.println( messages );
+            }
+
+
+        }
+
+...
+</code></pre>
+
+<p>This code is a subset of the <code>main()</code> method I have removed the connection management part, to add readability. Let&rsquo;s take a look to the code:</p>
+
+<ul>
+<li>line 3 to 10, using the method <code>xgroupCreate()</code>, that matches the <a href="https://redis.io/commands/xgroup">XGROUP CREATE</a> command,
+
+<ul>
+<li>is used to create a new group called <code>application_1</code>,</li>
+<li>consume messages from the stream <code>weather_sensor:wind</code></li>
+<li>starting at the first message in the stream, this is indicated using the message ID <code>0-0</code>. <em>Note that it is also possible to indicate to the group to start to read at a specific message ID, or only the new messages that arrive after the creating of the consumer group using <code>$</code> special ID (or the helper method <code>XReadArgs.StreamOffset.latest()</code></em>.</li>
+</ul>
+</li>
+<li>line 15 to 27, in this example we use an infinite loop (<code>while(true)</code>) to wait for any new messages published to the streams</li>
+<li>line 17 to 20, the method <code>xreadgroup()</code> returns the messages based on the group configuration
+
+<ul>
+<li>line 18 define the consumer named <code>consumer_1</code> that is associated with the group <code>application_1</code>: you can create new group do distribute the read to multiple clients</li>
+<li>line 19 indicates where to start, in this case, <code>StreamOffset.lastConsumed("weather_sensor:wind")</code> the consumer will consume messages that have not been read already. With the current configuration of the group (offset <code>0-0</code>), when the consumer will start for the first time, it will read all the existing messages.</li>
+<li>the <a href="https://redis.io/commands/xreadgroup">XREADGROUP</a> command by default sends an acknowledgment for each consumed message.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>The complete consumer code is available <a href="https://github.com/tgrall/redis-streams-101-java/blob/master/src/main/java/com/kanibl/redis/streams/simple/RedisStreams101Consumer.java">here</a>.</p>
+
+<h3>Build &amp; Run the Simple Java Application</h3>
+
+<p>Now that you have a better understanding of the code, let&rsquo;s run the producer and consumer. You can run this from your IDE, or using Maven.</p>
+
+<p>Let&rsquo;s do it using Maven CLI, for this open 2 terminals:</p>
+
+<ul>
+<li>one to produce messages</li>
+<li>one to consume them</li>
+</ul>
+
+
+<p><em>1- Clone and Build the project</em></p>
+
+<pre><code class="bash">&gt; git clone https://github.com/tgrall/redis-streams-101-java.git
+
+&gt; cd redis-streams-101-java
+
+&gt; mvn clean verify
+</code></pre>
+
+<p><em>2- Post a new message</em></p>
+
+<pre><code class="bash">
+&gt; mvn exec:java -Dexec.mainClass="com.kanibl.redis.streams.simple.RedisStreams101Producer"
+</code></pre>
+
+<p><em>3- Consume messages</em></p>
+
+<p>Open a new terminal and run the following command:</p>
+
+<pre><code class="bash">
+&gt; mvn exec:java -Dexec.mainClass="com.kanibl.redis.streams.simple.RedisStreams101Consumer"
+</code></pre>
+
+<p>The consumer will start and consume the message you just posted, and wait for any new messages.</p>
+
+<p><em>4- In the first terminal post 100 new messages</em></p>
+
+<pre><code class="bash">
+&gt; mvn exec:java -Dexec.mainClass="com.kanibl.redis.streams.simple.RedisStreams101Producer" -Dexec.args="100"
+</code></pre>
+
+<p>The consumer will receive and print all the messages.</p>
+
+<p><em>5- Kill the consumer and post more messages</em></p>
+
+<p>Let&rsquo;s now do another test, stop the consumer using a simple <code>ctrl+C</code>.</p>
+
+<p>Then post 5 new messages.</p>
+
+<pre><code class="bash">
+&gt; mvn exec:java -Dexec.mainClass="com.kanibl.redis.streams.simple.RedisStreams101Producer" -Dexec.args="5"
+</code></pre>
+
+<p>The messages are not yet consumed by any application, but still store in Redis Streams.</p>
+
+<p>So when you start the consumer, it will consumes these new messages.</p>
+
+<pre><code class="bash">
+&gt; mvn exec:java -Dexec.mainClass="com.kanibl.redis.streams.simple.RedisStreams101Consumer"
+</code></pre>
+
+<p>This is a one of the differences between <a href="https://redis.io/topics/streams-intro">Redis Streams</a> and <a href="https://redis.io/topics/pubsub">Redis PubSub</a>. The producer application has publish many messages while the consumer application was not running. Since the consumer is ran with <code>StreamOffset.lastConsumed()</code>, when the consumer is starting, it looks to the last consumed ID, and start to read the streams from there. This method generate a XGROUPREAD command with the group</p>
+
+<h3>Conclusion</h3>
+
+<p>In this small project, you have learned, how to use Lettuce, a Java client for Redis to:</p>
+
+<ul>
+<li>publish messages to a stream</li>
+<li>create a consumer group</li>
+<li>consume messages using the consumer group.</li>
+</ul>
+
+
+<p>This is a very basic example, and in a next post I will show you how to work with multiple consumers, and to configure the Consumer Group and Consumers to control which messages you want to read</p>
+
+<p>More to come!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Getting Started With MapR-DB JSON REST API]]></title>
@@ -925,291 +1221,6 @@ db.brewery.ensureIndex( { "loc" : "2dsphere" } );
 <p>As as said in the introduction, this week end project started as a joke on Twitter, and finished with a small blog post and Gitub repositories.</p>
 
 <p>My goal here is not to compare the two solutions -I made my choice few months back-  but simply show how you can move from one to the other with almost no effort, not only the data but also the application code.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Introduction to MongoDB Geospatial Feature]]></title>
-    <link href="http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature/"/>
-    <updated>2014-08-21T15:30:02+02:00</updated>
-    <id>http://tgrall.github.io/blog/2014/08/21/introduction-to-mongodb-geospatial-feature</id>
-    <content type="html"><![CDATA[<p>This post is a quick and simple introduction to Geospatial feature of MongoDB 2.6 using simple dataset and queries.</p>
-
-<h3>Storing Geospatial Informations</h3>
-
-<p>As you know you can store any type of data, but if you want to query them you need to use some coordinates, and create index on them. MongoDB supports three types of indexes for GeoSpatial queries:</p>
-
-<ul>
-<li><a href="http://docs.mongodb.org/manual/core/2d/">2d Index</a> : uses simple coordinate (longitude, latitude). As stated in the documentation: <em>The 2d index is intended for legacy coordinate pairs used in MongoDB 2.2 and earlier</em>. For this reason, I won&rsquo;t detail anything about this in this post. Just for the record 2d Index are used to query data stored as points on a two-dimensional plane</li>
-<li><a href="http://docs.mongodb.org/manual/core/2dsphere/">2d Sphere Index</a> : support queries of any geometries on an-earth-like sphere, the data can be stored as GeoJSON and legacy coordinate pairs (longitude, latitude). For the rest of the article I will use this type of index and focusing on GeoJSON.</li>
-<li><a href="http://docs.mongodb.org/manual/core/geohaystack/">Geo Haystack</a> : that are used to query on very small area. It is today less used by applications and I will not describe it in this post.
-So this article will focus now on the 2d Sphere index with GeoJSON format to store and query documents.</li>
-</ul>
-
-
-<p><em>So what is GeoJSON?</em></p>
-
-<p>You can look at the <a href="http://geojson.org/">http://geojson.org/</a> site, let&rsquo;s do a very short explanation. GeoJSON is a format for encoding, in JSON, a variety of geographic data structures, and support the following types:  Point , LineString , Polygon , MultiPoint , MultiLineString , MultiPolygon and Geometry.</p>
-
-<p>The GeoJSON format  is quite straightforward based, for the simple geometries, on two attributes: type and coordinates. Let&rsquo;s take some examples:</p>
-
-<p>The city where I spend all my childhood, Pleneuf Val-André, France, has the following coordinates (from Wikipedia)</p>
-
-<p><code>48° 35′ 30.12″ N, 2° 32′ 48.84″ W</code></p>
-
-<p>This notation is a point, based on a latitude &amp; longitude using the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Degrees, Minutes, Seconds) system. Not very easy to use by application/code, this is why it is also possible to represent the exact same point using the following values for latitude &amp; longitude:</p>
-
-<p><code>48.5917, -2.5469</code></p>
-
-<p>This one uses the <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a> (Decimal Degrees) system. This is the coordinates you see use in most of the application/API you are using as developer (eg: Google Maps/Earth for example)</p>
-
-<p>By default GeoJSON, and MongoDB use these values but <strong>the coordinates must be stored in the longitude, latitude order</strong>, so this point in GeoJSON will look like:</p>
-
-<pre><code class="json">{
-  "type": "Point",
-  "coordinates": [
-  -2.5469,  
-  48.5917
-  ]
-}
-</code></pre>
-
-<p>{% img <a href="http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png">http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png</a> %}</p>
-
-<p>This is a simple &ldquo;Point&rdquo;, let&rsquo;s now for example look at a line, a very nice walk on the beach :</p>
-
-<pre><code class="json">{
-  "type": "LineString",
-  "coordinates": [
-    [-2.551082,48.5955632],
-    [-2.551229,48.594312],
-    [-2.551550,48.593312],
-    [-2.552400,48.592312],
-    [-2.553677, 48.590898]
-  ]
-  }
-</code></pre>
-
-<p>{% img <a href="http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png">http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png</a> %}</p>
-
-<p>So using the same approach you will be able to create MultiPoint, MultiLineString, Polygon, MultiPolygon. It is also possible to mix all these in a single document using a GeometryCollection. The following example is a Geometry Collection of MultiLineString and Polygon over Central Park:</p>
-
-<pre><code class="json">{
-  "type" : "GeometryCollection",
-  "geometries" : [
-    {
-      "type" : "Polygon",
-      "coordinates" : [
-[
-  [ -73.9580, 40.8003 ],
-  [ -73.9498, 40.7968 ],
-  [ -73.9737, 40.7648 ],
-  [ -73.9814, 40.7681 ],
-  [ -73.9580, 40.8003  ]
-]
-      ]
-    },
-    {
-      "type" : "MultiLineString",
-      "coordinates" : [
-[ [ -73.96943, 40.78519 ], [ -73.96082, 40.78095 ] ],
-[ [ -73.96415, 40.79229 ], [ -73.95544, 40.78854 ] ],
-[ [ -73.97162, 40.78205 ], [ -73.96374, 40.77715 ] ],
-[ [ -73.97880, 40.77247 ], [ -73.97036, 40.76811 ] ]
-      ]
-    }
-  ]
-}
-</code></pre>
-
-<p>{% img <a href="http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png">http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png</a> %}</p>
-
-<p>Note: You can if you want test/visualize these JSON documents using the <a href="http://geojsonlint.com/">http://geojsonlint.com/</a> service.</p>
-
-<h5>Now what? Let&rsquo;s store data!</h5>
-
-<p>Once you have a GeoJSON document you just need to store it into your document. For example if you want to store a document about JFK Airport with its location you can run the following command:</p>
-
-<pre><code class="js">db.airports.insert(
-{
-  "name" : "John F Kennedy Intl",
-  "type" : "International",
-  "code" : "JFK",
-  "loc" : {
-    "type" : "Point",
-    "coordinates" : [ -73.778889, 40.639722 ]
-  }
-}
-</code></pre>
-
-<p>Yes this is that simple! You just save the GeoJSON as one of the attribute of the document, <code>loc</code> in this example)</p>
-
-<h3>Querying Geospatial Informations</h3>
-
-<p>Now that we have the data stored in MongoDB, it is now possible to use the geospatial information to do some interesting queries.</p>
-
-<p>For this we need a sample dataset. I have created one using some open data found in various places. This dataset contains the following informations:</p>
-
-<ul>
-<li>airports collection with the list of US airport (Point)</li>
-<li>states collection with the list of US states (MultiPolygon)</li>
-</ul>
-
-
-<p>I have created this dataset from various OpenData sources ( <a href="http://geocommons.com/">http://geocommons.com/</a> , <a href="http://catalog.data.gov/dataset">http://catalog.data.gov/dataset</a> ) and use <a href="https://github.com/mapbox/togeojson">toGeoJSON</a> to convert them into the proper format.</p>
-
-<p>Let&rsquo;s install the dataset:</p>
-
-<ol>
-<li>Download it from <a href="https://www.dropbox.com/s/yui7shcud2xbxt7/geo.zip">here</a></li>
-<li>Unzip geo.zip file</li>
-<li>Restore the data into your mongoDB instance, using the following command</li>
-</ol>
-
-
-<pre><code>mongorestore geo.zip
-</code></pre>
-
-<p>MongoDB allows applications to do the following types of query on geospatial data:</p>
-
-<ul>
-<li>inclusion</li>
-<li>intersection</li>
-<li>proximity</li>
-</ul>
-
-
-<p>Obviously, you will be able to use all the other operator in addition to the geospatial ones. Let&rsquo;s now look at some concrete examples.</p>
-
-<h4>Inclusion</h4>
-
-<p>Find all the airports in California. For this you need to get the California location (Polygon) and use the command $geoWithin in the query. From the shell it will look like :</p>
-
-<pre><code class="js">use geo
-var cal = db.states.findOne(  {code : "CA"}  );
-
-db.airports.find(
-{
-  loc : { $geoWithin : { $geometry : cal.loc } }
-},
-{ name : 1 , type : 1, code : 1, _id: 0 }
-);
-</code></pre>
-
-<p>Result:</p>
-
-<pre><code class="json">{ "name" : "Modesto City - County", "type" : "", "code" : "MOD" }
-...
-{ "name" : "San Francisco Intl", "type" : "International", "code" : "SFO" }
-{ "name" : "San Jose International", "type" : "International", "code" : "SJC" }
-...
-</code></pre>
-
-<p>So the query is using the &ldquo;California MultiPolygon&rdquo; and looks in the airports collection to find all the airports that are in these polygons. This looks like the following image on a map:</p>
-
-<p>{% img <a href="http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png">http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png</a> %}</p>
-
-<p>You can use any other query features or criteria, for example you can limit the query to international airport only sorted by name :</p>
-
-<pre><code class="js">db.airports.find(
-{
-  loc : { $geoWithin : { $geometry : cal.loc } },
-  type : "International"
-},
-{ name : 1 , type : 1, code : 1, _id: 0 }
-).sort({ name : 1 });
-</code></pre>
-
-<p>Result:</p>
-
-<pre><code class="json">{ "name" : "Los Angeles Intl", "type" : "International", "code" : "LAX" }
-{ "name" : "Metropolitan Oakland Intl", "type" : "International", "code" : "OAK" }
-{ "name" : "Ontario Intl", "type" : "International", "code" : "ONT" }
-{ "name" : "San Diego Intl", "type" : "International", "code" : "SAN" }
-{ "name" : "San Francisco Intl", "type" : "International", "code" : "SFO" }
-{ "name" : "San Jose International", "type" : "International", "code" : "SJC" }
-{ "name" : "Southern California International", "type" : "International", "code" : "VCV" }
-</code></pre>
-
-<p>I do not know if you have looked in detail, but we are querying these documents with no index. You can run a query with the <code>explain()</code> to see what&rsquo;s going on. The <code>$geoWithin</code> operator does not need index but your queries will be more efficient with one so let&rsquo;s create the index:</p>
-
-<pre><code class="js">db.airports.ensureIndex( { "loc" : "2dsphere" } );
-</code></pre>
-
-<p>Run the explain and you will se the difference.</p>
-
-<h4>Intersection</h4>
-
-<p>Suppose you want to know what are all the adjacent states to California, for this we just need to search for all the states that have coordinates that &ldquo;intersects&rdquo; with California. This is done with the following query:</p>
-
-<pre><code class="js">var cal = db.states.findOne(  {code : "CA"}  );
-db.states.find(
-{
-  loc : { $geoIntersects : { $geometry : cal.loc  }  } ,
-  code : { $ne : "CA"  }  
-},
-{ name : 1, code : 1 , _id : 0 }
-);
-</code></pre>
-
-<p>Result:</p>
-
-<pre><code class="json">{ "name" : "Oregon", "code" : "OR" }
-{ "name" : "Nevada", "code" : "NV" }
-{ "name" : "Arizona", "code" : "AZ" }
-</code></pre>
-
-<p>{% img <a href="http://3.bp.blogspot.com/--Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png">http://3.bp.blogspot.com/&#8211;Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png</a> %}</p>
-
-<p>Same as before <code>$geoIntersect</code> operator does not need an index to work, but it will be more efficient with the following index:</p>
-
-<pre><code class="js">db.states.ensureIndex( { loc : "2dsphere" } );
-</code></pre>
-
-<h4>Proximity</h4>
-
-<p>The last feature that I want to highlight in this post is related to query with proximity criteria. Let&rsquo;s find all the international airports that are located at less than 20km from the reservoir in NYC Central Park. For this you will be using the <code>$near</code> operator.</p>
-
-<pre><code class="js">db.airports.find(
-{
-  loc : {
-    $near : {
-      $geometry : {
-        type : "Point" ,
-        coordinates : [-73.965355,40.782865]  
-      },
-      $maxDistance : 20000
-    }
-  },
-  type : "International"
-},
-{
-  name : 1,
-  code : 1,
-  _id : 0
-}
-);
-</code></pre>
-
-<p>Results:</p>
-
-<pre><code class="json">{ "name" : "La Guardia", "code" : "LGA" }
-{ "name" : "Newark Intl", "code" : "EWR"}
-</code></pre>
-
-<p>So this query returns 2 airports, the closest being La Guardia, since the <code>$near</code> operator sorts the results by distance. Also it is important to raise here that the <code>$near</code> operator requires an index.</p>
-
-<h3>Conclusion</h3>
-
-<p>In this first post about geospatial feature you have learned:</p>
-
-<ul>
-<li>the basic of GeoJSON</li>
-<li>how to query documents with inclusion, intersection and proximity criteria.</li>
-</ul>
-
-
-<p>You can now play more with this for example integrate this into an application that expose data into some UI, or see how you can use the geospatial operators into a aggregation pipeline.</p>
 ]]></content>
   </entry>
   

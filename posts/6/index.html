@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Today I was working with a partner in Paris and he wanted to know how to calculate the size of a specific folder in the eXo Java Content Repository ( &hellip;">
+  <meta name="description" content="Yesterday, eXo has launched a new cloud based service: the eXo Cloud IDE. This IDE is an online service that facilitates the development of gadgets &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,60 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/03/16/exo-cloud-ide-develop-for-the-cloud-on-the-cloud/">eXo Cloud IDE : Develop for the Cloud on the Cloud</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-03-16T12:55:44+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:55 pm</span></time>
+        
+           | <a href="/blog/2011/03/16/exo-cloud-ide-develop-for-the-cloud-on-the-cloud/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2011/03/16/exo-cloud-ide-develop-for-the-cloud-on-the-cloud/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://1.bp.blogspot.com/-IgPlseainto/TYBq0-Sr6nI/AAAAAAAAAOw/YL3TECcXJts/s400/logoexoplatform.png"></p>
+
+<p>Yesterday, eXo has launched a new cloud based service: the <a href="http://www.cloud-ide.com/">eXo Cloud IDE</a>. This IDE is an online service that facilitates the development of gadgets and mashups that could be deployed directly to a PaaS.</p>
+
+<p>Before launching this service on the Cloud we, eXo team and customers, have used the IDE embedded in the <a href="http://www.exoplatform.com/company/en/platform/exo-platform-35">eXo Platform</a> to extend our intranet and customer deployments (some of the modules that we have developed live on our intranet are available as plugins on the <a href="http://www.exoplatform.com/company/en/Content-types/Plugins">eXo Resource Center</a>).</p>
+
+<p>This IDE is the last mile between the users and the developers. It provides a way to add new services asked by business users at a lower cost with a good time to market. And all this based on standards that corporate and Web developers like : REST Services using <a href="http://jcp.org/en/jsr/detail?id=311">JAX-RS</a> and UI based on <a href="http://www.opensocial.org/">OpenSocial</a> gadgets in which you can leverage all the cool and powerful features of HTML5.</p>
+
+<p>What eXo has launched yesterday is a big step for developers since you can now develop, test and deploy your gadgets and services online, and this in your &ldquo;personal environment&rdquo; using eXo Cloud IDE supports multi-tenancy. I won&rsquo;t go in all the features of the IDE since you can test it yourself by joining the <a href="http://cloud-ide.com/">beta program</a> and look at this video:</p>
+
+<iframe src="http://player.vimeo.com/video/20815141?portrait=0"  width="550" height="265" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe>
+
+
+<p>eXo Cloud IDE resources:</p>
+
+<ul>
+<li>Overview of <a href="http://www.exoplatform.com/company/en/platform/exo-platform-35">eXo Platform 3.5</a></li>
+<li>Overview of <a href="http://cloud-ide.com/">eXo Cloud IDE</a>, including how-to videos and sample applications</li>
+<li>Join the <a href="http://cloud-ide.com/">eXo Cloud IDE private beta</a></li>
+<li>Benjamin Mestrallet’s <a href="http://blog.exoplatform.org/2011/03/15/history-of-exo-cloud-ide/">blog post</a> about eXo Cloud IDE</li>
+<li><a href="http://www.exoplatform.com/exo-platform-3-trial/eXoPlatform-3.zip">Evaluation download</a> of eXo Platform 3.0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -627,113 +681,6 @@ So using the JCR API you just need to get the content length using the following
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/">JAX-WS: How to Configure the Service End Point at Runtime?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2009-02-17T19:52:56+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>7:52 pm</span></time>
-        
-           | <a href="/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2009/02/17/jax-ws-how-to-configure-the-service-end-point-at-runtime/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>When deploying your Web Service client you often need to change the endpoint of the service that &nbsp;has been set during the code generation. This short post explains how you can set change it at runtime in the client code.</p>
-
-<p>You have two approaches to do that:</p>
-
-<ul>
-<li>set the endpoint in the <code>Port</code> using the <code>BindingProvider</code></li>
-<li>get the endpoint <code>URL</code> from the WSDL itself at runtime</li>
-</ul>
-
-
-<h3>Use the Binding Provider to set the endpoint URL</h3>
-
-<p>The first approach is to change the
-BindingProvider.ENDPOINT_ADDRESS_PROPERTY property value of the
-BindingProvider (Port) using the following code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">EmployeeServiceService</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">EmployeeServiceService</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">EmployeeService</span> <span class="n">port</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getEmployeeServicePort</span><span class="o">();</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">BindingProvider</span> <span class="n">bp</span> <span class="o">=</span> <span class="o">(</span><span class="n">BindingProvider</span><span class="o">)</span><span class="n">port</span><span class="o">;</span>
-</span><span class='line'>  <span class="n">bp</span><span class="o">.</span><span class="na">getRequestContext</span><span class="o">().</span><span class="na">put</span><span class="o">(</span><span class="n">BindingProvider</span><span class="o">.</span><span class="na">ENDPOINT_ADDRESS_PROPERTY</span><span class="o">,</span> <span class="s">&quot;http://server1.grallandco.com:8282/HumanRessources/EmployeeServiceService&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">Employee</span> <span class="n">emp</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="na">getEmployee</span><span class="o">(</span><span class="mi">123</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Result = &quot;</span><span class="o">+</span> <span class="n">emp</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{...}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Use the WSDL to get the endpoint URL</h3>
-
-<p>Another part is to set the WSDL when you are creating the Service. The
-service will be using the value that is located in the WSDL port -SOAP
-Endpoint-. This is simply done using the following code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">try</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">EmployeeServiceService</span> <span class="n">service</span> <span class="o">=</span>
-</span><span class='line'>  <span class="k">new</span> <span class="n">org</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">service</span><span class="o">.</span><span class="na">EmployeeServiceService</span>
-</span><span class='line'>  <span class="o">(</span><span class="k">new</span> <span class="nf">URL</span><span class="o">(</span><span class="s">&quot;http://server1.grallandco.com:8282/HumanRessources/EmployeeServiceService?wsdl&quot;</span><span class="o">),</span>
-</span><span class='line'>  <span class="k">new</span> <span class="nf">QName</span><span class="o">(</span><span class="s">&quot;http://service.demo.org/&quot;</span><span class="o">,</span><span class="s">&quot;EmployeeServiceService&quot;</span><span class="o">));</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">EmployeeService</span> <span class="n">port</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getEmployeeServicePort</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">Employee</span> <span class="n">emp</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="na">getEmployee</span><span class="o">(</span><span class="mi">123</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Result = &quot;</span><span class="o">+</span> <span class="n">emp</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span> <span class="o">...</span> <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Note that, in Glassfish, like lot of Web Service environments the WSDL can generate dynamically the Endpoint URL based on the URL used
-    &nbsp;to get the WSDL. With this approach you can also dynamically
-    change the Soap endpoint. (If compatible with the network configuration
-      of the production environment.)</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/7">&larr; Older</a>
@@ -751,6 +698,10 @@ Endpoint-. This is simply done using the following code:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting With Redis Streams &amp; Java</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
@@ -764,10 +715,6 @@ Endpoint-. This is simply done using the following code:</p>
     
       <li class="post">
         <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/10/17/getting-started-with-apache-flink-and-mapr-streams/">Getting Started With Apache Flink and Mapr Streams</a>
       </li>
     
   </ul>

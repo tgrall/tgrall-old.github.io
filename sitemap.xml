@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://tgrall.github.io/blog/2019/09/02/getting-with-redis-streams-and-java/</loc>
+<lastmod>2019-09-02T09:24:24+02:00</lastmod>
+</url>
+<url>
 <loc>http://tgrall.github.io/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/</loc>
 <lastmod>2018-04-23T14:37:51+02:00</lastmod>
 </url>
@@ -1273,5 +1277,11 @@
 </url>
 <url>
 <loc>http://tgrall.github.io/blog/categories/api/</loc>
+</url>
+<url>
+<loc>http://tgrall.github.io/blog/categories/redis/</loc>
+</url>
+<url>
+<loc>http://tgrall.github.io/blog/categories/stream/</loc>
 </url>
 </urlset>
