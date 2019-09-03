@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Getting with Redis Streams &amp; Java"
+title: "Getting Started with Redis Streams &amp; Java"
 date: 2019-09-02 09:24:24 +0200
 comments: true
 categories: redis nosql stream streaming java
