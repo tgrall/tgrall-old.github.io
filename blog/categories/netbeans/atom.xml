@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Netbeans | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/netbeans/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -27,7 +27,7 @@
 </ul>
 
 
-<p>{% img <a href="http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png">http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png</a> %}</p>
+<p><img class="<a" src="href="http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png">http://2.bp.blogspot.com/_aoQgQ1obiyE/RehrkeHe9xI/AAAAAAAAAAw/0DruPeS4ijQ/s1600-h/nb-002.png</a>&#8221;></p>
 
 <p>You can follow the development of this plugin directly in the <a href="http://wiki.netbeans.org/wiki/view/OC4JSupport">Netbeans Wiki OC4J Support</a> page.</p>
 ]]></content>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Json | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/json/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -411,7 +411,7 @@ So this article will focus now on the 2d Sphere index with GeoJSON format to sto
 }
 </code></pre>
 
-<p>{% img <a href="http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png">http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png</a> %}</p>
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png">http://2.bp.blogspot.com/-0GfvAvSgLM8/U_NwAR_BCpI/AAAAAAAAArI/INweKtutfDQ/s1600/01-geojson-point.png</a>&#8221;></p>
 
 <p>This is a simple &ldquo;Point&rdquo;, let&rsquo;s now for example look at a line, a very nice walk on the beach :</p>
 
@@ -427,7 +427,7 @@ So this article will focus now on the 2d Sphere index with GeoJSON format to sto
   }
 </code></pre>
 
-<p>{% img <a href="http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png">http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png</a> %}</p>
+<p><img class="<a" src="href="http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png">http://1.bp.blogspot.com/-dg_myaJAG-c/U_Nv80jrncI/AAAAAAAAArA/utmCcBlQeqY/s1600/02-geojson-linestring.png</a>&#8221;></p>
 
 <p>So using the same approach you will be able to create MultiPoint, MultiLineString, Polygon, MultiPolygon. It is also possible to mix all these in a single document using a GeometryCollection. The following example is a Geometry Collection of MultiLineString and Polygon over Central Park:</p>
 
@@ -459,7 +459,7 @@ So this article will focus now on the 2d Sphere index with GeoJSON format to sto
 }
 </code></pre>
 
-<p>{% img <a href="http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png">http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png</a> %}</p>
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png">http://3.bp.blogspot.com/-tIxoUIeSMWw/U_SUsEJ_EDI/AAAAAAAAArY/2qelBrB1xRY/s1600/03-gejson-collection.png</a>&#8221;></p>
 
 <p>Note: You can if you want test/visualize these JSON documents using the <a href="http://geojsonlint.com/">http://geojsonlint.com/</a> service.</p>
 
@@ -544,7 +544,7 @@ db.airports.find(
 
 <p>So the query is using the &ldquo;California MultiPolygon&rdquo; and looks in the airports collection to find all the airports that are in these polygons. This looks like the following image on a map:</p>
 
-<p>{% img <a href="http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png">http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png</a> %}</p>
+<p><img class="<a" src="href="http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png">http://1.bp.blogspot.com/-AO6C6fgsrYQ/U_Wyr2RHPWI/AAAAAAAAAro/hVn6YFJQtNI/s1600/04-geojson-cal-airport.png</a>&#8221;></p>
 
 <p>You can use any other query features or criteria, for example you can limit the query to international airport only sorted by name :</p>
 
@@ -596,7 +596,7 @@ db.states.find(
 { "name" : "Arizona", "code" : "AZ" }
 </code></pre>
 
-<p>{% img <a href="http://3.bp.blogspot.com/--Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png">http://3.bp.blogspot.com/&#8211;Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png</a> %}</p>
+<p><img class="<a" src="href="http://3.bp.blogspot.com/--Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png">http://3.bp.blogspot.com/&#8211;Kh1AzmsaSU/U_XreY-tRlI/AAAAAAAAAr4/cS1pgjgF2Pc/s1600/05-geojson-intersect.png</a>&#8221;></p>
 
 <p>Same as before <code>$geoIntersect</code> operator does not need an index to work, but it will be more efficient with the following index:</p>
 
@@ -714,7 +714,33 @@ Page x : <code>?limit=5&amp;amp;skip(limit*(page-1))</code></p>
 
 <p>Some code sample in python that paginate using this view :</p>
 
-<p>{% gist 6174762 %}</p>
+<p><div><script src='https://gist.github.com/6174762.js'></script>
+<noscript><pre><code>from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+  hasRow = False
+	skip = 0 if page == 0 else 1
+	page = page + 1
+	print &quot;-- Page %s --&quot; % (page)
+	rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+	for row in rows:
+		hasRow = True
+		print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+		currentStartkey = row.key
+		startDocId = row.docid
+	print &quot; -- -- -- -- \n&quot;
+
+
+
+</code></pre></noscript></div>
+</p>
 
 <p>This application loops on all the pages until the end of the index.</p>
 
@@ -773,7 +799,32 @@ Query for page 3<br />
 
 <p>Let&rsquo;s now look at the application code, once again in Python</p>
 
-<p>{% gist 6176322 %}</p>
+<p><div><script src='https://gist.github.com/6176322.js'></script>
+<noscript><pre><code>
+from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+	hasRow = False
+	skip = 0 if page == 0 else 1
+	page = page + 1
+	print &quot;-- Page %s --&quot; % (page)
+	rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+	for row in rows:
+		hasRow = True
+		print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+		currentStartkey = row.key
+		startDocId = row.docid
+	print &quot; -- -- -- -- \n&quot;
+
+</code></pre></noscript></div>
+</p>
 
 <p>This application loops on all the pages until the end of the index</p>
 
@@ -789,7 +840,87 @@ Query for page 3<br />
 
 <p>In the previous examples, I have showed how to do pagination using the various query parameters. The Java SDK provides a Paginator object to help developers to deal with pagination. The following example is using the same view with the Paginator API.</p>
 
-<p>{% gist 6774932 %}</p>
+<p><div><script src='https://gist.github.com/6774932.js'></script>
+<noscript><pre><code>package com.couchbase.devday;
+
+import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class JavaPaginatorSample {
+
+public static void main(String[] args) {
+
+	configure();
+	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+	System.out.println(&quot;\tCouchbase - Paginator&quot;);
+	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+
+    List&lt;URI&gt; uris = new LinkedList&lt;URI&gt;();
+    uris.add(URI.create(&quot;http://127.0.0.1:8091/pools&quot;));
+
+    CouchbaseClient cb = null;
+    try {
+    	cb = new CouchbaseClient(uris, &quot;beer-sample&quot;, &quot;&quot;);
+	  	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+	  	System.out.println(&quot;Breweries (by_name) with docs &amp; JSON parsing&quot;);
+		View view = cb.getView(&quot;test&quot;, &quot;by_country&quot;);
+		Query query = new Query();
+		int docsPerPage = 5;
+
+		Paginator paginatedQuery = cb.paginatedQuery(view, query, docsPerPage);
+		int pageCount = 0;
+		while(paginatedQuery.hasNext()) {
+			pageCount++;
+			System.out.println(&quot; -- Page &quot;+ pageCount +&quot; -- &quot;);
+			ViewResponse response = paginatedQuery.next();
+			for (ViewRow row : response) {
+				System.out.println(row.getKey() + &quot; : &quot; + row.getId());
+			}
+			System.out.println(&quot; -- -- -- &quot;);
+		}
+		
+		System.out.println(&quot;\n\n&quot;);
+    	cb.shutdown(10, TimeUnit.SECONDS);
+    } catch (Exception e) {
+    	System.err.println(&quot;Error connecting to Couchbase: &quot; + e.getMessage());
+    }
+}
+
+
+
+private static void configure() {
+
+	for(Handler h : Logger.getLogger(&quot;com.couchbase.client&quot;).getParent().getHandlers()) {
+		if(h instanceof ConsoleHandler) {
+			h.setLevel(Level.OFF);
+		}
+	}
+	Properties systemProperties = System.getProperties();
+	systemProperties.put(&quot;net.spy.log.LoggerImpl&quot;, &quot;net.spy.memcached.compat.log.SunLogger&quot;);
+	System.setProperties(systemProperties);
+
+	Logger logger = Logger.getLogger(&quot;com.couchbase.client&quot;);
+	logger.setLevel(Level.OFF);
+	for(Handler h : logger.getParent().getHandlers()) {
+		if(h instanceof ConsoleHandler){
+			h.setLevel(Level.OFF);
+		}
+	}
+}
+
+}
+</code></pre></noscript></div>
+</p>
 
 <p>So as you can see you can easily paginate on the results of a Query using the Java Paginator.</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Kafka | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/kafka/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -364,7 +364,7 @@ use messages published in the MapR Converged Data Platform.</p>
 
 <p>It is very common for Flink applications to use <a href="http://kafka.apache.org/">Apache Kafka</a> for data input and output. This article will guide you into  the steps to use Apache Flink with Kafka.</p>
 
-<p>{% img center /images/posts/flink-kafka/flink-kafka.png Flink-Kafka %}</p>
+<p><img class="center" src="/images/posts/flink-kafka/flink-kafka.png" title="Flink-Kafka" ></p>
 
 <!-- more -->
 

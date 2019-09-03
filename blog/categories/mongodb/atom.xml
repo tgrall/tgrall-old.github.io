@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mongodb | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/mongodb/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -244,7 +244,7 @@ In document databases, like MongoDB, these relations are, most of the time, repr
 </ul>
 
 
-<p>{%img center /images/posts/intro-mongodb-security/password.jpg %}</p>
+<p><img class="center" src="/images/posts/intro-mongodb-security/password.jpg"></p>
 
 <p>In this post, <em>I won&rsquo;t go</em> into the detail about how to deploy your database in a secured environment (DMZ/Network/IP/Location/&hellip;)</p>
 
@@ -549,7 +549,7 @@ exit
 
 <p>Look at this screencast to see it in action:</p>
 
-<p>{% youtube Fpl74Z0HbC0  %}</p>
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/Fpl74Z0HbC0?color=white&theme=light"></iframe></p>
 
 <!-- more -->
 
@@ -812,7 +812,7 @@ db.brewery.ensureIndex( { "loc" : "2dsphere" } );
 
 <p>In case you do not know Sage is a 30+ years old ERP vendor. I have to say that I could not imagine that coming from such company… Let me tell me more about it.</p>
 
-<p>{% img center /images/posts/everybody-says-hackathon/00-logo.png %}</p>
+<p><img class="center" src="/images/posts/everybody-says-hackathon/00-logo.png"></p>
 
 <!-- more -->
 
@@ -850,12 +850,12 @@ db.brewery.ensureIndex( { "loc" : "2dsphere" } );
 
 <p>The event started with a very short presentation of the teams, projects, and jury.</p>
 
-<p>{% img center /images/posts/everybody-says-hackathon/01-sage-hack-intro.png Presentation %}</p>
+<p><img class="center" src="/images/posts/everybody-says-hackathon/01-sage-hack-intro.png" title="Presentation" ></p>
 
 <p>Quickly the teams started to draw things on whiteboard, discuss architecture, and design&hellip; The organizers, included myself, were
 very happy to see that everybody was diving into it.</p>
 
-<p>{% img /images/posts/everybody-says-hackathon/02-team-work.png Team Work %} {% img /images/posts/everybody-says-hackathon/03-motto.png %}</p>
+<p><img src="/images/posts/everybody-says-hackathon/02-team-work.png" title="Team Work" > <img src="/images/posts/everybody-says-hackathon/03-motto.png"></p>
 
 <p>MongoDB (<a href="http://twitter.com/alainhelaili">Alain</a> and I), and Sage architects were here to help; so we did. I pushed hard to be sure all the teams start to develop, design
 as early as possible. I also gave many advices around document design and other things around MongoDB and node.</p>
@@ -864,11 +864,11 @@ as early as possible. I also gave many advices around document design and other 
 
 <p>Let&rsquo;s go back to the code thing, so all the teams were working like crazy on their project. I had lot of interesting discussions with all of them.</p>
 
-<p>{% img /images/posts/everybody-says-hackathon/04-night-coding.png Night Coding %} {% img /images/posts/everybody-says-hackathon/05-night-coding.png Night Coding %}</p>
+<p><img src="/images/posts/everybody-says-hackathon/04-night-coding.png" title="Night Coding" > <img src="/images/posts/everybody-says-hackathon/05-night-coding.png" title="Night Coding" ></p>
 
 <p>I went to bed at 11:30pm, <em>yeah, I am a loser!</em>, while everybody was still working.</p>
 
-<p>{% img /images/posts/everybody-says-hackathon/06-night-coding.png Night Coding %}{% img /images/posts/everybody-says-hackathon/07-night-coding.png Night Coding %}</p>
+<p><img src="/images/posts/everybody-says-hackathon/06-night-coding.png" title="Night Coding" ><img src="/images/posts/everybody-says-hackathon/07-night-coding.png" title="Night Coding" ></p>
 
 <p>I as back in the <em>war room</em> around 6:00am, and helped some team to finish their project.</p>
 
@@ -879,7 +879,7 @@ as early as possible. I also gave many advices around document design and other 
 <p>At noon each team started to demonstrate their feature in 5mn. All the teams did a live demonstration, with the feature well integrated to the Sage X3 screens.
 It was really cool. A team even created a small video clip to explain the feature and vision.</p>
 
-<p>{% img /images/posts/everybody-says-hackathon/08-demonstration.png %} {% img /images/posts/everybody-says-hackathon/10-demonstration.png %} {% img /images/posts/everybody-says-hackathon/11-demonstration.png %} {% img /images/posts/everybody-says-hackathon/12-demonstration.png %} {% img /images/posts/everybody-says-hackathon/13-demonstration.png %} {% img /images/posts/everybody-says-hackathon/14-demonstration.png %} {% img /images/posts/everybody-says-hackathon/15-demonstration.png %} {% img /images/posts/everybody-says-hackathon/09-demonstration.png %}</p>
+<p><img src="/images/posts/everybody-says-hackathon/08-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/10-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/11-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/12-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/13-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/14-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/15-demonstration.png"> <img src="/images/posts/everybody-says-hackathon/09-demonstration.png"></p>
 
 <p>It was very hard to chose a winner, but we agreed on a very rich and promising notification platform.</p>
 
@@ -958,9 +958,9 @@ Mathieu explained how you can use <a href="https://dev.myscript.com/dev-kits/clo
 </ul>
 
 
-<p>{% img center <a href="http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg">http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg</a> %}</p>
+<p><img class="center <a" src="href="http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg">http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg</a>&#8221;></p>
 
-<p>{% slideshare 43741214 %}</p>
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/43741214 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
 
 <h3>Aggregation Framework</h3>
 
@@ -978,9 +978,9 @@ Mathieu explained how you can use <a href="https://dev.myscript.com/dev-kits/clo
 
 <p>To close his presentation, Seb talked about aggregation best practices, and behavior&nbsp;<a href="http://docs.mongodb.org/manual/core/aggregation-pipeline-sharded-collections/#aggregation-pipeline-sharded-collection">in a sharded cluster</a>.</p>
 
-<p>{% img center <a href="http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg">http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg</a> %}</p>
+<p><img class="center <a" src="href="http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg">http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg</a>&#8221;></p>
 
-<p>{% slideshare 43730356 %}</p>
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/43730356 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
 
 <h3>And&hellip;</h3>
 

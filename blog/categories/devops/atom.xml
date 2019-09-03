@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Devops | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/devops/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -24,7 +24,7 @@
 
 <h3>What! I still need DBA?</h3>
 
-<p>{% img <a href="http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg">http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg</a> %}</p>
+<p><img class="<a" src="href="http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg">http://ct.fra.bz/ol/fz/sw/i53/5/6/8/frabz-what-if-i-told-you-you-dont-need-to-know-sql-to-be-a-dba-85380e.jpg</a>&#8221;></p>
 
 <p>This is a good opportunity to raise a point, or comment a wrong idea: the fact that you are using MongoDB, or any other NoSQL datastore does not mean that you do not need a DBA… Like any project, an administrator is not mandatory, but if you have one it is better. So even when MongoDB is pushed by development team it is very important to understand the way the database works, and how to administer, monitor it.</p>
 
@@ -131,7 +131,7 @@
 
 <p>You can watch the demonstration below, and/or look at all the details in the next paragraph.</p>
 
-<p>{% youtube COb6y89xcYY %}</p>
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/COb6y89xcYY?color=white&theme=light"></iframe></p>
 
 <h3>Ansible</h3>
 
@@ -250,9 +250,7 @@ shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket
 
 <p>To generate the shell script, I use <a href="http://ansible.cc/docs/modules.html#template">Ansible Template</a>, the template is available in the <a href="https://github.com/tgrall/couchbase-ansible-playbook/blob/master/couchbase-add-node.j2">couchbase-add-node.j2</a> file.</p>
 
-<pre><code>{% for host in groups['couchbase-nodes'] %}
-/opt/couchbase/bin/couchbase-cli server-add -c 127.0.0.1:8091 -u ${admin_user} -p ${admin_password} --server-add={{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}:8091 --server-add-username=${admin_user} --server-add-password=${admin_password}
-{% endfor %}
+<pre><code>
 </code></pre>
 
 <p>As you can see this script loop on each server in the [couchbase-nodes] group and use its IP address to add the node to the cluster.</p>
@@ -268,7 +266,7 @@ shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket
 
 <p>This will execute all the commands described in the playbook, and after few seconds you will have a new cluster ready to be used! You can for example open a browser and go to the Couchase Administration Console and check that your cluster is configured as expected.</p>
 
-<p> {% img <a href="http://1.bp.blogspot.com/-L-3yeJZECwY/Uaj_PA_aVUI/AAAAAAAAAcg/fKBZ47Nhd4M/s320/Screen+Shot+2013-05-31+at+9.50.44+PM.png">http://1.bp.blogspot.com/-L-3yeJZECwY/Uaj_PA_aVUI/AAAAAAAAAcg/fKBZ47Nhd4M/s320/Screen+Shot+2013-05-31+at+9.50.44+PM.png</a> %}</p>
+<p> <img class="<a" src="href="http://1.bp.blogspot.com/-L-3yeJZECwY/Uaj_PA_aVUI/AAAAAAAAAcg/fKBZ47Nhd4M/s320/Screen+Shot+2013-05-31+at+9.50.44+PM.png">http://1.bp.blogspot.com/-L-3yeJZECwY/Uaj_PA_aVUI/AAAAAAAAAcg/fKBZ47Nhd4M/s320/Screen+Shot+2013-05-31+at+9.50.44+PM.png</a>&#8221;></p>
 
 <p>As you can see it is really easy and fast to create a new cluster using Ansible.</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Cloud | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/cloud/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -22,7 +22,7 @@
 
 <p><a href="http://www.clever-cloud.com/en/">Clever Cloud</a> is the first PaaS to provide Couchbase as a service allowing developers to run applications in a fully managed environment. This article shows how to deploy an existing application to Clever Cloud.</p>
 
-<p>{% img <a href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a> %}</p>
+<p><img class="<a" src="href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a>&#8221;></p>
 
 <p>I am using a very simple Node application that I have documented in a previous article: “<a href="http://tugdualgrall.blogspot.fr/2013/03/easy-application-development-with.html">Easy application development with Couchbase, Angular and Node</a>”.</p>
 
@@ -50,7 +50,7 @@
 
 <p>2-  Click on “Add a Service” in the left menu </span></p>
 
-<p>{% img <a href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a>&#8221;></p>
 
 <p>3- Click on “Couchbase” button.</p>
 
@@ -59,7 +59,7 @@
 </ol>
 
 
-<p>{% img <a href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a>&#8221;></p>
 
 <p>The size of the RAM Quota for your bucket will have an impact on performance but also on the pricing.</p>
 
@@ -211,7 +211,7 @@ git push clever mybranch:master
 
 <p>Here the slides that I have used during this presentation:</p>
 
-<p>{% slideshare 95672 %}</p>
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/95672 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
 
 <p><strong><a href="http://www.slideshare.net/tgrall/sap-cloud-inside-develop-and-deploy-on-the-cloud" title="SAP Cloud Inside : Develop and Run on the Cloud">SAP Cloud Inside : Develop and Run on the Cloud</a></strong></p>
 
@@ -224,7 +224,7 @@ git push clever mybranch:master
     <link href="http://tgrall.github.io/blog/2011/03/16/exo-cloud-ide-develop-for-the-cloud-on-the-cloud/"/>
     <updated>2011-03-16T12:55:44+01:00</updated>
     <id>http://tgrall.github.io/blog/2011/03/16/exo-cloud-ide-develop-for-the-cloud-on-the-cloud</id>
-    <content type="html"><![CDATA[<p>{% img <a href="http://1.bp.blogspot.com/-IgPlseainto/TYBq0-Sr6nI/AAAAAAAAAOw/YL3TECcXJts/s400/logoexoplatform.png">http://1.bp.blogspot.com/-IgPlseainto/TYBq0-Sr6nI/AAAAAAAAAOw/YL3TECcXJts/s400/logoexoplatform.png</a> %}</p>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://1.bp.blogspot.com/-IgPlseainto/TYBq0-Sr6nI/AAAAAAAAAOw/YL3TECcXJts/s400/logoexoplatform.png">http://1.bp.blogspot.com/-IgPlseainto/TYBq0-Sr6nI/AAAAAAAAAOw/YL3TECcXJts/s400/logoexoplatform.png</a>&#8221;></p>
 
 <p>Yesterday, eXo has launched a new cloud based service: the <a href="http://www.cloud-ide.com/">eXo Cloud IDE</a>. This IDE is an online service that facilitates the development of gadgets and mashups that could be deployed directly to a PaaS.</p>
 
@@ -234,7 +234,7 @@ git push clever mybranch:master
 
 <p>What eXo has launched yesterday is a big step for developers since you can now develop, test and deploy your gadgets and services online, and this in your &ldquo;personal environment&rdquo; using eXo Cloud IDE supports multi-tenancy. I won&rsquo;t go in all the features of the IDE since you can test it yourself by joining the <a href="http://cloud-ide.com/">beta program</a> and look at this video:</p>
 
-<p>{% vimeo 20815141 %}</p>
+<p><iframe src="http://player.vimeo.com/video/20815141?portrait=0"  width="550" height="265" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe></p>
 
 <p>eXo Cloud IDE resources:</p>
 
@@ -301,7 +301,7 @@ Jersey 1.1.5 release. You can download it from <a href="https://jersey.dev.java.
 </ul>
 
 
-<p>{% img <a href="http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png</a> %}</p>
+<p><img class="<a" src="href="http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png</a>&#8221;></p>
 
 <ul>
 <li>Click Finish</li>
@@ -309,7 +309,7 @@ Jersey 1.1.5 release. You can download it from <a href="https://jersey.dev.java.
 </ul>
 
 
-<p>{%img <a href="http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png">http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png">http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png</a>&#8221;></p>
 
 <h4>Running the application</h4>
 
@@ -321,7 +321,7 @@ Jersey 1.1.5 release. You can download it from <a href="https://jersey.dev.java.
 
 <p>You can access the application, and the sample servlet that has been created using the URL: <code>http://localhost:8080/employeeservice</code>.</p>
 
-<p>To stop the server, click on the terminate button {% img <a href="http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png">http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png</a> %} in the Eclipse console.</p>
+<p>To stop the server, click on the terminate button <img class="<a" src="href="http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png">http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png</a>&#8221;> in the Eclipse console.</p>
 
 <h3>Configuring the REST support in the application</h3>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Couchbase | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/couchbase/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -36,7 +36,7 @@
 
 <p>Look at this screencast to see it in action:</p>
 
-<p>{% youtube Fpl74Z0HbC0  %}</p>
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/Fpl74Z0HbC0?color=white&theme=light"></iframe></p>
 
 <!-- more -->
 
@@ -334,7 +334,33 @@ Page x : <code>?limit=5&amp;amp;skip(limit*(page-1))</code></p>
 
 <p>Some code sample in python that paginate using this view :</p>
 
-<p>{% gist 6174762 %}</p>
+<p><div><script src='https://gist.github.com/6174762.js'></script>
+<noscript><pre><code>from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+  hasRow = False
+	skip = 0 if page == 0 else 1
+	page = page + 1
+	print &quot;-- Page %s --&quot; % (page)
+	rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+	for row in rows:
+		hasRow = True
+		print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+		currentStartkey = row.key
+		startDocId = row.docid
+	print &quot; -- -- -- -- \n&quot;
+
+
+
+</code></pre></noscript></div>
+</p>
 
 <p>This application loops on all the pages until the end of the index.</p>
 
@@ -393,7 +419,32 @@ Query for page 3<br />
 
 <p>Let&rsquo;s now look at the application code, once again in Python</p>
 
-<p>{% gist 6176322 %}</p>
+<p><div><script src='https://gist.github.com/6176322.js'></script>
+<noscript><pre><code>
+from couchbase import Couchbase
+cb = Couchbase.connect(bucket=&#39;beer-sample&#39;)
+
+hasRow = True
+rowPerPage = 5
+page = 0
+currentStartkey=&quot;&quot;
+startDocId=&quot;&quot;
+
+while hasRow :
+	hasRow = False
+	skip = 0 if page == 0 else 1
+	page = page + 1
+	print &quot;-- Page %s --&quot; % (page)
+	rows = cb.query(&quot;test&quot;, &quot;by_country&quot;, limit=rowPerPage, skip=skip, startkey=currentStartkey, startkey_docid=startDocId)
+	for row in rows:
+		hasRow = True
+		print &quot;Country: \&quot;%s\&quot; \t Id: &#39;%s&#39;&quot; % (row.key, row.docid)
+		currentStartkey = row.key
+		startDocId = row.docid
+	print &quot; -- -- -- -- \n&quot;
+
+</code></pre></noscript></div>
+</p>
 
 <p>This application loops on all the pages until the end of the index</p>
 
@@ -409,7 +460,87 @@ Query for page 3<br />
 
 <p>In the previous examples, I have showed how to do pagination using the various query parameters. The Java SDK provides a Paginator object to help developers to deal with pagination. The following example is using the same view with the Paginator API.</p>
 
-<p>{% gist 6774932 %}</p>
+<p><div><script src='https://gist.github.com/6774932.js'></script>
+<noscript><pre><code>package com.couchbase.devday;
+
+import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class JavaPaginatorSample {
+
+public static void main(String[] args) {
+
+	configure();
+	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+	System.out.println(&quot;\tCouchbase - Paginator&quot;);
+	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+
+    List&lt;URI&gt; uris = new LinkedList&lt;URI&gt;();
+    uris.add(URI.create(&quot;http://127.0.0.1:8091/pools&quot;));
+
+    CouchbaseClient cb = null;
+    try {
+    	cb = new CouchbaseClient(uris, &quot;beer-sample&quot;, &quot;&quot;);
+	  	System.out.println(&quot;--------------------------------------------------------------------------&quot;);
+	  	System.out.println(&quot;Breweries (by_name) with docs &amp; JSON parsing&quot;);
+		View view = cb.getView(&quot;test&quot;, &quot;by_country&quot;);
+		Query query = new Query();
+		int docsPerPage = 5;
+
+		Paginator paginatedQuery = cb.paginatedQuery(view, query, docsPerPage);
+		int pageCount = 0;
+		while(paginatedQuery.hasNext()) {
+			pageCount++;
+			System.out.println(&quot; -- Page &quot;+ pageCount +&quot; -- &quot;);
+			ViewResponse response = paginatedQuery.next();
+			for (ViewRow row : response) {
+				System.out.println(row.getKey() + &quot; : &quot; + row.getId());
+			}
+			System.out.println(&quot; -- -- -- &quot;);
+		}
+		
+		System.out.println(&quot;\n\n&quot;);
+    	cb.shutdown(10, TimeUnit.SECONDS);
+    } catch (Exception e) {
+    	System.err.println(&quot;Error connecting to Couchbase: &quot; + e.getMessage());
+    }
+}
+
+
+
+private static void configure() {
+
+	for(Handler h : Logger.getLogger(&quot;com.couchbase.client&quot;).getParent().getHandlers()) {
+		if(h instanceof ConsoleHandler) {
+			h.setLevel(Level.OFF);
+		}
+	}
+	Properties systemProperties = System.getProperties();
+	systemProperties.put(&quot;net.spy.log.LoggerImpl&quot;, &quot;net.spy.memcached.compat.log.SunLogger&quot;);
+	System.setProperties(systemProperties);
+
+	Logger logger = Logger.getLogger(&quot;com.couchbase.client&quot;);
+	logger.setLevel(Level.OFF);
+	for(Handler h : logger.getParent().getHandlers()) {
+		if(h instanceof ConsoleHandler){
+			h.setLevel(Level.OFF);
+		}
+	}
+}
+
+}
+</code></pre></noscript></div>
+</p>
 
 <p>So as you can see you can easily paginate on the results of a Query using the Java Paginator.</p>
 
@@ -684,7 +815,7 @@ client.setAutomaticVersionning(true);
 
 <p><a href="http://www.clever-cloud.com/en/">Clever Cloud</a> is the first PaaS to provide Couchbase as a service allowing developers to run applications in a fully managed environment. This article shows how to deploy an existing application to Clever Cloud.</p>
 
-<p>{% img <a href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a> %}</p>
+<p><img class="<a" src="href="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png">http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png</a>&#8221;></p>
 
 <p>I am using a very simple Node application that I have documented in a previous article: “<a href="http://tugdualgrall.blogspot.fr/2013/03/easy-application-development-with.html">Easy application development with Couchbase, Angular and Node</a>”.</p>
 
@@ -712,7 +843,7 @@ client.setAutomaticVersionning(true);
 
 <p>2-  Click on “Add a Service” in the left menu </span></p>
 
-<p>{% img <a href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png">http://4.bp.blogspot.com/-He8scPOrH5I/Uac5B_O2k3I/AAAAAAAAAcE/OZyn8jW-bV8/s320/clever-cloud-add-couchbase.png</a>&#8221;></p>
 
 <p>3- Click on “Couchbase” button.</p>
 
@@ -721,7 +852,7 @@ client.setAutomaticVersionning(true);
 </ol>
 
 
-<p>{% img <a href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png">http://4.bp.blogspot.com/-V_GMolXLClI/Uac5CMdKQoI/AAAAAAAAAcM/vvGKJUXW-xQ/s320/Screen+Shot+2013-05-30+at+9.19.59+AM.png</a>&#8221;></p>
 
 <p>The size of the RAM Quota for your bucket will have an impact on performance but also on the pricing.</p>
 
@@ -881,7 +1012,7 @@ git push clever mybranch:master
 
 <p>So I have written this small program that allows you to import the content of a RDBMS into Couchbase. This tools could be used as it is, or you can look at the code to adapt it to your application.</p>
 
-<p>{% youtube xzqBjhYKCLY %}</p>
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/xzqBjhYKCLY?color=white&theme=light"></iframe></p>
 
 <h3>The Tool: Couchbase SQL Importer</h3>
 

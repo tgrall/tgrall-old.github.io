@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Jug | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/jug/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -18,7 +18,7 @@
     <link href="http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/"/>
     <updated>2009-11-08T22:27:15+01:00</updated>
     <id>http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies</id>
-    <content type="html"><![CDATA[<p>{% img <a href="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2">http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2</a> %}</p>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2">http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2</a>&#8221;></p>
 
 <p>This Friday , the Nantes JUG is pleased to organize a conference about &ldquo;Google Technologies&rdquo;. Didier Girard, <a href="http://twitter.com/dgirard">http://twitter.com/dgirard</a> , will be presenting and demoing cool stuff from Google:</p>
 

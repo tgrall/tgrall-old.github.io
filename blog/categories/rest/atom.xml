@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Rest | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/rest/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -547,7 +547,7 @@ steps of this tutorial are:</p>
 
 <p>You can now configure your Couchbase instance, for this you just need to access the Admin Console, available at the following location <a href="http://127.0.0.1:8091/">http://127.0.0.1:8091</a> (change the IP address if needed) or simply by going in the Couchbase menu and click on Open Admin Console entry.</p>
 
-<p>{% img <a href="http://4.bp.blogspot.com/-UokiHs1DlFw/T_VpJHmn8KI/AAAAAAAAAUo/oy7bh5w9nOw/s1600/couchbase-menu.png">http://4.bp.blogspot.com/-UokiHs1DlFw/T_VpJHmn8KI/AAAAAAAAAUo/oy7bh5w9nOw/s1600/couchbase-menu.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-UokiHs1DlFw/T_VpJHmn8KI/AAAAAAAAAUo/oy7bh5w9nOw/s1600/couchbase-menu.png">http://4.bp.blogspot.com/-UokiHs1DlFw/T_VpJHmn8KI/AAAAAAAAAUo/oy7bh5w9nOw/s1600/couchbase-menu.png</a>&#8221;></p>
 
 <ol>
 <li>Welcome Screen : Click Setup</li>
@@ -560,7 +560,7 @@ steps of this tutorial are:</p>
 </ol>
 
 
-<p>{% img <a href="http://2.bp.blogspot.com/-_a1iynqdk8w/T_VpTwa5qEI/AAAAAAAAAUw/ZGBHZsC6x_8/s320/install-step8.png">http://2.bp.blogspot.com/-_a1iynqdk8w/T_VpTwa5qEI/AAAAAAAAAUw/ZGBHZsC6x_8/s320/install-step8.png</a> %}</p>
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-_a1iynqdk8w/T_VpTwa5qEI/AAAAAAAAAUw/ZGBHZsC6x_8/s320/install-step8.png">http://2.bp.blogspot.com/-_a1iynqdk8w/T_VpTwa5qEI/AAAAAAAAAUw/ZGBHZsC6x_8/s320/install-step8.png</a>&#8221;></p>
 
 <p>This is it! You are ready to use your Couchbase server.</p>
 
@@ -862,10 +862,10 @@ public class JAXBContextResolver implements ContextResolver &amp;lt; JAXBContext
 </ul>
 
 
-<p>{% img <a href="http://1.bp.blogspot.com/-eR15bpCaiXo/TZ8yp1kkLYI/AAAAAAAAAPM/8Az5EVfVrzU/s200/rest-no-access.png">http://1.bp.blogspot.com/-eR15bpCaiXo/TZ8yp1kkLYI/AAAAAAAAAPM/8Az5EVfVrzU/s200/rest-no-access.png</a> %}
+<p><img class="<a" src="href="http://1.bp.blogspot.com/-eR15bpCaiXo/TZ8yp1kkLYI/AAAAAAAAAPM/8Az5EVfVrzU/s200/rest-no-access.png">http://1.bp.blogspot.com/-eR15bpCaiXo/TZ8yp1kkLYI/AAAAAAAAAPM/8Az5EVfVrzU/s200/rest-no-access.png</a>&#8221;>
 Not-authorized</p>
 
-<p>{% img <a href="http://2.bp.blogspot.com/-wcfWsRgV8Xc/TZ8ypzrBsLI/AAAAAAAAAPE/U9VnHpc3q9M/s200/rest-access.png">http://2.bp.blogspot.com/-wcfWsRgV8Xc/TZ8ypzrBsLI/AAAAAAAAAPE/U9VnHpc3q9M/s200/rest-access.png</a> %}
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-wcfWsRgV8Xc/TZ8ypzrBsLI/AAAAAAAAAPE/U9VnHpc3q9M/s200/rest-access.png">http://2.bp.blogspot.com/-wcfWsRgV8Xc/TZ8ypzrBsLI/AAAAAAAAAPE/U9VnHpc3q9M/s200/rest-access.png</a>&#8221;>
 Authorized</p>
 
 <p>If you are not interested to follow steps by step the explanations you can directly jump to the complete <a href="#completeService">REST Service code</a> or download the full eXo IDE Project from <a href="https://github.com/tgrall/sample-gadget-with-security">GitHub</a></p>

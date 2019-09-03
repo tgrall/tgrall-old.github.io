@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Windows | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/windows/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -190,7 +190,7 @@ driver.connect({
 </ul>
 
 
-<p>{% img <a href="http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png">http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png</a> %}</p>
+<p><img class="<a" src="href="http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png">http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png</a>&#8221;></p>
 
 <ul>
 <li>When you try to restart the server it does not start and you have the following error message in the error log :
@@ -201,7 +201,7 @@ driver.connect({
 <p>Some of these issues are related to a known issue on Windows ( see <a href="http://www.couchbase.com/issues/browse/MB-7417">MB-7417</a> that will be fixed in 2.0.1) or the fact that Couchbase server does not support change of the IP address after installation.  This is documented in the section “<a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-bestpractice-cloud-ip.html">Using Couchbase in the Cloud: Handling Changes in IP Addresses</a>” of the Couchbase Server Manual. This article explains what should be done when configuring Couchbase Server on Windows, but you can do equivalent steps on any platform using the shell scripts available on Linux and/or Mac OS X.</p>
 
 <p>Once you have installed Couchbase, you can see in the console that the IP address of your server is used :
-  {% img <a href="http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png">http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png</a> %}</p>
+  <img class="<a" src="href="http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png">http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png</a>&#8221;></p>
 
 <p>Typically the address 192.168.0.97 is stored in the configuration of Couchbase. If your server receives a new address from the DHCP server, Couchbase will not work anymore. In this article you will see how you can configure Couchbase to use another IP address or Hostname.</p>
 
@@ -226,7 +226,7 @@ driver.connect({
 </ol>
 
 
-<p>{% img <a href="http://4.bp.blogspot.com/-gxd-rAWLqd8/ULy-vIxak3I/AAAAAAAAAZc/00pNi3Iu0uc/s320/Screen+Shot+2012-12-03+at+3.57.16+PM.png">http://4.bp.blogspot.com/-gxd-rAWLqd8/ULy-vIxak3I/AAAAAAAAAZc/00pNi3Iu0uc/s320/Screen+Shot+2012-12-03+at+3.57.16+PM.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-gxd-rAWLqd8/ULy-vIxak3I/AAAAAAAAAZc/00pNi3Iu0uc/s320/Screen+Shot+2012-12-03+at+3.57.16+PM.png">http://4.bp.blogspot.com/-gxd-rAWLqd8/ULy-vIxak3I/AAAAAAAAAZc/00pNi3Iu0uc/s320/Screen+Shot+2012-12-03+at+3.57.16+PM.png</a>&#8221;></p>
 
 <p>You can now open the file <code>C:\Windows\System21\drivers\etc\hosts</code></p>
 
@@ -307,7 +307,7 @@ driver.connect({
 </ol>
 
 
-<p>{% img <a href="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png">http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png</a> %}</p>
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png">http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png</a>&#8221;></p>
 
 <p>Your Couchbase node is now configured to use the hostname of your server.</p>
 
@@ -329,7 +329,7 @@ driver.connect({
 <li>Execute the <code>service_stop.bat</code></li>
 <li><p>Edit the Service Register script</p></li>
 <li><p>Open <code>service_register.bat</code></p></li>
-<li>Edit the line 9 to replace <code>%IP_ADDR%`` by your hostname (or your IP address), the line should look like:</code>set NS_NAME=<a href="&#109;&#97;&#x69;&#108;&#116;&#x6f;&#58;&#110;&#115;&#95;&#x31;&#x40;&#99;&#x6f;&#x75;&#99;&#x68;&#x62;&#97;&#115;&#101;&#45;&#110;&#111;&#100;&#x65;&#49;&#x2e;&#109;&#121;&#x63;&#x6f;&#109;&#112;&#x61;&#110;&#x79;&#x2e;&#99;&#x6f;&#109;">&#x6e;&#115;&#95;&#49;&#64;&#99;&#x6f;&#x75;&#99;&#x68;&#x62;&#97;&#x73;&#x65;&#45;&#110;&#x6f;&#x64;&#x65;&#x31;&#46;&#109;&#x79;&#x63;&#x6f;&#x6d;&#112;&#x61;&#x6e;&#121;&#x2e;&#99;&#111;&#x6d;</a>`</li>
+<li>Edit the line 9 to replace <code>%IP_ADDR%`` by your hostname (or your IP address), the line should look like:</code>set NS_NAME=<a href="&#109;&#97;&#105;&#108;&#116;&#x6f;&#58;&#x6e;&#115;&#x5f;&#49;&#64;&#x63;&#111;&#117;&#99;&#x68;&#x62;&#97;&#115;&#x65;&#x2d;&#110;&#x6f;&#100;&#x65;&#49;&#x2e;&#x6d;&#x79;&#99;&#x6f;&#x6d;&#112;&#x61;&#110;&#121;&#46;&#x63;&#111;&#x6d;">&#110;&#x73;&#95;&#49;&#x40;&#99;&#x6f;&#117;&#99;&#x68;&#x62;&#x61;&#115;&#x65;&#x2d;&#x6e;&#x6f;&#x64;&#101;&#49;&#x2e;&#x6d;&#x79;&#x63;&#111;&#x6d;&#x70;&#97;&#x6e;&#121;&#x2e;&#x63;&#x6f;&#109;</a>`</li>
 <li>Save the file3.  Delete the content of: <code>C:\Program Files\Couchbase\Server\var\lib\couchbase\mnesia</code></li>
 <li>Execute the `service_reregister.bat</li>
 </ol>
@@ -349,7 +349,7 @@ driver.connect({
 </ol>
 
 
-<p>{% img <a href="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png">http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png</a> %}</p>
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png">http://3.bp.blogspot.com/-tAn4jv_cdrk/ULzOA53roDI/AAAAAAAAAZ0/r8gts5uSdbU/s320/Screen+Shot+2012-12-03+at+5.06.07+PM.png</a>&#8221;></p>
 
 <p>Your Couchbase node is now configured to use the hostname of your server.</p>
 ]]></content>

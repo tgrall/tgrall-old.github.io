@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Oracle | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/oracle/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -33,7 +33,7 @@
 
 <p>Here the archtecture schema of OracleAS Database Web Services:</p>
 
-<p>{% img <a href="http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif">http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif</a> %}</p>
+<p><img class="<a" src="href="http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif">http://1.bp.blogspot.com/_aoQgQ1obiyE/R-ni1lmTTxI/AAAAAAAAADc/Os4eMkzOGXM/s320/aswsv009.gif</a>&#8221;></p>
 
 <p>It is important to mention that such service can leverage the WS-* support of OracleAS and any JAX-RPC handler you want to add to the service.</p>
 
@@ -74,7 +74,7 @@
     <link href="http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/"/>
     <updated>2007-11-08T06:39:38+01:00</updated>
     <id>http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11</id>
-    <content type="html"><![CDATA[<p>{% img <a href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a> %}</p>
+    <content type="html"><![CDATA[<p><img class="<a" src="href="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png">http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png</a>&#8221;></p>
 
 <p>Steve Muench has published in Oracle Magazine an article about the use of Groovy in Oracle ADF. In this article you learn how you can do validation and calculation in you business service layer.</p>
 

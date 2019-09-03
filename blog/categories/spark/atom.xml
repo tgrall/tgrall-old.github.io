@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Spark | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/spark/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -148,7 +148,7 @@ spark.executor.instances = 0
 </ul>
 
 
-<p>{% img center center <a href="http://cdn.meme.am/instances/500x/47510205.jpg">http://cdn.meme.am/instances/500x/47510205.jpg</a>  320 &lsquo;Big Data&rsquo; %}</p>
+<p><img class="center center <a" src="href="http://cdn.meme.am/instances/500x/47510205.jpg">http://cdn.meme.am/instances/500x/47510205.jpg</a>&#8221; width=&#8221;320&#8221; title=&#8221;&lsquo;Big Data&rsquo;&#8221; ></p>
 
 <!-- more -->
 

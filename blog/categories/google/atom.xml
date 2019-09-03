@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Google | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/google/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -65,7 +65,7 @@ Jersey 1.1.5 release. You can download it from <a href="https://jersey.dev.java.
 </ul>
 
 
-<p>{% img <a href="http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png</a> %}</p>
+<p><img class="<a" src="href="http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png">http://3.bp.blogspot.com/_aoQgQ1obiyE/S4pu9erB81I/AAAAAAAAAKE/ER3aDZKd520/s320/app-engine-wizard.png</a>&#8221;></p>
 
 <ul>
 <li>Click Finish</li>
@@ -73,7 +73,7 @@ Jersey 1.1.5 release. You can download it from <a href="https://jersey.dev.java.
 </ul>
 
 
-<p>{%img <a href="http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png">http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png">http://4.bp.blogspot.com/_aoQgQ1obiyE/S4pvDuZVWQI/AAAAAAAAAKM/8I2aUTtx7Os/s320/project-structure.png</a>&#8221;></p>
 
 <h4>Running the application</h4>
 
@@ -85,7 +85,7 @@ Jersey 1.1.5 release. You can download it from <a href="https://jersey.dev.java.
 
 <p>You can access the application, and the sample servlet that has been created using the URL: <code>http://localhost:8080/employeeservice</code>.</p>
 
-<p>To stop the server, click on the terminate button {% img <a href="http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png">http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png</a> %} in the Eclipse console.</p>
+<p>To stop the server, click on the terminate button <img class="<a" src="href="http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png">http://1.bp.blogspot.com/_aoQgQ1obiyE/S4pvYft_VPI/AAAAAAAAAKU/UCNDdfNlEnM/s320/terminate_button.png</a>&#8221;> in the Eclipse console.</p>
 
 <h3>Configuring the REST support in the application</h3>
 

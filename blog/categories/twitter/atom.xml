@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Twitter | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/twitter/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -37,11 +37,17 @@
 
 <p>The views that I used in this demonstration are available at the bottom of this post.</p>
 
-<p>{% youtube X167R0TV5QE %}</p>
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/X167R0TV5QE?color=white&theme=light"></iframe></p>
 
 <p>Views:</p>
 
-<p>{% gist 1df10b10c9dd387995cb %}</p>
+<p><div><script src='https://gist.github.com/1df10b10c9dd387995cb.js'></script>
+<noscript><pre><code>function (doc, meta) {
+  if (doc.created_at) {
+   emit( dateToArray(doc.created_at));
+  }
+}</code></pre></noscript></div>
+</p>
 ]]></content>
   </entry>
   
@@ -78,17 +84,17 @@
 
 <p>3- Enter the Application Details information</p>
 
-<p>{% img <a href="http://4.bp.blogspot.com/-zxOaF_YLaO0/UJhoZOhjoJI/AAAAAAAAAVk/7HnRfFRSKxs/s320/couchbase-twitter-001.png">http://4.bp.blogspot.com/-zxOaF_YLaO0/UJhoZOhjoJI/AAAAAAAAAVk/7HnRfFRSKxs/s320/couchbase-twitter-001.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-zxOaF_YLaO0/UJhoZOhjoJI/AAAAAAAAAVk/7HnRfFRSKxs/s320/couchbase-twitter-001.png">http://4.bp.blogspot.com/-zxOaF_YLaO0/UJhoZOhjoJI/AAAAAAAAAVk/7HnRfFRSKxs/s320/couchbase-twitter-001.png</a>&#8221;></p>
 
 <p>4- Click &ldquo;Create Your Twitter Application&rdquo; button</p>
 
 <p>Your application&rsquo;s OAuth settings are now available :</p>
 
-<p>{% img <a href="http://3.bp.blogspot.com/-ZdaST7c-HdY/UJhqi8WJMGI/AAAAAAAAAVs/ndeXQwc4F0k/s320/couchbase-twitter-002.png">http://3.bp.blogspot.com/-ZdaST7c-HdY/UJhqi8WJMGI/AAAAAAAAAVs/ndeXQwc4F0k/s320/couchbase-twitter-002.png</a> %}</p>
+<p><img class="<a" src="href="http://3.bp.blogspot.com/-ZdaST7c-HdY/UJhqi8WJMGI/AAAAAAAAAVs/ndeXQwc4F0k/s320/couchbase-twitter-002.png">http://3.bp.blogspot.com/-ZdaST7c-HdY/UJhqi8WJMGI/AAAAAAAAAVs/ndeXQwc4F0k/s320/couchbase-twitter-002.png</a>&#8221;></p>
 
 <p>5- Go down on the Application Settings page and click on the &ldquo;Create My Access Token&rdquo; button</p>
 
-<p>{% img <a href="http://4.bp.blogspot.com/-WIW2AN93n6k/UJhrfZV1AVI/AAAAAAAAAV0/OseQ1EOpg9k/s320/couchbase-twitter-003.png">http://4.bp.blogspot.com/-WIW2AN93n6k/UJhrfZV1AVI/AAAAAAAAAV0/OseQ1EOpg9k/s320/couchbase-twitter-003.png</a> %}</p>
+<p><img class="<a" src="href="http://4.bp.blogspot.com/-WIW2AN93n6k/UJhrfZV1AVI/AAAAAAAAAV0/OseQ1EOpg9k/s320/couchbase-twitter-003.png">http://4.bp.blogspot.com/-WIW2AN93n6k/UJhrfZV1AVI/AAAAAAAAAV0/OseQ1EOpg9k/s320/couchbase-twitter-003.png</a>&#8221;></p>
 
 <p>You have now all the necessary information to create your application:</p>
 
@@ -106,7 +112,133 @@
 
 <p>The following code is the main code of the application:</p>
 
-<p>{% gist 4022377  %}</p>
+<p><div><script src='https://gist.github.com/4022377.js'></script>
+<noscript><pre><code>package com.couchbase.demo;
+
+import com.couchbase.client.CouchbaseClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+import twitter4j.*;
+import twitter4j.json.DataObjectFactory;
+
+
+import java.io.InputStream;
+import java.net.URI;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+public class TwitterInjector {
+
+    public final static String COUCHBASE_URIS = &quot;couchbase.uri.list&quot;;
+    public final static String COUCHBASE_BUCKET = &quot;couchbase.bucket&quot;;
+    public final static String COUCHBASE_PASSWORD = &quot;couchbase.password&quot;;
+
+    private List&lt;URI&gt; couchbaseServerUris = new ArrayList&lt;URI&gt;();
+    private String couchbaseBucket = &quot;default&quot;;
+    private String couchbasePassword = &quot;&quot;;
+
+
+    public static void main(String[] args) {
+        TwitterInjector twitterInjector = new TwitterInjector();
+        twitterInjector.setUp();
+        twitterInjector.injectTweets();
+    }
+
+    private void setUp() {
+        try {
+            Properties prop = new Properties();
+            InputStream in = TwitterInjector.class.getClassLoader().getResourceAsStream(&quot;twitter4j.properties&quot;);
+            if (in == null) {
+                throw new Exception(&quot;File twitter4j.properties not found&quot;);
+            }
+            prop.load(in);
+            in.close();
+
+            if (prop.containsKey(COUCHBASE_URIS)) {
+                String[] uriStrings =  prop.getProperty(COUCHBASE_URIS).split(&quot;,&quot;);
+                for (int i=0; i&lt;uriStrings.length; i++) {
+                    couchbaseServerUris.add( new URI( uriStrings[i] ) );
+                }
+
+            } else {
+                couchbaseServerUris.add( new URI(&quot;http://127.0.0.1:8091/pools&quot;) );
+            }
+
+            if (prop.containsKey(COUCHBASE_BUCKET)) {
+                couchbaseBucket = prop.getProperty(COUCHBASE_BUCKET);
+            }
+
+            if (prop.containsKey(COUCHBASE_PASSWORD)) {
+                couchbasePassword = prop.getProperty(COUCHBASE_PASSWORD);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println( e.getMessage() );
+            System.exit(0);
+        }
+
+
+    }
+
+
+
+    private void injectTweets() {
+        TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+        try {
+            final CouchbaseClient cbClient = new CouchbaseClient( couchbaseServerUris , couchbaseBucket , couchbasePassword );
+            System.out.println(&quot;Send data to : &quot;+  couchbaseServerUris +&quot;/&quot;+ couchbaseBucket );
+            StatusListener listener = new StatusListener() {
+
+                @Override
+                public void onStatus(Status status) {
+                    String twitterMessage = DataObjectFactory.getRawJSON(status);
+
+                    // extract the id_str from the JSON document
+                    // see : https://dev.twitter.com/docs/twitter-ids-json-and-snowflake
+                    try {
+                        JSONObject statusAsJson = new JSONObject(twitterMessage);
+                        String idStr = statusAsJson.getString(&quot;id_str&quot;);
+                        cbClient.add( idStr ,0, twitterMessage  );
+                        System.out.print(&quot;.&quot;);
+                    } catch (JSONException e) {
+                        e.printStackTrace(); 
+                    }
+                }
+
+                @Override
+                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+                }
+
+                @Override
+                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+                }
+
+                @Override
+                public void onScrubGeo(long userId, long upToStatusId) {
+                }
+
+                @Override
+                public void onException(Exception ex) {
+                    ex.printStackTrace();
+                }
+            };
+
+        twitterStream.addListener(listener);
+        twitterStream.sample();
+
+        } catch (Exception e) {
+            e.printStackTrace();  
+        }
+    }
+
+
+
+}
+</code></pre></noscript></div>
+</p>
 
 <p>Some basic explanation:</p>
 

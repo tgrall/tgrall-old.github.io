@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Dataviz | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/dataviz/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -24,7 +24,7 @@
 
 <p>The ASCII Dashboard looks like</p>
 
-<p>{% img center /images/posts/drill_dashboard/dashboard_demo.gif Dashboard %}</p>
+<p><img class="center" src="/images/posts/drill_dashboard/dashboard_demo.gif" title="Dashboard" ></p>
 
 <!-- more -->
 
@@ -176,7 +176,52 @@ FROM dfs.data.`/airport/*.csv`
 
 <p>The complete Bar Chat application looks like:</p>
 
-<p>{% gist 00c5d83b85f59d80ad95 app001.js %}</p>
+<p><div><script src='https://gist.github.com/00c5d83b85f59d80ad95.js?file=app001.js'></script>
+<noscript><pre><code>var blessed = require(&#39;blessed&#39;)
+  , contrib = require(&#39;blessed-contrib&#39;)
+  , request = require(&#39;request&#39;)
+  , screen = blessed.screen()
+  , bar = contrib.bar(
+       { label: &#39;Bar Chart&#39;
+       , barWidth: 12
+       , barSpacing: 5
+       , maxHeight: 9
+       , height: &quot;100%&quot;
+       , width: &quot;100%&quot;})
+
+screen.append(bar);
+
+var query =  {
+	&quot;queryType&quot; : &quot;SQL&quot;,
+	&quot;query&quot; : &quot;select `YEAR`, SUM(`PASSENGER_COUNT`) from dfs.tmp.`airport_data_view` GROUP BY `YEAR`&quot;
+};
+
+request(
+	{
+   		url: &#39;http://localhost:8047/query.json&#39;, //URL to hit
+		method: &#39;POST&#39;,
+		json: query
+	}, 
+	function(error, response, body){
+     	var columns = body.columns;
+		var data = {
+			titles : [],
+			data : []
+		};
+		for(var entry of body.rows){
+			data.titles.push(entry[columns[0]]);
+			data.data.push(entry[columns[1]]);
+		}
+		bar.setData(data);
+		screen.render()
+	});
+
+
+screen.key([&#39;escape&#39;, &#39;q&#39;, &#39;C-c&#39;], function(ch, key) {
+	  return process.exit(0);
+});
+</code></pre></noscript></div>
+</p>
 
 <ul>
 <li>The lines 15-17 contain the query object used by the Drill REST API</li>

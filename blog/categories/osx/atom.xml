@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Osx | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/osx/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -354,7 +354,7 @@ export ODI_HOME=&lt;path to ODI installation folder&gt;/odi/oracled
 
 <p>Select the Getting Started project and when you are in the designer switch to the Mac OS X look and feel ;-), using the Menu &ldquo;Look And Feel &gt; Standard &gt; Mac OS X&rdquo;.</p>
 
-<p>{% img <a href="http://farm1.static.flickr.com/139/361446290_8481172875_o.png">http://farm1.static.flickr.com/139/361446290_8481172875_o.png</a> %}</p>
+<p><img class="<a" src="href="http://farm1.static.flickr.com/139/361446290_8481172875_o.png">http://farm1.static.flickr.com/139/361446290_8481172875_o.png</a>&#8221;></p>
 
 <p>These are the first steps to start with Oracle Data Integrator, you can now follow the Getting Started Guide, to learm more about the product, and since your environment is set you can run any of the command documented in this guide.</p>
 ]]></content>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Presentation | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/presentation/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -36,7 +36,7 @@
 </ul>
 
 
-<p>{% slideshare 1678352 %}
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1678352 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> 
 <a href="http://www.slideshare.net/tgrall/wiki-vs-cms-1678352" title="Wiki vs CMS ">Wiki vs CMS </a></p>
 ]]></content>
   </entry>
@@ -50,7 +50,7 @@
 
 <p>Feel free to test OpenSocial and eXo Platform integration by downloading latest release of eXo products.</p>
 
-<p>{% slideshare 1258208 %}</p>
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/1258208 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
 ]]></content>
   </entry>
   

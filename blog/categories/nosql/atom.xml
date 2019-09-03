@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nosql | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/nosql/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -35,7 +35,7 @@
 
 <p>In addition to this, Redis Streams has the concept of <strong>Consumer Groups</strong>. Redis Streams Consumer Groups, like Apache Kafka ones, allows the client applications to consume messages in a distributed fashion (multiple clients), providing an easy way to scale and create highly available systems.</p>
 
-<p>{%img center /images/posts/getting-with-redis-streams-and-java/redis-streams-101-img-1.png %}</p>
+<p><img class="center" src="/images/posts/getting-with-redis-streams-and-java/redis-streams-101-img-1.png"></p>
 
 <p>Enroll in the <a href="https://university.redislabs.com/courses/course-v1:redislabs+RU202+2019_03/about">Redis University: Redis Streams</a> to learn more and get certified.</p>
 
@@ -685,7 +685,7 @@ maprdb mapr:&gt; find /apps/user_profiles
 </ul>
 
 
-<p>{%img center /images/posts/intro-mongodb-security/password.jpg %}</p>
+<p><img class="center" src="/images/posts/intro-mongodb-security/password.jpg"></p>
 
 <p>In this post, <em>I won&rsquo;t go</em> into the detail about how to deploy your database in a secured environment (DMZ/Network/IP/Location/&hellip;)</p>
 
@@ -990,7 +990,7 @@ exit
 
 <p>Look at this screencast to see it in action:</p>
 
-<p>{% youtube Fpl74Z0HbC0  %}</p>
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/Fpl74Z0HbC0?color=white&theme=light"></iframe></p>
 
 <!-- more -->
 

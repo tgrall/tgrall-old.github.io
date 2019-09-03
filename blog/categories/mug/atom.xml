@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mug | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/mug/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T10:24:38+02:00</updated>
+  <updated>2019-09-03T10:31:15+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -59,9 +59,9 @@ Mathieu explained how you can use <a href="https://dev.myscript.com/dev-kits/clo
 </ul>
 
 
-<p>{% img center <a href="http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg">http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg</a> %}</p>
+<p><img class="center <a" src="href="http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg">http://4.bp.blogspot.com/-AWHn75hAyBY/VL9EMpRrFVI/AAAAAAAAAwA/CrDMkKL5A1Y/s1600/IMG_3743.jpg</a>&#8221;></p>
 
-<p>{% slideshare 43741214 %}</p>
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/43741214 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
 
 <h3>Aggregation Framework</h3>
 
@@ -79,9 +79,9 @@ Mathieu explained how you can use <a href="https://dev.myscript.com/dev-kits/clo
 
 <p>To close his presentation, Seb talked about aggregation best practices, and behavior&nbsp;<a href="http://docs.mongodb.org/manual/core/aggregation-pipeline-sharded-collections/#aggregation-pipeline-sharded-collection">in a sharded cluster</a>.</p>
 
-<p>{% img center <a href="http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg">http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg</a> %}</p>
+<p><img class="center <a" src="href="http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg">http://4.bp.blogspot.com/-1fK-Q5SmL4s/VL9EQiaUIvI/AAAAAAAAAwI/AMVYrmQDPVg/s1600/IMG_3745.jpg</a>&#8221;></p>
 
-<p>{% slideshare 43730356 %}</p>
+<p><iframe src="http://www.slideshare.net/slideshow/embed_code/43730356 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe> </p>
 
 <h3>And&hellip;</h3>
 
