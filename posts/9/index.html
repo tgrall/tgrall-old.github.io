@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Last week, more than 400 people of Sogeti group were meeting at Les Fontaines, for the annual KickOff. It was for me the first big event since I have &hellip;">
+  <meta name="description" content="By default Oracle Web Service client is sending the SOAP messages using an UTF-8 encoding. This is the recommendation of WS-I Basic Profile. To be &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,51 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/02/02/oracle-jax-rpc-how-to-change-the-character-encoding/">Oracle JAX-RPC: How to Change the Character Encoding?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2008-02-02T02:13:21+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2008</span></span> <span class='time'>2:13 am</span></time>
+        
+           | <a href="/blog/2008/02/02/oracle-jax-rpc-how-to-change-the-character-encoding/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2008/02/02/oracle-jax-rpc-how-to-change-the-character-encoding/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>By default Oracle Web Service client is sending the SOAP messages using an UTF-8 encoding. This is the recommendation of WS-I Basic Profile. To be exact it says UTF-8 or UTF-16.</p>
+
+<p>It is quite simple to change this encoding&hellip;</p>
+
+<p>First you have to know that the JAX-RPC container will return the same character encoding than the one that is received. To change the character encoding, you just need to set the <code>ClientConstants.CHARACTER_SET_ENCODING</code> to the value you want to use. Here some simple client code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Stub</span> <span class="n">stub</span> <span class="o">=</span> <span class="o">(</span><span class="n">Stub</span><span class="o">)</span><span class="n">myPort</span><span class="o">.</span><span class="na">getPort</span><span class="o">();</span>
+</span><span class='line'><span class="n">stub</span><span class="o">.</span><span class="na">_setProperty</span><span class="o">(</span><span class="n">oracle</span><span class="o">.</span><span class="na">webservices</span><span class="o">.</span><span class="na">ClientConstants</span><span class="o">.</span><span class="na">CHARACTER_SET_ENCODING</span><span class="o">,</span> <span class="s">&quot;UTF-16&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Most of the Web Services stacks are offering the same kind of utility to do that, for example here the property you must set to do the same in IBM&rsquo;s JAX-RPC implementation: <code>com.ibm.wsspi.webservices.Constants.MESSAGE_CHARACTER_SET_ENCODING</code>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -644,46 +689,6 @@ define many objectives, that are represented from a technical point of view by t
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/">A Groovier ADF With Oracle ADF 11</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2007-11-08T06:39:38+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>6:39 am</span></time>
-        
-           | <a href="/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2007/11/08/a-groovier-adf-with-oracle-adf-11/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://media.xircles.codehaus.org/_projects/groovy/_logos/medium.png"></p>
-
-<p>Steve Muench has published in Oracle Magazine an article about the use of Groovy in Oracle ADF. In this article you learn how you can do validation and calculation in you business service layer.</p>
-
-<ul>
-<li><a href="http://www.oracle.com/technology/oramag/oracle/07-nov/o67frame.html">Enhanced Calculation and Validation</a></li>
-<li><a href="http://www.oracle.com/technology/products/adf/index.html">Oracle ADF</a></li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/10">&larr; Older</a>
@@ -701,6 +706,10 @@ define many objectives, that are represented from a technical point of view by t
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
       </li>
     
@@ -714,10 +723,6 @@ define many objectives, that are represented from a technical point of view by t
     
       <li class="post">
         <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
       </li>
     
   </ul>

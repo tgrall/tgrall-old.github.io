@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Redis | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/redis/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-03T11:24:02+02:00</updated>
+  <updated>2019-09-05T15:56:33+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -12,6 +12,255 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Multi-Nodes Redis Cluster With Docker]]></title>
+    <link href="http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/"/>
+    <updated>2019-09-05T11:33:56+02:00</updated>
+    <id>http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker</id>
+    <content type="html"><![CDATA[<p>As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Server (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.</p>
+
+<p>Once your cluster is up &amp; running, you will kill some containers to see how the system automatically fail-over to guarantee service continuity.</p>
+
+<p>The deployment will look more or less like the schema below, (<em><a href="https://docs.redislabs.com/latest/rs/getting-started/docker/">coming from RedisLabs documentation</a></em>)</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/docker-deployment.png"></p>
+
+<p><strong>Prerequisites:</strong></p>
+
+<p><em>Docker Desktop (</em>I am running Docker on Mac*)</p>
+
+<!--more-->
+
+
+<h3>Installing and Running your First Redis Node</h3>
+
+<p>As usual, installing a new product with Docker is very simple just run the following command:</p>
+
+<pre><code class="bash">docker run -d --cap-add sys_resource \
+--name  redis-node1 \
+-p 8443:8443 \
+-p 9443:9443 \
+-p 12000:12000 \
+redislabs/redis
+</code></pre>
+
+<p>Let&rsquo;s look at the parameters used here:</p>
+
+<ul>
+<li><code>-d</code>: run the container in the background</li>
+<li><code>--cap-add sys_resource</code>: add Linux  <code>sys_resource</code>capabilities to set proper privileges</li>
+<li><code>--name  redis-node1</code>: naming the container</li>
+<li><code>-p 8443:8443</code>: to access the management web UI (HTTPS)</li>
+<li><code>-p 9443:9443</code>: to access the REST API (HTTPS)</li>
+<li><code>-p 12000:12000</code>: the TCP port that we will use for the database endpoint on this node</li>
+<li><code>redislabs/redis</code>: use the RedisLabs image (the enterprise version of Redis)</li>
+</ul>
+
+
+<h4>Creating a new Cluster</h4>
+
+<p>Once the container is started you can configure the &ldquo;cluster&rdquo;.</p>
+
+<ol>
+<li>Go top <a href="https://localhost:8443/">https://localhost:8443/</a> (accept the connect using the temporary certificate)</li>
+<li>Click &ldquo;Setup&rdquo;</li>
+<li>Change the Cluster Name to &ldquo;my-redis-cluster.tug-demo.com&rdquo;</li>
+<li>Click &ldquo;Next&rdquo;</li>
+<li>On the &ldquo;cluster authentication&rdquo; click &ldquo;Next&rdquo;  <em>(we will be using the free version)</em></li>
+<li>Enter the user admin credentials and click &ldquo;Next&rdquo;.</li>
+</ol>
+
+
+<p>Once it is configured, connect to the console to the console using the credentials you have created.</p>
+
+<h4>Adding a new database</h4>
+
+<p>Now you have to create a new database.</p>
+
+<ol>
+<li>Select &ldquo;Redis Database&rdquo; and &ldquo;Single Region&rdquo;</li>
+<li>Enter the name &ldquo;test-db-001&rdquo;, and &ldquo;0.5&rdquo; for the memory limit</li>
+<li>Click &ldquo;Show Advanced Options&rdquo;</li>
+<li>Enter 12000 in the &ldquo;Endpoint port number&rdquo; field</li>
+<li>Click &ldquo;Activate&rdquo;.</li>
+</ol>
+
+
+<p>After  fewseconds, the database is created and available.</p>
+
+<p>Note: we have not set anything special around clustering and replication; we will do that later.</p>
+
+<h4>Using the Single Node Database</h4>
+
+<p>You can now connect to the database. You can use  <code>redis-cli</code>from your host, or you can connect to the container and do it from there:</p>
+
+<pre><code class="bash">&gt; docker  exec-it redis-node1 /bin/bash
+
+redislabs@0a174e819a6b:/opt$ redis-cli -p 12000
+
+127.0.0.1:12000&gt; SET foo bar
+OK
+
+127.0.0.1:12000&gt; GET foo
+"bar"
+
+127.0.0.1:12000&gt;  exit
+</code></pre>
+
+<p><strong><em>Checkpoint</em></strong></p>
+
+<p>So far you have:</p>
+
+<ol>
+<li>Install a single node cluster of Redis Enterprise using Docker</li>
+<li>Create a new cluster</li>
+<li>Created a database that listens on port 12000.</li>
+</ol>
+
+
+<p>In the container, run the  <code>rladminstatus</code>command, to get information about your deployment.</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/rladmin-status.png"></p>
+
+<p>In the cluster node section, you can see the address of the node, 172.17.0.2 in my case. This is the IP address of the container, that will be used to create the multi-node cluster.</p>
+
+<p>It is time to add new nodes to the cluster and enable replication and sharding</p>
+
+<h3>Adding new nodes</h3>
+
+<p>To add new nodes to the cluster, you start new containers. Since the 3 containers will be running on the same host, it is necessary, to avoid conflicts, to use different mapping to the Web UI, REST API, and database endpoint ports.</p>
+
+<p><strong>Start node 2:</strong></p>
+
+<pre><code class="bash">docker run -d --cap-add sys_resource \
+--name redis-node2 \
+-p 8444:8443 \
+-p 9444:9443 \
+-p 12001:12000 \
+redislabs/redis
+</code></pre>
+
+<p><strong>Start node 3:</strong></p>
+
+<pre><code class="bash">docker run -d --cap-add sys_resource \
+--name redis-node3 \
+-p 8445:8443 \
+-p 9445:9443 \
+-p 12002:12000 \
+redislabs/redis
+</code></pre>
+
+<p>So to configure each node you need to use the URLs:</p>
+
+<ul>
+<li>node 2: <a href="https://localhost:8444/">https://localhost:8444/</a></li>
+<li>node 3: <a href="https://localhost:8445/">https://localhost:8445/</a></li>
+</ul>
+
+
+<p>I have just increase the port number of the Web UI (8443: node 1, 8444: node 2, 8445 node 3).</p>
+
+<p>For these 2 new nodes, do the following steps to add them to the cluster:</p>
+
+<ol>
+<li>Click &ldquo;Setup&rdquo;</li>
+<li>In  clusterconfiguration, select &ldquo;Join Cluster&rdquo;,
+
+<ul>
+<li>Enter the IP address of the first node, 172.17.0.2 in my environment</li>
+<li>Enter the credentials you have used during the installation of the first node.</li>
+</ul>
+</li>
+<li>Click &ldquo;Next&rdquo;</li>
+</ol>
+
+
+<p>After a few seconds, you will be redirected to the home page and see the list of nodes of your cluster.</p>
+
+<p>Repeat the same steps for the third node.</p>
+
+<p>Your environment should look like this after the installation and configuration of the 3 nodes.</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/cluster-view-3-nodes.png"></p>
+
+<p>You can also reuse the  <code>rladminstatus</code>command on one of the containers and see the new configuration.</p>
+
+<p>If you look carefully, you can see that you have only 1 shard in your cluster. Let&rsquo;s now add a new shard to the database.</p>
+
+<p><strong>Enabling Clustering and Replication to the DB</strong></p>
+
+<p>In the Redis Enterprise Admin Web UI, (<em>you can use any of the nodes</em>):</p>
+
+<ol>
+<li>Click on the &ldquo;databases&rdquo; tab</li>
+<li>Click on &ldquo;test-db-001&rdquo; database</li>
+<li>Click on the &ldquo;configuration&rdquo;</li>
+<li>Go to the bottom of the page and click &ldquo;Edit&rdquo;</li>
+<li>Check the &ldquo;Replication&rdquo; checkbox, to create new shard that will be a replica, to provide high availability</li>
+<li>Check &ldquo;Database Clustering&rdquo; and increase the number of shards to 2. This will  <em>distribute</em>the data in your database into 2 shards, this for better scalability.
+ <em>You can see that the UI indicated that you have  </em>4 shards with replication*. Yes because you have a database that you have &ldquo;divided in 2&rdquo;, and each of the portions of the database is replicated.
+(Also with the free version of Redis Enterprise you are limited to 4 shards, so do not be surprised if you can not increase the number of shards to more than 4)</li>
+<li>Click &ldquo;Update&rdquo; at the bottom of the page.</li>
+</ol>
+
+
+<p>Go back to the &ldquo;nodes&rdquo; tab, and you will see that you have now 4 shards distributed on your 3 nodes.</p>
+
+<p><strong>Discovering the cluster topology</strong></p>
+
+<p>Run  <code>rladminstatus</code>to inspect your cluster and see how the various components are installed:</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/rladmin-status-with-db.png"></p>
+
+<p>For example, you can see, that in my environment:</p>
+
+<p><em>in the &ldquo;CLUSTER NODES&rdquo; section that the &ldquo;node:1&rdquo; is the master of the cluster
+</em>in the &ldquo;DATABASES&rdquo; section that replication is enabled, and the database uses a &ldquo;<a href="https://docs.redislabs.com/latest/rs/concepts/rebalancing-shard-placement/#dense-shard-placement-policy">dense placement</a>&rdquo;
+<em>in the &ldquo;SHARDS&rdquo; section you can see the various shards and their placement (</em>node:1|2|3<em>), their role (</em>master|slave*) and their slots.</p>
+
+<p>Using Redis Enterprise Enterprise Software (RS), all the clustering is managed transparently for you, and your applications. This means that you just have to connect your application to RS Cluster.</p>
+
+<p><strong>Clustering in Action</strong></p>
+
+<p>First of all, you have already seen a lot, just using the Web UI (and you could have done it using CLI and REST API), you have moved an existing database from a single instance to a distributed and highly available instance.</p>
+
+<p>So now if something happens to the system, for example, if one of the masters disappears RS will automatically get another  oneelected.</p>
+
+<p>Let me kill for example the node 3 that contains the 2 masters for my database.</p>
+
+<pre><code class="bash">&gt; docker  killredis-node3
+</code></pre>
+
+<p>After a few seconds, you should see that the master shards are now on another node, in my case node:1.</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/rladmin-status-with-db-002.png"></p>
+
+<p>So if an application, is using this cluster it would be almost transparent as the election of the new master is happening in the  backgroud.</p>
+
+<p>If you restart the node 3 it will rejoin the cluster, and the replicas will be updated on node 3 with any changes that happened to the masters.</p>
+
+<pre><code class="bash">&gt; docker start  redis-node3
+</code></pre>
+
+<p>The same automatic fail-over will happen if you kill a node with the cluster  manager,or the endpoint.</p>
+
+<h4>Conclusion</h4>
+
+<p>In this small article you have learned how to:</p>
+
+<ul>
+<li>deploy a 3 nodes Redis Enterprise Server (RS) on Docker (on a single host)</li>
+<li>create a database, and make it highly available and distributed easily using the Admin UI</li>
+<li>look at the deployment using  <code>rladminstatus</code>command.</li>
+</ul>
+
+
+<p>You have also seen, by killing some nodes, how the cluster fail-over will various master services (shards, endpoint, master cluster node) to another node automatically. This to ensure a continuity of service for your application.</p>
+
+<p>In another  postI will show what is the exact behavior of client applications during the fail-over.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Getting Started With Redis Streams &amp; Java]]></title>

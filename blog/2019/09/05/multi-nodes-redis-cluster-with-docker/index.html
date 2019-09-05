@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Multi-Nodes Redis Cluster With Docker - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>Redis, NoSQL and more&#8230;</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/talks">Talks</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Multi-Nodes Redis Cluster With Docker</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-09-05T11:33:56+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>11:33 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Server (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.</p>
+
+<p>Once your cluster is up &amp; running, you will kill some containers to see how the system automatically fail-over to guarantee service continuity.</p>
+
+<p>The deployment will look more or less like the schema below, (<em><a href="https://docs.redislabs.com/latest/rs/getting-started/docker/">coming from RedisLabs documentation</a></em>)</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/docker-deployment.png"></p>
+
+<p><strong>Prerequisites:</strong></p>
+
+<p><em>Docker Desktop (</em>I am running Docker on Mac*)</p>
+
+<!--more-->
+
+
+<h3>Installing and Running your First Redis Node</h3>
+
+<p>As usual, installing a new product with Docker is very simple just run the following command:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker run -d --cap-add sys_resource <span class="se">\</span>
+</span><span class='line'>--name  redis-node1 <span class="se">\</span>
+</span><span class='line'>-p 8443:8443 <span class="se">\</span>
+</span><span class='line'>-p 9443:9443 <span class="se">\</span>
+</span><span class='line'>-p 12000:12000 <span class="se">\</span>
+</span><span class='line'>redislabs/redis
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s look at the parameters used here:</p>
+
+<ul>
+<li><code>-d</code>: run the container in the background</li>
+<li><code>--cap-add sys_resource</code>: add Linux  <code>sys_resource</code>capabilities to set proper privileges</li>
+<li><code>--name  redis-node1</code>: naming the container</li>
+<li><code>-p 8443:8443</code>: to access the management web UI (HTTPS)</li>
+<li><code>-p 9443:9443</code>: to access the REST API (HTTPS)</li>
+<li><code>-p 12000:12000</code>: the TCP port that we will use for the database endpoint on this node</li>
+<li><code>redislabs/redis</code>: use the RedisLabs image (the enterprise version of Redis)</li>
+</ul>
+
+
+<h4>Creating a new Cluster</h4>
+
+<p>Once the container is started you can configure the &ldquo;cluster&rdquo;.</p>
+
+<ol>
+<li>Go top <a href="https://localhost:8443/">https://localhost:8443/</a> (accept the connect using the temporary certificate)</li>
+<li>Click &ldquo;Setup&rdquo;</li>
+<li>Change the Cluster Name to &ldquo;my-redis-cluster.tug-demo.com&rdquo;</li>
+<li>Click &ldquo;Next&rdquo;</li>
+<li>On the &ldquo;cluster authentication&rdquo; click &ldquo;Next&rdquo;  <em>(we will be using the free version)</em></li>
+<li>Enter the user admin credentials and click &ldquo;Next&rdquo;.</li>
+</ol>
+
+
+<p>Once it is configured, connect to the console to the console using the credentials you have created.</p>
+
+<h4>Adding a new database</h4>
+
+<p>Now you have to create a new database.</p>
+
+<ol>
+<li>Select &ldquo;Redis Database&rdquo; and &ldquo;Single Region&rdquo;</li>
+<li>Enter the name &ldquo;test-db-001&rdquo;, and &ldquo;0.5&rdquo; for the memory limit</li>
+<li>Click &ldquo;Show Advanced Options&rdquo;</li>
+<li>Enter 12000 in the &ldquo;Endpoint port number&rdquo; field</li>
+<li>Click &ldquo;Activate&rdquo;.</li>
+</ol>
+
+
+<p>After  fewseconds, the database is created and available.</p>
+
+<p>Note: we have not set anything special around clustering and replication; we will do that later.</p>
+
+<h4>Using the Single Node Database</h4>
+
+<p>You can now connect to the database. You can use  <code>redis-cli</code>from your host, or you can connect to the container and do it from there:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; docker  <span class="nb">exec</span>-it redis-node1 /bin/bash
+</span><span class='line'>
+</span><span class='line'>redislabs@0a174e819a6b:/opt<span class="nv">$ </span>redis-cli -p 12000
+</span><span class='line'>
+</span><span class='line'>127.0.0.1:12000&gt; SET foo bar
+</span><span class='line'>OK
+</span><span class='line'>
+</span><span class='line'>127.0.0.1:12000&gt; GET foo
+</span><span class='line'><span class="s2">&quot;bar&quot;</span>
+</span><span class='line'>
+</span><span class='line'>127.0.0.1:12000&gt;  <span class="nb">exit</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong><em>Checkpoint</em></strong></p>
+
+<p>So far you have:</p>
+
+<ol>
+<li>Install a single node cluster of Redis Enterprise using Docker</li>
+<li>Create a new cluster</li>
+<li>Created a database that listens on port 12000.</li>
+</ol>
+
+
+<p>In the container, run the  <code>rladminstatus</code>command, to get information about your deployment.</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/rladmin-status.png"></p>
+
+<p>In the cluster node section, you can see the address of the node, 172.17.0.2 in my case. This is the IP address of the container, that will be used to create the multi-node cluster.</p>
+
+<p>It is time to add new nodes to the cluster and enable replication and sharding</p>
+
+<h3>Adding new nodes</h3>
+
+<p>To add new nodes to the cluster, you start new containers. Since the 3 containers will be running on the same host, it is necessary, to avoid conflicts, to use different mapping to the Web UI, REST API, and database endpoint ports.</p>
+
+<p><strong>Start node 2:</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker run -d --cap-add sys_resource <span class="se">\</span>
+</span><span class='line'>--name redis-node2 <span class="se">\</span>
+</span><span class='line'>-p 8444:8443 <span class="se">\</span>
+</span><span class='line'>-p 9444:9443 <span class="se">\</span>
+</span><span class='line'>-p 12001:12000 <span class="se">\</span>
+</span><span class='line'>redislabs/redis
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Start node 3:</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker run -d --cap-add sys_resource <span class="se">\</span>
+</span><span class='line'>--name redis-node3 <span class="se">\</span>
+</span><span class='line'>-p 8445:8443 <span class="se">\</span>
+</span><span class='line'>-p 9445:9443 <span class="se">\</span>
+</span><span class='line'>-p 12002:12000 <span class="se">\</span>
+</span><span class='line'>redislabs/redis
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So to configure each node you need to use the URLs:</p>
+
+<ul>
+<li>node 2: <a href="https://localhost:8444/">https://localhost:8444/</a></li>
+<li>node 3: <a href="https://localhost:8445/">https://localhost:8445/</a></li>
+</ul>
+
+
+<p>I have just increase the port number of the Web UI (8443: node 1, 8444: node 2, 8445 node 3).</p>
+
+<p>For these 2 new nodes, do the following steps to add them to the cluster:</p>
+
+<ol>
+<li>Click &ldquo;Setup&rdquo;</li>
+<li>In  clusterconfiguration, select &ldquo;Join Cluster&rdquo;,
+
+<ul>
+<li>Enter the IP address of the first node, 172.17.0.2 in my environment</li>
+<li>Enter the credentials you have used during the installation of the first node.</li>
+</ul>
+</li>
+<li>Click &ldquo;Next&rdquo;</li>
+</ol>
+
+
+<p>After a few seconds, you will be redirected to the home page and see the list of nodes of your cluster.</p>
+
+<p>Repeat the same steps for the third node.</p>
+
+<p>Your environment should look like this after the installation and configuration of the 3 nodes.</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/cluster-view-3-nodes.png"></p>
+
+<p>You can also reuse the  <code>rladminstatus</code>command on one of the containers and see the new configuration.</p>
+
+<p>If you look carefully, you can see that you have only 1 shard in your cluster. Let&rsquo;s now add a new shard to the database.</p>
+
+<p><strong>Enabling Clustering and Replication to the DB</strong></p>
+
+<p>In the Redis Enterprise Admin Web UI, (<em>you can use any of the nodes</em>):</p>
+
+<ol>
+<li>Click on the &ldquo;databases&rdquo; tab</li>
+<li>Click on &ldquo;test-db-001&rdquo; database</li>
+<li>Click on the &ldquo;configuration&rdquo;</li>
+<li>Go to the bottom of the page and click &ldquo;Edit&rdquo;</li>
+<li>Check the &ldquo;Replication&rdquo; checkbox, to create new shard that will be a replica, to provide high availability</li>
+<li>Check &ldquo;Database Clustering&rdquo; and increase the number of shards to 2. This will  <em>distribute</em>the data in your database into 2 shards, this for better scalability.
+ <em>You can see that the UI indicated that you have  </em>4 shards with replication*. Yes because you have a database that you have &ldquo;divided in 2&rdquo;, and each of the portions of the database is replicated.
+(Also with the free version of Redis Enterprise you are limited to 4 shards, so do not be surprised if you can not increase the number of shards to more than 4)</li>
+<li>Click &ldquo;Update&rdquo; at the bottom of the page.</li>
+</ol>
+
+
+<p>Go back to the &ldquo;nodes&rdquo; tab, and you will see that you have now 4 shards distributed on your 3 nodes.</p>
+
+<p><strong>Discovering the cluster topology</strong></p>
+
+<p>Run  <code>rladminstatus</code>to inspect your cluster and see how the various components are installed:</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/rladmin-status-with-db.png"></p>
+
+<p>For example, you can see, that in my environment:</p>
+
+<p><em>in the &ldquo;CLUSTER NODES&rdquo; section that the &ldquo;node:1&rdquo; is the master of the cluster
+</em>in the &ldquo;DATABASES&rdquo; section that replication is enabled, and the database uses a &ldquo;<a href="https://docs.redislabs.com/latest/rs/concepts/rebalancing-shard-placement/#dense-shard-placement-policy">dense placement</a>&rdquo;
+<em>in the &ldquo;SHARDS&rdquo; section you can see the various shards and their placement (</em>node:1|2|3<em>), their role (</em>master|slave*) and their slots.</p>
+
+<p>Using Redis Enterprise Enterprise Software (RS), all the clustering is managed transparently for you, and your applications. This means that you just have to connect your application to RS Cluster.</p>
+
+<p><strong>Clustering in Action</strong></p>
+
+<p>First of all, you have already seen a lot, just using the Web UI (and you could have done it using CLI and REST API), you have moved an existing database from a single instance to a distributed and highly available instance.</p>
+
+<p>So now if something happens to the system, for example, if one of the masters disappears RS will automatically get another  oneelected.</p>
+
+<p>Let me kill for example the node 3 that contains the 2 masters for my database.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; docker  killredis-node3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After a few seconds, you should see that the master shards are now on another node, in my case node:1.</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/rladmin-status-with-db-002.png"></p>
+
+<p>So if an application, is using this cluster it would be almost transparent as the election of the new master is happening in the  backgroud.</p>
+
+<p>If you restart the node 3 it will rejoin the cluster, and the replicas will be updated on node 3 with any changes that happened to the masters.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt; docker start  redis-node3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The same automatic fail-over will happen if you kill a node with the cluster  manager,or the endpoint.</p>
+
+<h4>Conclusion</h4>
+
+<p>In this small article you have learned how to:</p>
+
+<ul>
+<li>deploy a 3 nodes Redis Enterprise Server (RS) on Docker (on a single host)</li>
+<li>create a database, and make it highly available and distributed easily using the Admin UI</li>
+<li>look at the deployment using  <code>rladminstatus</code>command.</li>
+</ul>
+
+
+<p>You have also seen, by killing some nodes, how the cluster fail-over will various master services (shards, endpoint, master cluster node) to another node automatically. This to ensure a continuity of service for your application.</p>
+
+<p>In another  postI will show what is the exact behavior of client applications during the fail-over.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2019-09-05T11:33:56+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>11:33 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/cloud/'>cloud</a>, <a class='category' href='/blog/categories/cluster/'>cluster</a>, <a class='category' href='/blog/categories/container/'>container</a>, <a class='category' href='/blog/categories/docker/'>docker</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>, <a class='category' href='/blog/categories/redis/'>redis</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2019/09/02/getting-with-redis-streams-and-java/" title="Previous Post: Getting Started with Redis Streams &amp; Java">&laquo; Getting Started with Redis Streams &amp; Java</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/';
+        var disqus_url = 'http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

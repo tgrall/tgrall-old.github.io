@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="I was discussing with a friend about SOAP testing tools. We all know SOAP UI that is a very powerful one, but I am also using a very simple one &hellip;">
+  <meta name="description" content="Groovy release 1.0 is here now ! You can find the release at the following location: http://dist.codehaus.org/groovy/distributions/ Congratulations &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,58 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/02/groovy-1-dot-0-released/">Groovy 1.0 Released</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-01-02T15:14:55+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2007</span></span> <span class='time'>3:14 pm</span></time>
+        
+           | <a href="/blog/2007/01/02/groovy-1-dot-0-released/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/01/02/groovy-1-dot-0-released/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Groovy release 1.0 is here now !</p>
+
+<p>You can find the release at the following location:</p>
+
+<ul>
+<li><a href="http://dist.codehaus.org/groovy/distributions/">http://dist.codehaus.org/groovy/distributions/</a></li>
+</ul>
+
+
+<p>Congratulations to all the Groovy developers, and users that have done a great job with this language that is here in production. And it is interesting to see that more and more projects are using Groovy as part of their infrastructure to simplify development:</p>
+
+<ul>
+<li>SOAPUI</li>
+<li>XWiki</li>
+<li>Spring 2 integration</li>
+<li>Grails</li>
+<li>&hellip; and many development teams in custom projects</li>
+</ul>
+
+
+<p>So once again happy new year to all&hellip; and enjoy it with Groovy !</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -506,256 +558,6 @@ various handlers where information can be sent:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/10/13/using-https-with-web-services/">Using HTTPS With Web Services</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2006-10-13T22:43:19+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2006</span></span> <span class='time'>10:43 pm</span></time>
-        
-           | <a href="/blog/2006/10/13/using-https-with-web-services/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2006/10/13/using-https-with-web-services/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><em>Prerequisites:</em></p>
-
-<p>In this article you have</p>
-
-<ul>
-<li>already a Web Service deployed in OC4J that is running on the default HTTP port. The WSDL and Endpoint are available. In my sample
-the non secure Web Service endpoint is: <code>http://127.0.0.1:8888/math-service/MathServiceSoapHttpPort</code></li>
-</ul>
-
-
-<h4>Add HTTPS to OC4J</h4>
-
-<h5>Creating of the Keystore</h5>
-
-<p>The first thing to do to secure OC4J would be to create a new keystore
-that will contain the different certificates. The easiest way to do
-that for a Java developer is to use <a href="http://java.sun.com/j2se/1.5.0/docs/tooldocs/solaris/keytool.html">SUN&rsquo;s keytool</a>:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>keytool -genkey -alias oracle-server -dname "CN=Tug Grall, OU=Blog O=Grall And Co L=Redwood Shores, S=CA, C=US" -keyalg RSA -keypass welcome -storepass welcome -keystore server.keystore</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can copy the <code>server.keystore</code> into the <code>$ORACLE_HOME/j2ee/home/config</code> to simplify the next steps.</p>
-
-<h4>Configuring OC4J</h4>
-
-<p>OC4J stand alone is using the notion of Web-Site to expose HTTP resources (Web Applications). The default-web-site is define is he
-<code>$ORACLE_HOME/j2ee/home/config/default-web-site.xml</code>. To secure an OC4J you can follow the steps describe in the <a href="http://download.oracle.com/docs/cd/B25221_04/web.1013/b14429/configssl.htm">OC4J Security guide</a> that I have summarized in the following section.</p>
-
-<p>What we want to achieve for the purpose of the demonstration is to have OC4J using HTTP and HTTPS, on port 8888 and 4443 for example.</p>
-
-<ol>
-<li>Copy <code>default-web-site.xml</code> to <code>secure-web-site.xml</code></li>
-<li>Edit the secure-web-site.xml:
-
-<ul>
-<li>Change the <code>web-site</code> tag by changing the port to <code>4443</code> and adding the element <code>secure="true"</code></li>
-<li>Add the <code>ssl-config</code> element and point this to the new created keystore.</li>
-</ul>
-</li>
-</ol>
-
-
-<p>The file looks like:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;web-site</span>   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>  <span class="na">xsi:noNamespaceSchemaLocation=</span><span class="s">&quot;http://xmlns.oracle.com/oracleas/schema/web-site-10_0.xsd&quot;</span>
-</span><span class='line'>  <span class="na">port=</span><span class="s">&quot;4443&quot;</span>
-</span><span class='line'>  <span class="na">secure=</span><span class="s">&quot;true&quot;</span>
-</span><span class='line'>  <span class="na">display-name=</span><span class="s">&quot;OC4J 10g (10.1.3) Default Web Site&quot;</span>
-</span><span class='line'>  <span class="na">schema-major-version=</span><span class="s">&quot;10&quot;</span>
-</span><span class='line'>  <span class="na">schema-minor-version=</span><span class="s">&quot;0&quot;</span> <span class="nt">&gt;</span>
-</span><span class='line'>  ...
-</span><span class='line'>  <span class="nt">&lt;ssl-config</span> <span class="na">keystore=</span><span class="s">&quot;server.keystore&quot;</span> <span class="na">keystore-password=</span><span class="s">&quot;welcome&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>  ...
-</span><span class='line'><span class="nt">&lt;/web-site&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ol>
-<li>Import the new Web site in your OC4J instance by editing the <code>$ORACLE_HOME/j2ee/home/server.xml</code>
-file. You need to add or replace the web-site tag. In my case I want to
-add the secure web site to my instance so the configuration looks like:</li>
-</ol>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>...
-</span><span class='line'><span class="nt">&lt;web-site</span> <span class="na">default=</span><span class="s">&quot;true&quot;</span> <span class="na">path=</span><span class="s">&quot;./default-web-site.xml&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;web-site</span> <span class="na">path=</span><span class="s">&quot;./secure-web-site.xml&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>...
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since we have copied the file from the default-web-site, all applications are available using HTTP and HTTPS</p>
-
-<h4>Start OC4J and test the HTTPS port</h4>
-
-<p>Start OC4J using the standard Java command or shell script, I am adding the Java Network debug flag that would help you to see what is
-happening at the SSL level.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>java -Djavax.net.debug=ssl -jar oc4j.jar
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You should be able to access the service WSDL using the HTTPS port for example in my case:</p>
-
-<ul>
-<li><code>https://127.0.0.1:4443/math-service/MathServiceSoapHttpPort?WSDL</code></li>
-</ul>
-
-
-<h3>Consuming the Service using HTTPS</h3>
-
-<h4>Generate and configure a client Keystore</h4>
-
-<p>Event if this is possible to use the same keystore for the server and the client, I will guide you in the steps to create a client
-certificate and import the certificate from the existing -server- one.</p>
-
-<p>Here the command <em>to create</em> a new keystore:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>keytool -genkey -alias oracle-client -dname &quot;CN=John Doe, OU=Blog O=MyDummyClient, S=CA, C=US&quot; -keyalg RSA -keypass welcomeClient -storepass welcomeClient -keystore client.keystore
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The next step is <em>to export</em> the certificate from the server keystore to be able to import it in the client:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>keytool -keystore server.keystore -export -alias oracle-server -file server.cer
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can now <em>import the cerificate</em> in the client keystore:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>keytool -keystore client.keystore -import -file server.cer
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Generate the proxy</h3>
-
-<p>You have now the client certificate so you can use the Oracle Web
-Service Assembler to generate the proxy. The only specific thing you
-have to do is to specify which key store to use when running the tool.
-The command to use when generating the proxy is:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>java -Djavax.net.ssl.trustStore=/Users/tgrall/ssl/client.keystore
-</span><span class='line'>    -Djavax.net.ssl.keyStore=/Users/tgrall/ssl/client.keystore
-</span><span class='line'>    -Djavax.net.ssl.trustStorePassword=welcomeClient
-</span><span class='line'>    -Djavax.net.ssl.keyStorePassword=welcomeClient
-</span><span class='line'>    -jar $ORACLE_HOME/webservices/lib/wsa.jar
-</span><span class='line'>    -genProxy
-</span><span class='line'>    -wsdl https://127.0.0.1:4443/math-service/MathServiceSoapHttpPort?WSDL
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Calling the Service using secure endpoint</h3>
-
-<p>Configure the Java Environment to use the client store is made using the following System properties:</p>
-
-<ul>
-<li>javax.net.ssl.trustStore</li>
-<li>javax.net.ssl.keyStore</li>
-<li>javax.net.ssl.trustStorePassword</li>
-<li>javax.net.ssl.keyStorePassword</li>
-</ul>
-
-
-<p>This could be done using different approach, property file, -D command
-line parameter or programmatically. To simply the example I am using
-the programmatic approach, the following code is part of the main
-method of the Client class:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.trustStore&quot;</span><span class="o">,</span> <span class="s">&quot;/Users/tgrall/ssl/client.keystore&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.keyStore&quot;</span><span class="o">,</span> <span class="s">&quot;/Users/tgrall/ssl/client.keystore&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.trustStorePassword&quot;</span><span class="o">,</span> <span class="s">&quot;welcomeClient&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.keyStorePassword&quot;</span><span class="o">,</span> <span class="s">&quot;welcomeClient&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="c1">// Adding Debug information</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.debug&quot;</span><span class="o">,</span> <span class="s">&quot;ssl&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It is possible to change the Endpoint dynamically in the Proxy using the <code>setEndpoint</code> method.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">democlient</span><span class="o">.</span><span class="na">proxy</span><span class="o">.</span><span class="na">MathServiceSoapHttpPortClient</span> <span class="n">myPort</span> <span class="o">=</span> <span class="k">new</span> <span class="n">democlient</span><span class="o">.</span><span class="na">proxy</span><span class="o">.</span><span class="na">MathServiceSoapHttpPortClient</span><span class="o">();</span>
-</span><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">String</span> <span class="n">ep</span> <span class="o">=</span> <span class="s">&quot;https://127.0.0.1:4443/math-service/MathServiceSoapHttpPort&quot;</span><span class="o">;</span>
-</span><span class='line'><span class="n">myPort</span><span class="o">.</span><span class="na">setEndpoint</span><span class="o">(</span><span class="n">ep</span><span class="o">);</span>
-</span><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Result of the operation is &quot;</span><span class="o">+</span> <span class="n">myPort</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span><span class="mi">2</span><span class="o">));</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You should now be able to run the client and call the service using HTTPS. This would look like:</p>
-
-<p><img src="http://static.flickr.com/86/268580831_c24ec07d89_o.png"></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/15">&larr; Older</a>
@@ -773,6 +575,10 @@ method of the Client class:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
       </li>
     
@@ -786,10 +592,6 @@ method of the Client class:</p>
     
       <li class="post">
         <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
       </li>
     
   </ul>

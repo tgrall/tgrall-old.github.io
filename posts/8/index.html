@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Lately, I have been presenting Web 2.0 tools to my coworkers, and explaining how it could be used to improve the way we do &ldquo;things&rdquo; ( &hellip;">
+  <meta name="description" content="Like many of you I am following TechCrunch, and one of the latest post was quite &ldquo;amazing&rdquo;: see the Twitter! post from Michael Arrigton. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/05/26/seesmic-in-action-on-techcrunchs-great-twitter-post-dot-dot-dot/">Seesmic in Action on TechCrunch&#8217;s &#8216;Great&#8217; Twitter Post&#8230;.</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2008-05-26T12:53:17+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2008</span></span> <span class='time'>12:53 pm</span></time>
+        
+           | <a href="/blog/2008/05/26/seesmic-in-action-on-techcrunchs-great-twitter-post-dot-dot-dot/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2008/05/26/seesmic-in-action-on-techcrunchs-great-twitter-post-dot-dot-dot/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://www.techcrunch.com/wp-content/themes/techcrunch/techcrunch.gif">
+Like many of you I am following <a href="http://www.techcrunch.com/">TechCrunch</a>, and one of the latest post was quite &ldquo;amazing&rdquo;:</p>
+
+<ul>
+<li>see the <a href="http://www.techcrunch.com/2008/05/25/twitter-2/">Twitter!</a> post from Michael Arrigton.More than the post itself, the comments that this single word generated is quite funny: so far we have 291 comments&hellip; As you can guess I have not read (all of) them&hellip; But something is interesting, you can see that many people have used <a href="http://www.seesmic.com/">Seesmic </a>to drop a video comment.
+<a href="http://www.seesmic.com/"><img src="http://api.seesmic.com/images/seesmic_logo.png" alt="" /></a></li>
+</ul>
+
+
+<p>I have to say that I am quite impressed by the large number of comments that have  been made using Seesmic.  Bravo to Loic Lemeur&rsquo;s vision for this tools&hellip; This is simply the new and easy way to really do the &ldquo;read/write&rdquo; Web, I should say &ldquo;record/watch&rdquo; Web.</p>
+
+<p>One thing is still bothering me, how to I find interesting content that is saved using Seesmic?</p>
+
+<p>Yes, I can use social features to subscribe to people that are sharing similar center of interest.  But I cannot find any folksonomy on Seesmic, am I missing it, or it is just not available yet?</p>
+
+<p>Or let&rsquo;s dream and imagine than Web search/index engine will be able to index these video content to help me to find interesting content -may be this exists but I have not found it yet-.  Loic, is it your next big feature to transform Seesmic in the next killer app?</p>
+
+<p>So far I do not have the feeling that I missed anything -watch the comments and you will understand-, but it looks like people love to use the video to discuss/share with others, and I can understand why&hellip; We have moved from technical tools: Complex Web Authoring Platform, to easy Blog publishing, to pure video recording tool, so very easy indeed. I can imagine my mother posting a comment to a blog or video now&hellip; thanks to Seesmic!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -523,51 +572,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2008/02/02/oracle-jax-rpc-how-to-change-the-character-encoding/">Oracle JAX-RPC: How to Change the Character Encoding?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2008-02-02T02:13:21+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2008</span></span> <span class='time'>2:13 am</span></time>
-        
-           | <a href="/blog/2008/02/02/oracle-jax-rpc-how-to-change-the-character-encoding/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2008/02/02/oracle-jax-rpc-how-to-change-the-character-encoding/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>By default Oracle Web Service client is sending the SOAP messages using an UTF-8 encoding. This is the recommendation of WS-I Basic Profile. To be exact it says UTF-8 or UTF-16.</p>
-
-<p>It is quite simple to change this encoding&hellip;</p>
-
-<p>First you have to know that the JAX-RPC container will return the same character encoding than the one that is received. To change the character encoding, you just need to set the <code>ClientConstants.CHARACTER_SET_ENCODING</code> to the value you want to use. Here some simple client code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Stub</span> <span class="n">stub</span> <span class="o">=</span> <span class="o">(</span><span class="n">Stub</span><span class="o">)</span><span class="n">myPort</span><span class="o">.</span><span class="na">getPort</span><span class="o">();</span>
-</span><span class='line'><span class="n">stub</span><span class="o">.</span><span class="na">_setProperty</span><span class="o">(</span><span class="n">oracle</span><span class="o">.</span><span class="na">webservices</span><span class="o">.</span><span class="na">ClientConstants</span><span class="o">.</span><span class="na">CHARACTER_SET_ENCODING</span><span class="o">,</span> <span class="s">&quot;UTF-16&quot;</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Most of the Web Services stacks are offering the same kind of utility to do that, for example here the property you must set to do the same in IBM&rsquo;s JAX-RPC implementation: <code>com.ibm.wsspi.webservices.Constants.MESSAGE_CHARACTER_SET_ENCODING</code>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/9">&larr; Older</a>
@@ -585,6 +589,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
       </li>
     
@@ -598,10 +606,6 @@
     
       <li class="post">
         <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
       </li>
     
   </ul>

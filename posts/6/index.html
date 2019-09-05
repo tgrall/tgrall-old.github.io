@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Yesterday, eXo has launched a new cloud based service: the eXo Cloud IDE. This IDE is an online service that facilitates the development of gadgets &hellip;">
+  <meta name="description" content="During a partner workshop I was showing to the developers how the eXo IDE can help them to develop new features quickly and push them to the users in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,413 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/04/11/how-to-protect-your-rest-service-and-gadget-in-exo-platform/">How to Protect Your REST Service and Gadget in eXo Platform</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-04-11T20:22:56+02:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>8:22 pm</span></time>
+        
+           | <a href="/blog/2011/04/11/how-to-protect-your-rest-service-and-gadget-in-exo-platform/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2011/04/11/how-to-protect-your-rest-service-and-gadget-in-exo-platform/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>During a partner workshop I was showing to the developers how the eXo IDE can help them to develop new features quickly and push them to the users in few minutes. A person asked me if it is possible to put some restriction in services and gadgets based on user profile.</p>
+
+<p>As you can guess the answer is YES WE CAN!</p>
+
+<ul>
+<li>How to access the security context in a REST service</li>
+<li>How to check is a user is member of a  group and manage permission from this information</li>
+<li>How to consume this service in a gadget and leverage the security to protect resources</li>
+</ul>
+
+
+<p><img src="http://1.bp.blogspot.com/-eR15bpCaiXo/TZ8yp1kkLYI/AAAAAAAAAPM/8Az5EVfVrzU/s200/rest-no-access.png">
+Not-authorized</p>
+
+<p><img src="http://2.bp.blogspot.com/-wcfWsRgV8Xc/TZ8ypzrBsLI/AAAAAAAAAPE/U9VnHpc3q9M/s200/rest-access.png">
+Authorized</p>
+
+<p>If you are not interested to follow steps by step the explanations you can directly jump to the complete <a href="#completeService">REST Service code</a> or download the full eXo IDE Project from <a href="https://github.com/tgrall/sample-gadget-with-security">GitHub</a></p>
+
+<h3>Access the User Profile from your REST Service</h3>
+
+<p>As you probably know eXo Platform uses <a href="http://jcp.org/en/jsr/detail?id=311">JAX-RS</a> as API to develop and deploy REST Services. eXo developers can create REST services using their favorite Java IDE, but here I am using the eXo IDE package with <a href="http://www.exoplatform.org/company/public/website/platform">eXo Platform</a>.</p>
+
+<p>To access the security and user information in your service method it is possible to use the <a href="http://jersey.java.net/nonav/apidocs/1.5/jersey/javax/ws/rs/core/SecurityContext.html">SecurityContext</a> class of the JAX-RS API.  Your method signature will look like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Path</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.GET</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.PathParam</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.Response</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.MediaType</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Produces</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.SecurityContext</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.Context</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/system&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@Produces</span><span class="o">(</span><span class="s">&quot;application/json&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SystemInformationService</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@GET</span>
+</span><span class='line'>  <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;information&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Response</span> <span class="nf">getSystemInfo</span><span class="o">(</span><span class="nd">@Context</span> <span class="n">SecurityContext</span> <span class="n">sc</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">sc</span><span class="o">.</span><span class="na">getUserPrincipal</span><span class="o">();</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">,</span> <span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In lines 7 and 8, I import the classes needed to inject the security context in the method <code>getSystemInfo()</code> in line 16. For now let&rsquo;s forget about the other part of the code.</p>
+
+<p>With the Security Context object you can now access many things in your code. Two methods are quite interesting for this example: <code>getUserPrincipal()</code> and <code>isUserInRole()</code>, since our goal is to check if a user is allowed to execute or not a part of the business logic.</p>
+
+<p>It is important here to remember that we cannot directly use the <code>isUserInRole()</code> method since this method uses the logical JavaEE roles that are defined at the Java application level. In our case we are interested to know if a user is present in a &ldquo;eXo User Identity&rdquo; Group, for example member of the <code>/platform/administrators group</code>. This information is populated during the login process and comes from the user provider that could be LDAP, the eXo Database or JCR, or any other source since developers can extend this API to plug their own provider.</p>
+
+<p>Let&rsquo;s create an helper method that check, using the eXo Identity Service, if the user that executes the method is present in a group.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.container.ExoContainer</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.container.ExoContainerContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.container.component.ComponentPlugin</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.services.security.Identity</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.services.security.IdentityRegistry</span><span class="o">;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">isMemberOf</span><span class="o">(</span><span class="n">String</span> <span class="n">username</span><span class="o">,</span><span class="n">String</span> <span class="n">group</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">ExoContainer</span> <span class="n">container</span> <span class="o">=</span> <span class="n">ExoContainerContext</span><span class="o">.</span><span class="na">getCurrentContainer</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">IdentityRegistry</span> <span class="n">identityRegistry</span> <span class="o">=</span> <span class="o">(</span><span class="n">IdentityRegistry</span><span class="o">)</span> <span class="n">container</span><span class="o">.</span><span class="na">getComponentInstanceOfType</span><span class="o">(</span><span class="n">IdentityRegistry</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">Identity</span> <span class="n">identity</span> <span class="o">=</span> <span class="n">identityRegistry</span><span class="o">.</span><span class="na">getIdentity</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">identity</span><span class="o">.</span><span class="na">isMemberOf</span><span class="o">(</span> <span class="n">group</span> <span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So this method is quite simple, it takes as parameter:</p>
+
+<ul>
+<li>the name of the user, that you can get from the <code>UserPrincipal.getName()</code> method</li>
+<li>the eXo Group you want to check, for example <code>/platform/administrator</code></li>
+</ul>
+
+
+<p>You can now call this method from your resource to check the user, and code the &ldquo;permission business logic&rdquo;. The method could now looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@GET</span>
+</span><span class='line'><span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;information&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Response</span> <span class="nf">getSystemInfo</span><span class="o">(</span><span class="nd">@Context</span> <span class="n">SecurityContext</span> <span class="n">sc</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">String</span> <span class="n">groupToCheck</span> <span class="o">=</span> <span class="s">&quot;/platform/administrators&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">String</span> <span class="n">response</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">sc</span><span class="o">.</span><span class="na">getUserPrincipal</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="o">!</span><span class="k">this</span><span class="o">.</span><span class="na">isMemberOf</span><span class="o">(</span><span class="n">sc</span><span class="o">.</span><span class="na">getUserPrincipal</span><span class="o">().</span><span class="na">getName</span><span class="o">(),</span> <span class="n">groupToCheck</span><span class="o">)</span> <span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="s">&quot;NOT-ALLOWED&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">response</span> <span class="o">=</span> <span class="s">&quot;ALLOWED&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span>  <span class="n">response</span>   <span class="o">,</span> <span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this example for simplicity reason I have hard coded the group to check, you can obviously use smarter code to user external configuration to inject a list of group to check for example. I manage the security logic of my method using simple if statement and return a string. You can also depending of your needs, manage the status of your response and use HTTP Code for example return an <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">HTTP 403</a>. For this you just need to return a different response using following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">status</span><span class="o">(</span><span class="n">Response</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">FORBIDDEN</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For simplicity reason I will stay with a single Response status (OK) and manage the permission in my client code.</p>
+
+<h3>Complete REST Service</h3>
+
+<p>Let&rsquo;s take a look to the full service now, this service allows administrators to get the list of the System Properties, other users get an status string &ldquo;NOT-ALLOWED&rdquo;:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Path</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.GET</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.PathParam</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.Response</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.MediaType</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.CacheControl</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.Produces</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.SecurityContext</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">javax.ws.rs.core.Context</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.container.ExoContainer</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.container.ExoContainerContext</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.container.component.ComponentPlugin</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.services.security.Identity</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.services.security.IdentityRegistry</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/system&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@Produces</span><span class="o">(</span><span class="s">&quot;application/json&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SystemInformationService</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@GET</span>
+</span><span class='line'>  <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;information&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Response</span> <span class="nf">getSystemInfo</span><span class="o">(</span><span class="nd">@Context</span> <span class="n">SecurityContext</span> <span class="n">sc</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">groupToCheck</span> <span class="o">=</span> <span class="s">&quot;/platform/administrators&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">SimpleResponseWrapper</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">SimpleResponseWrapper</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">sc</span><span class="o">.</span><span class="na">getUserPrincipal</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="o">!</span><span class="k">this</span><span class="o">.</span><span class="na">isMemberOf</span><span class="o">(</span><span class="n">sc</span><span class="o">.</span><span class="na">getUserPrincipal</span><span class="o">().</span><span class="na">getName</span><span class="o">(),</span> <span class="n">groupToCheck</span><span class="o">)</span> <span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">response</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="s">&quot;NOT-ALLOWED&quot;</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">response</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="s">&quot;OK&quot;</span><span class="o">;</span>
+</span><span class='line'>      <span class="n">response</span><span class="o">.</span><span class="na">data</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">getProperties</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">CacheControl</span> <span class="n">cacheControl</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">CacheControl</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">cacheControl</span><span class="o">.</span><span class="na">setNoCache</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">cacheControl</span><span class="o">.</span><span class="na">setNoStore</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span>  <span class="n">response</span>   <span class="o">,</span> <span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">).</span><span class="na">cacheControl</span><span class="o">(</span><span class="n">cacheControl</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kt">boolean</span> <span class="nf">isMemberOf</span><span class="o">(</span><span class="n">String</span> <span class="n">username</span><span class="o">,</span><span class="n">String</span> <span class="n">role</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">ExoContainer</span> <span class="n">container</span> <span class="o">=</span> <span class="n">ExoContainerContext</span><span class="o">.</span><span class="na">getCurrentContainer</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">IdentityRegistry</span> <span class="n">identityRegistry</span> <span class="o">=</span> <span class="o">(</span><span class="n">IdentityRegistry</span><span class="o">)</span> <span class="n">container</span><span class="o">.</span><span class="na">getComponentInstanceOfType</span><span class="o">(</span><span class="n">IdentityRegistry</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">Identity</span> <span class="n">identity</span> <span class="o">=</span> <span class="n">identityRegistry</span><span class="o">.</span><span class="na">getIdentity</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">identity</span><span class="o">.</span><span class="na">isMemberOf</span><span class="o">(</span> <span class="n">role</span> <span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SimpleResponseWrapper</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">String</span> <span class="n">status</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">Object</span> <span class="n">data</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To summarize:</p>
+
+<ul>
+<li>Line 24 : the <span style="font-family: Courier New,Courier,mono">SecurityContext</span> is injected to the method</li>
+<li>Line 26 : Initialization of a simple <span style="font-family: Courier New,Courier,mono">ResponseWrapper</span> defined on line 51, that contains a status and data. That will be serialized in JSON by the eXo REST engine.* Line 28 : the method check if a user is connected and member of <span style="font-family: Courier New,Courier,mono">/platform/administrator</span>. If not it send response with the status NO-ALLOWED.</li>
+<li>Line 31/32 : The response object is sent. This response contains an OK status and the data (system properties list)</li>
+<li>Line 42 : Using the eXo Identity Service, the method check if the connected user is member of a specific group.</li>
+</ul>
+
+
+<h3>Consume the service into a Gadget</h3>
+
+<p>I can now take this service and consume it into an Gadget. I also develop this Gadget using the eXo IDE.</p>
+
+<p>The following code shows the Javascript part of the Gadget that calls the service, check the security and push the response content in Gadget body. For productivity I use JQuery framework.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">printInfo</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">htmlResponse</span><span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s2">&quot;OK&quot;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">htmlResponse</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;&lt;tr&gt;&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">htmlResponse</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;&lt;tr&gt;&lt;td&gt;&#39;</span><span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">&#39;&lt;/td&gt;&lt;td&gt;&#39;</span> <span class="o">+</span> <span class="nx">value</span> <span class="o">+</span> <span class="s1">&#39;&lt;/td&gt;&lt;/tr&gt;&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="nx">htmlResponse</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;&lt;/tr&gt;&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#systemInfo&#39;</span><span class="p">).</span><span class="nx">height</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">htmlResponse</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;Not permitted&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#systemInfo&#39;</span><span class="p">).</span><span class="nx">height</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#systemInfo&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">htmlResponse</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">));</span>
+</span><span class='line'>  <span class="nx">gadgets</span><span class="p">.</span><span class="nb">window</span><span class="p">.</span><span class="nx">adjustHeight</span><span class="p">(</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#sysInfoContainer&#39;</span><span class="p">).</span><span class="nx">outerHeight</span><span class="p">()</span>  <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">loadInformationFromServer</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;/rest/private/system/information&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">){</span> <span class="nx">printInfo</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>   <span class="p">}</span> <span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">loadInformationFromServer</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">gadgets</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">registerOnLoadHandler</span><span class="p">(</span><span class="nx">init</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here some quick explanation about this code:</p>
+
+<ul>
+<li>Line 23: To call the REST service, I use the <span style="font-family: Courier New,Courier,mono">$.getJSON()</span> method. This method is really easy to use when you are executing the Gadget is in the same container than the portal that consumes it. When you are using the gadget.io.MakeRequest is interesting to proxy a request and you need to re-authenticate, for example using oAuth.</li>
+<li>Line 3 : This is the call back method, as you can see in this method I use the <span style="font-family: Courier New,Courier,mono">ResponseWrapper</span> to check the code in the status attribute. Depending of the status OK or not I do print the value.</li>
+</ul>
+
+
+<h3>Conclusion</h3>
+
+<p>In this how-to you have learned how to:</p>
+
+<ul>
+<li>Get the security context in your REST Service</li>
+<li>Check the membership of a user using the eXo Identity Service</li>
+<li>Create a gadget that consume this service and expose only data to user with correct profile</li>
+<li>Download the full project from <a href="https://github.com/tgrall/sample-gadget-with-security">GitHub</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -631,56 +1038,6 @@ So using the JCR API you just need to get the content length using the following
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/03/30/conference-season-for-exo-platform-in-paris/">Conference Season for eXo Platform in Paris</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2009-03-30T01:03:00+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>1:03 am</span></time>
-        
-           | <a href="/blog/2009/03/30/conference-season-for-exo-platform-in-paris/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2009/03/30/conference-season-for-exo-platform-in-paris/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>eXo Platform, and I, will be present in conferences in the upcoming weeks:</p>
-
-<ul>
-<li><a href="http://www.solutionslinux.fr/">Linux Solutions</a>, March 31st - April 2nd : In addition to the demonstration pod where you can meet eXo people, I am inviting you to joing us during the <a href="http://www.ow2.org/view/Events2009AnnualConference/">OW2 Annual Conference</a> presentations:
-
-<ul>
-<li>Next generation Portals: how OpenSocial standard adds social to the mix (April 2, 01:30 - 02:00)</li>
-<li>Which Portlet Bridge is made for you? (April 2, 02:00 - 02:30)</li>
-</ul>
-</li>
-</ul>
-
-
-<p>You can find the <a href="http://www.ow2.org/view/Events2009AnnualConference/Sessions">full program here</a>.</p>
-
-<ul>
-<li><a href="http://www.salon-intranet.com/">Salon Intranet</a>, May 12th,13th : Once again, eXo will be present with a demonstration pod, but also come to meet eXo CEO, Benjamin Mestrallet and myself during the &ldquo;eXo Platform, the Open Source solution for your Intranet&rdquo; on May 12th from 3pm-4pm.</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/7">&larr; Older</a>
@@ -698,6 +1055,10 @@ So using the JCR API you just need to get the content length using the following
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
       </li>
     
@@ -711,10 +1072,6 @@ So using the JCR API you just need to get the content length using the following
     
       <li class="post">
         <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
       </li>
     
   </ul>

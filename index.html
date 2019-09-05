@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="As you may have seen, I have joined Redis Labs a month ago; one of the first task as a new hire is to learn more about Redis. So I learned, and I am &hellip;">
+  <meta name="description" content="As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-09-05T11:33:56+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>11:33 am</span></time>
+        
+           | <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Server (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.</p>
+
+<p>Once your cluster is up &amp; running, you will kill some containers to see how the system automatically fail-over to guarantee service continuity.</p>
+
+<p>The deployment will look more or less like the schema below, (<em><a href="https://docs.redislabs.com/latest/rs/getting-started/docker/">coming from RedisLabs documentation</a></em>)</p>
+
+<p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/docker-deployment.png"></p>
+
+<p><strong>Prerequisites:</strong></p>
+
+<p><em>Docker Desktop (</em>I am running Docker on Mac*)</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -529,43 +576,6 @@ this article use the same code and approach than the <a href="http://tgrall.gith
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json/">Save MapR Streams Messages Into MapR DB JSON</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-03-31T09:00:07+02:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>9:00 am</span></time>
-        
-           | <a href="/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In this article you will learn how to create a MapR Streams Consumer that saves all the messages into a <a href="http://maprdocs.mapr.com/51/#MapR-DB/JSON_DB/mapr_db_json_top.html">MapR-DB JSON Table</a>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/03/31/save-mapr-streams-messages-into-mapr-db-json/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -581,6 +591,10 @@ this article use the same code and approach than the <a href="http://tgrall.gith
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
       </li>
     
@@ -594,10 +608,6 @@ this article use the same code and approach than the <a href="http://tgrall.gith
     
       <li class="post">
         <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/02/getting-started-with-mqtt/">Getting Started With MQTT and Java</a>
       </li>
     
   </ul>
