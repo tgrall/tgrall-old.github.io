@@ -6,7 +6,7 @@ comments: true
 categories: redis nosql cluster docker container cloud
 ---
 
-As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Server (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.
+As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Software (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.
 
 Once your cluster is up & running, you will kill some containers to see how the system automatically fail-over to guarantee service continuity.
 
@@ -14,12 +14,20 @@ The deployment will look more or less like the schema below, (*[coming from Redi
 
 {%img center /images/posts/multi-nodes-redis-cluster-with-docker/docker-deployment.png %}
 
+This is a perfect environment for learning, developing and testing your applications, but it is not supported in production; for production, you can use:
+
+* [Redis Cloud](https://redislabs.com/redis-enterprise/pro/)
+* [Redis Enterprise Software with Kubernetes and Red Hat OpenShift](https://docs.redislabs.com/latest/platforms/openshift/)
+* [Redis Enterprise Software with Kubernetes Operator on PKS (Pivotal Container Service)](https://docs.redislabs.com/latest/platforms/pks/)
+* [Redis Enterprise for Pivotal Cloud Foundry (PCF)](https://docs.redislabs.com/latest/platforms/pcf/).
+
+<!--more-->
+
 
 **Prerequisites:**
 
 * Docker Desktop (*I am running Docker on Mac*)
 
-<!--more-->
 
 ### Installing and Running your First Redis Node
 
