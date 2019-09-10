@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Redis | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/redis/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-05T15:59:01+02:00</updated>
+  <updated>2019-09-10T09:02:17+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -18,7 +18,7 @@
     <link href="http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/"/>
     <updated>2019-09-05T11:33:56+02:00</updated>
     <id>http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker</id>
-    <content type="html"><![CDATA[<p>As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Server (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.</p>
+    <content type="html"><![CDATA[<p>As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Software (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.</p>
 
 <p>Once your cluster is up &amp; running, you will kill some containers to see how the system automatically fail-over to guarantee service continuity.</p>
 
@@ -26,14 +26,24 @@
 
 <p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/docker-deployment.png"></p>
 
+<p>This is a perfect environment for learning, developing and testing your applications, but it is not supported in production; for production, you can use:</p>
+
+<ul>
+<li><a href="https://redislabs.com/redis-enterprise/pro/">Redis Cloud</a></li>
+<li><a href="https://docs.redislabs.com/latest/platforms/openshift/">Redis Enterprise Software with Kubernetes and Red Hat OpenShift</a></li>
+<li><a href="https://docs.redislabs.com/latest/platforms/pks/">Redis Enterprise Software with Kubernetes Operator on PKS (Pivotal Container Service)</a></li>
+<li><a href="https://docs.redislabs.com/latest/platforms/pcf/">Redis Enterprise for Pivotal Cloud Foundry (PCF)</a>.</li>
+</ul>
+
+
+<!--more-->
+
+
 <p><strong>Prerequisites:</strong></p>
 
 <ul>
 <li>Docker Desktop (<em>I am running Docker on Mac</em>)</li>
 </ul>
-
-
-<!--more-->
 
 
 <h3>Installing and Running your First Redis Node</h3>

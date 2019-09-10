@@ -103,7 +103,7 @@
   </header>
 
 
-  <div class="entry-content"><p>As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Server (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.</p>
+  <div class="entry-content"><p>As part of my on-boarding/training at RedisLabs I continue to play with the product, and I have decided today to install a local 3 nodes cluster of Redis Enterprise Software (RS); and show how easy is to move from a single node/shard database to a multi nodes highly available one.</p>
 
 <p>Once your cluster is up &amp; running, you will kill some containers to see how the system automatically fail-over to guarantee service continuity.</p>
 
@@ -111,10 +111,13 @@
 
 <p><img class="center" src="/images/posts/multi-nodes-redis-cluster-with-docker/docker-deployment.png"></p>
 
-<p><strong>Prerequisites:</strong></p>
+<p>This is a perfect environment for learning, developing and testing your applications, but it is not supported in production; for production, you can use:</p>
 
 <ul>
-<li>Docker Desktop (<em>I am running Docker on Mac</em>)</li>
+<li><a href="https://redislabs.com/redis-enterprise/pro/">Redis Cloud</a></li>
+<li><a href="https://docs.redislabs.com/latest/platforms/openshift/">Redis Enterprise Software with Kubernetes and Red Hat OpenShift</a></li>
+<li><a href="https://docs.redislabs.com/latest/platforms/pks/">Redis Enterprise Software with Kubernetes Operator on PKS (Pivotal Container Service)</a></li>
+<li><a href="https://docs.redislabs.com/latest/platforms/pcf/">Redis Enterprise for Pivotal Cloud Foundry (PCF)</a>.</li>
 </ul>
 
 
