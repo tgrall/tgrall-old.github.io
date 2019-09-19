@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Download the Beta version of the Oracle Application Server Developer&rsquo;s Guide for Microsoft Office Interoperability along with sample code (and &hellip;">
+  <meta name="description" content="When I was working in Oracle Consulting I was surprised to see how many customers are using character mode applications, base on Oracle Forms. Lot of &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/03/13/oracle-industrial-telnet-server-its-the-oracleas-hidden-treasure-dot/">Oracle Industrial Telnet Server (ITS): The OracleAS Hidden Treasure..</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2006-03-13T20:28:35+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2006</span></span> <span class='time'>8:28 pm</span></time>
+        
+           | <a href="/blog/2006/03/13/oracle-industrial-telnet-server-its-the-oracleas-hidden-treasure-dot/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2006/03/13/oracle-industrial-telnet-server-its-the-oracleas-hidden-treasure-dot/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When I was working in Oracle Consulting I was surprised to see how many customers are using character mode applications, base on Oracle Forms. Lot of applications in wharehouses, harbour, &hellip; are using telnet terminal, usually remote/mobile using RF networks.</p>
+
+<p>Moving to Java on the server was very hard for them because of the lack of support for easy character mode development based solutions.</p>
+
+<p>OracleAS 10_g<em>/ADFprovides such support with the </em>Industrial Telnet Server (ITS)_.  ITS is the telnet server running in a J2EE container as a J2CA adaptor, and uses JavaServer Faces to render the user interface. The advantage of using JSF for the UI, it allows developer to leverage automatically different renderers (HTML, Mobile and telnet) without changing the application.</p>
+
+<p>Here an example of the different renderer provided by Oracle ADF Faces (Instant Messaging, PDA, HTML and Telnet)
+<a href="http://farm1.static.flickr.com/172/388762316_44c01f4260_o.png"><img src="http://farm1.static.flickr.com/172/388762316_44c01f4260_o.png" alt="jsf-renderer.PNG" /></a></p>
+
+<p>If you are looking for more information around Oracle ITS:</p>
+
+<ul>
+<li><a href="http://www.oracle.com/technology/products/iaswe/adfmb.html">Oralce ADF Mobile</a></li>
+<li><a href="http://www.oracle.com/technology/products/jdev/101/howtos/telnet/index.html">How To Install, Configure, and Manage the Industrial Telnet Server</a></li>
+<li><a href="http://www.oracle.com/technology/products/iaswe/adfmb/mbl_pits3pinstall.html">How To Install the Industrial Telnet Server on Third-Party Containers</a></li>
+<li><a href="http://www.oracle.com/technology/products/iaswe/adfmb/tiki-download_file.php152_telnet.swf">Demonstration: Using JDeveloper to create Telnet Applications</a>(flash)</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -542,71 +591,6 @@ Groovy and other scripting languages will help. And I will also
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2005/10/20/can-i-do-soa-with-web-services-today/">Can I Do SOA With Web Services Today?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2005-10-20T21:20:14+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2005</span></span> <span class='time'>9:20 pm</span></time>
-        
-           | <a href="/blog/2005/10/20/can-i-do-soa-with-web-services-today/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2005/10/20/can-i-do-soa-with-web-services-today/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I am just coming back for Toronto where I have been presenting Oracle
-Developer Day: SOA for J2EE Developers. As part of this exercise I have
-introduced Web Services and related technologies/standards.</p>
-
-<p>A person in the audience asked me:</p>
-
-<blockquote><p>But can I do SOA Today?
-Are Web Services are mature enough?</p></blockquote>
-
-<p>I think that is a very interesting and valid question. The answer is
-certainly:&nbsp;</p>
-
-<ul>
-<li><em>Yes you can, and I would add, yes you should!!</em></li>
-</ul>
-
-
-<p>Web Services are &nbsp;definitively big actors in Service Oriented
-Architecture since by definition they are loosely coupled,
-implementation agnostic and facilitate reusability. In the same time
-the concern of this person are justified since some important pieces of
-infrastructure are yet available in vendors solutions. Or if they exist
-they are proprietary and won&rsquo;t allow interoperability of the service
-with other stack&hellip; Losing interoperability is a big deal when you talk
-about Web Services since most of the time, if the designers want to use
-Web Services it is to be able to reuse it in various applications,
-independently of the platform where this application is running.</p>
-
-<h4>Why I have answered Yes?</h4>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2005/10/20/can-i-do-soa-with-web-services-today/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/17">&larr; Older</a>
@@ -624,6 +608,10 @@ independently of the platform where this application is running.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
       </li>
     
@@ -637,10 +625,6 @@ independently of the platform where this application is running.</p>
     
       <li class="post">
         <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
       </li>
     
   </ul>

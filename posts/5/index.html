@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="NOTE: The Couchbase Node.js Client Library is currently changing. I will update this article and source code once the API is stable. I am currently &hellip;">
+  <meta name="description" content="An easy way to create large dataset when playing/demonstrating Couchbase -or any other NoSQL engine- is to inject Twitter feed into your database. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,311 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/">Couchbase : Create a Large Dataset Using Twitter and Java</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-11-05T21:11:00+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>9:11 pm</span></time>
+        
+           | <a href="/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/11/05/couchbase-create-a-large-dataset-using-twitter-and-java/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>An easy way to create large dataset when playing/demonstrating Couchbase -or any other NoSQL engine- is to inject Twitter feed into your database.</p>
+
+<p>For this small application I am using:</p>
+
+<ul>
+<li><a href="http://www.couchbase.com/downloads-all#couchbase-server-2-0">Couchbase Server 2.0 Server</a></li>
+<li><a href="http://www.couchbase.com/develop/java/next">Couchbase Java SDK</a> (will be installed by Maven)</li>
+<li><a href="http://twitter4j.org/">Twitter4J</a> (will be installed by Maven)</li>
+<li><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a> called using Twitter4J</li>
+</ul>
+
+
+<p>In this example I am using Java to inject Tweets into Couchbase, you can obviously use another langage if you want to.</p>
+
+<p>The sources of this project are available on my Github repository <a href="https://github.com/tgrall/couchbase-twitter-injector"> Twitter Injector for Couchbase</a> you can also download the Binary version <a href="https://github.com/downloads/tgrall/couchbase-twitter-injector/CouchbaseTwitterInjector.jar">here</a>, and execute the application from the command line, see <a href="http://www.blogger.com/blogger.g?blogID=785895453418216075#runTheApp">Run The Application paragraph</a>. Do not forget to create your Twitter oAuth keys (see next paragraph)</p>
+
+<h4>Create oAuth Keys</span></h4>
+
+<p>The first thing to do to be able to use the Twitter API is to create a set of keys. If you want to learn more about all these keys/tokens take a look to the oAuth protocol : <a href="http://oauth.net/">http://oauth.net/</a></p>
+
+<p>1- Log in into the Twitter Development Portal : <a href="https://dev.twitter.com/">https://dev.twitter.com/</a></p>
+
+<p>2- Create a new Application</p>
+
+<p>Click on the &ldquo;Create an App&rdquo; link or go into the &ldquo;User Menu &gt; My Applications &gt; Create a new application&rdquo;</p>
+
+<p>3- Enter the Application Details information</p>
+
+<p><img src="http://4.bp.blogspot.com/-zxOaF_YLaO0/UJhoZOhjoJI/AAAAAAAAAVk/7HnRfFRSKxs/s320/couchbase-twitter-001.png"></p>
+
+<p>4- Click &ldquo;Create Your Twitter Application&rdquo; button</p>
+
+<p>Your application&rsquo;s OAuth settings are now available :</p>
+
+<p><img src="http://3.bp.blogspot.com/-ZdaST7c-HdY/UJhqi8WJMGI/AAAAAAAAAVs/ndeXQwc4F0k/s320/couchbase-twitter-002.png"></p>
+
+<p>5- Go down on the Application Settings page and click on the &ldquo;Create My Access Token&rdquo; button</p>
+
+<p><img src="http://4.bp.blogspot.com/-WIW2AN93n6k/UJhrfZV1AVI/AAAAAAAAAV0/OseQ1EOpg9k/s320/couchbase-twitter-003.png"></p>
+
+<p>You have now all the necessary information to create your application:</p>
+
+<ul>
+<li>Consumer key</li>
+<li>Consumer secret</li>
+<li>Access token</li>
+<li>Access token secret</li>
+</ul>
+
+
+<p>These keys will be uses in the <code>twitter4j.properties</code> file when running the Java application from the command line</p>
+
+<h4>Create the Java Application</h4>
+
+<p>The following code is the main code of the application:</p>
+
+<div><script src='https://gist.github.com/4022377.js'></script>
+<noscript><pre><code>package com.couchbase.demo;
+
+import com.couchbase.client.CouchbaseClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+import twitter4j.*;
+import twitter4j.json.DataObjectFactory;
+
+
+import java.io.InputStream;
+import java.net.URI;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+public class TwitterInjector {
+
+    public final static String COUCHBASE_URIS = &quot;couchbase.uri.list&quot;;
+    public final static String COUCHBASE_BUCKET = &quot;couchbase.bucket&quot;;
+    public final static String COUCHBASE_PASSWORD = &quot;couchbase.password&quot;;
+
+    private List&lt;URI&gt; couchbaseServerUris = new ArrayList&lt;URI&gt;();
+    private String couchbaseBucket = &quot;default&quot;;
+    private String couchbasePassword = &quot;&quot;;
+
+
+    public static void main(String[] args) {
+        TwitterInjector twitterInjector = new TwitterInjector();
+        twitterInjector.setUp();
+        twitterInjector.injectTweets();
+    }
+
+    private void setUp() {
+        try {
+            Properties prop = new Properties();
+            InputStream in = TwitterInjector.class.getClassLoader().getResourceAsStream(&quot;twitter4j.properties&quot;);
+            if (in == null) {
+                throw new Exception(&quot;File twitter4j.properties not found&quot;);
+            }
+            prop.load(in);
+            in.close();
+
+            if (prop.containsKey(COUCHBASE_URIS)) {
+                String[] uriStrings =  prop.getProperty(COUCHBASE_URIS).split(&quot;,&quot;);
+                for (int i=0; i&lt;uriStrings.length; i++) {
+                    couchbaseServerUris.add( new URI( uriStrings[i] ) );
+                }
+
+            } else {
+                couchbaseServerUris.add( new URI(&quot;http://127.0.0.1:8091/pools&quot;) );
+            }
+
+            if (prop.containsKey(COUCHBASE_BUCKET)) {
+                couchbaseBucket = prop.getProperty(COUCHBASE_BUCKET);
+            }
+
+            if (prop.containsKey(COUCHBASE_PASSWORD)) {
+                couchbasePassword = prop.getProperty(COUCHBASE_PASSWORD);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println( e.getMessage() );
+            System.exit(0);
+        }
+
+
+    }
+
+
+
+    private void injectTweets() {
+        TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
+        try {
+            final CouchbaseClient cbClient = new CouchbaseClient( couchbaseServerUris , couchbaseBucket , couchbasePassword );
+            System.out.println(&quot;Send data to : &quot;+  couchbaseServerUris +&quot;/&quot;+ couchbaseBucket );
+            StatusListener listener = new StatusListener() {
+
+                @Override
+                public void onStatus(Status status) {
+                    String twitterMessage = DataObjectFactory.getRawJSON(status);
+
+                    // extract the id_str from the JSON document
+                    // see : https://dev.twitter.com/docs/twitter-ids-json-and-snowflake
+                    try {
+                        JSONObject statusAsJson = new JSONObject(twitterMessage);
+                        String idStr = statusAsJson.getString(&quot;id_str&quot;);
+                        cbClient.add( idStr ,0, twitterMessage  );
+                        System.out.print(&quot;.&quot;);
+                    } catch (JSONException e) {
+                        e.printStackTrace(); 
+                    }
+                }
+
+                @Override
+                public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+                }
+
+                @Override
+                public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+                }
+
+                @Override
+                public void onScrubGeo(long userId, long upToStatusId) {
+                }
+
+                @Override
+                public void onException(Exception ex) {
+                    ex.printStackTrace();
+                }
+            };
+
+        twitterStream.addListener(listener);
+        twitterStream.sample();
+
+        } catch (Exception e) {
+            e.printStackTrace();  
+        }
+    }
+
+
+
+}
+</code></pre></noscript></div>
+
+
+<p>Some basic explanation:</p>
+
+<ul>
+<li>The <code>setUp()</code> method simply reads the <code>twitter4j.properties</code> file from the classpath to build the Couchbase connection string.</li>
+<li>The <code>injectTweets</code> opens the Couchbase connection -line 76- and calls the TwitterStream API.</li>
+<li>A Listener is created and will receive all the <code>onStatus(Status status)</code> from Twitter. The most important method is onStatus() that receive the message and save it into Couchbase.</li>
+<li>One interesting thing : since Couchbase is a JSON Document database it allows your to just take the JSON String and save it directly. <code>cbClient.add(idStr,0 ,twitterMessage);</code></li>
+</ul>
+
+
+<h4>Packaging</h4>
+
+<p>To be able to execute the application directly from the Jar file, I am using the assembly plugin with the following informations from the pom.xml:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>  ...
+</span><span class='line'><span class="nt">&lt;archive&gt;</span>
+</span><span class='line'><span class="nt">&lt;manifest&gt;</span>
+</span><span class='line'><span class="nt">&lt;mainclass&gt;</span>com.couchbase.demo.TwitterInjector<span class="nt">&lt;/mainclass&gt;</span>
+</span><span class='line'><span class="nt">&lt;/manifest&gt;</span>
+</span><span class='line'><span class="nt">&lt;manifestentries&gt;</span>
+</span><span class='line'><span class="nt">&lt;class-path&gt;</span>.<span class="nt">&lt;/class-path&gt;</span>
+</span><span class='line'><span class="nt">&lt;/manifestentries&gt;</span>
+</span><span class='line'><span class="nt">&lt;/archive&gt;</span>
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Some information:</p>
+
+<ul>
+<li>The mainClass</span> entry allows you to set which class to execute when running java -jar</span> command.</li>
+<li>The Class-Path</span> entry allows you to set the current directory as part of the classpath where the program will search for the twitter4j.properties</span> file.</li>
+<li>The assembly file is also configure to include all the dependencies (Twitter4J, Couchbase client  SDK, &hellip;)</li>
+</ul>
+
+
+<p>If you do want to build it from the sources, simply run :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mvn clean package
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will create the following Jar file ./target/CouchbaseTwitterInjector.jar</span></p>
+
+<h4>Run the Java Application</span></h4>
+
+<p>Before running the application you must create a twitter4j.properties file with the following information :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>twitter4j.jsonStoreEnabled<span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>
+</span><span class='line'>oauth.consumerKey<span class="o">=[</span>YOUR CONSUMER KEY<span class="o">]</span>
+</span><span class='line'>oauth.consumerSecret<span class="o">=[</span>YOUR CONSUMER SECRET KEY<span class="o">]</span>
+</span><span class='line'>oauth.accessToken<span class="o">=[</span>YOUR ACCESS TOKEN<span class="o">]</span>
+</span><span class='line'>oauth.accessTokenSecret<span class="o">=[</span>YOUR ACCESS TOKEN SECRET<span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>couchbase.uri.list<span class="o">=</span>http://127.0.0.1:8091/pools
+</span><span class='line'>couchbase.bucket<span class="o">=</span>default
+</span><span class='line'>couchbase.password<span class="o">=</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Save the properties file and from the same location run:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>jar -jar <span class="o">[</span>path-to-jar<span class="o">]</span>/CouchbaseTwitterInjector.jar
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will inject Tweets into your Couchbase Server. Enjoy !</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -864,406 +1169,6 @@ These are two example where a shared cache could be interesting for your portal 
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/31/how-to-create-a-new-content-list-template-for-exo-platform-3/">How to Create a New Content List Template for eXo Platform 3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-08-31T23:50:18+02:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2011</span></span> <span class='time'>11:50 pm</span></time>
-        
-           | <a href="/blog/2011/08/31/how-to-create-a-new-content-list-template-for-exo-platform-3/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2011/08/31/how-to-create-a-new-content-list-template-for-exo-platform-3/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>Introduction</h3>
-
-<p>eXo Platform provide many powerful features to manipulate and expose any type of content on a page. This is due to the fact that eXo stores the all the content in its Java Content Repository (JCR) and render the content on a page using Groovy Templates.</p>
-
-<p>In this how to you will learn how you can create and use template that are used in the &ldquo;Content List&rdquo; portlet. For example in the ACME sample site you can show the content in 1 or 2 columns just by selecting different templates.</p>
-
-<p><img src="http://2.bp.blogspot.com/-aEn1Gp75nD4/TbbALBRftVI/AAAAAAAAAPc/3JLHePfFkuM/s200/one-col-view.png">
-One Column View</p>
-
-<p><img src="http://4.bp.blogspot.com/-xSn44HNlBZ8/TbbAMSRDq7I/AAAAAAAAAPg/YEu715pX3WE/s200/two-col-view.png">
-Two Columns View</p>
-
-<h3>Creating a new Content List Template</h3>
-
-<p>In this section you will learn how to create a new template using the eXo IDE. Before writing the new template it is important to learn where the templates are stored.</p>
-
-<h4>eXo Content Service: Template Storage</h4>
-
-<p>Like many things inside eXo Platform, the eXo JCR is used to stored the templates. Templates are just a special type of content. This allows developers to easily write and test code without having complex deployment process, but also it make the life easy to export a running configuration to another one. For this you just need to use the standard JCR export/import features.</p>
-
-<p>All the template and eXo Content Service configurations are stored inside a specific JCR workspace named : <code>dms-system</code>.</p>
-
-<p>Each template type (Document Type, Content List, &hellip;.) is stored in a specific location. In our case we want to work on the &ldquo;Content List&rdquo; portlet so the template are stored inside the following folder:</p>
-
-<ul>
-<li><code>/exo:ecm/views/templates/content-list-viewer/list/</code></li>
-</ul>
-
-
-<p>Just for the fun of it, let&rsquo;s inspect this folder using the eXo CRaSH utility. If you are not interested you can jump to the next section. CRaSH is a shell for Java Content Repositories, the source of CRaSH is available on <a href="http://code.google.com/p/crsh/">Google Code</a>. So in a terminal window:</p>
-
-<p>1-  Connect to CRaSH using telnet client:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'> telnet 127.0.0.1 5000
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2-  Connect to the JCR workspace using the following command:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'> connect -u root -p gtn -c portal dms-system&lt;/span&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Where: -u is the user, -p the password, -c the Portal Container, and dms-system the workspace to use</p>
-
-<p>3-  Move the the folder that contains all the templates for the Content List portlet:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'> <span class="nb">cd</span> /exo:ecm/views/templates/content-list-viewer/list/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>4-  List all the templates using the <code>ls</code> command
-You can see the list of all the templates available for the Content List portlet.</p>
-
-<h4>Create a new template using the eXo IDE</h4>
-
-<p>Let&rsquo;s now create a new template using the IDE. For this be sure you are connected with a user that is part of the <code>/Developer</code> group. For simplicity reason I am using the <code>root</code> user.</p>
-
-<p>The first important step is to go the the template location using the following steps:</p>
-
-<p>1-  Access the IDE: click on <code>My Spaces &amp;gt; IDE</code>.</p>
-
-<p>2-  Switch <code>dms-system</code> workspace: In the IDE menu click <code>My Spaces &amp;gt;on Window &amp;gt; Select Workspace</code>. And select the dms-system location in the dialog box and click OK.</p>
-
-<p>3-  In the file structure on the left navigate to the template location :</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>/exo:ecm/views/templates/content-list-viewer/list/
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>4-  Create a new template : In the IDE Menu click on <code>File &amp;gt; New &amp;gt; Groovy Template</code></p>
-
-<p>5-  Save the file as &ldquo;<code>MyNewTemplate.gtmpl</code>&rdquo;</p>
-
-<p>6-  Enter some basic code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;h1&gt;</span>This is my template<span class="nt">&lt;/h1&gt;</span>
-</span><span class='line'>The date is <span class="err">&lt;</span>= new Date()&gt;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>7-  Save the template</p>
-
-<p>8-  Go back to the Home page of the Acme Site</p>
-
-<p>9-  Switch to Edit more by selecting Edit in the top right drop down list.</p>
-
-<p><img src="http://3.bp.blogspot.com/-EsSUDUdUo_8/TbbRJZlZlHI/AAAAAAAAAPk/5iTn-NoC-JE/s200/edit-mode.png"></p>
-
-<p>10-  Move you mouse at the top of the list of news and click on the preference button: <img src="http://1.bp.blogspot.com/-ksljDe3llf4/TbbSIOl0DII/AAAAAAAAAPs/C0eBv-SJ25I/s200/PreferencesIcon.png"></p>
-
-<p>11-  In the list of templates, select the &ldquo;MyNewTemplate&rdquo;, and click save.</p>
-
-<p><img src="http://2.bp.blogspot.com/-7hT5osGXK1w/TbbTTJ7ZKSI/AAAAAAAAAP0/--VCTefhrSI/s320/select-template.png"></p>
-
-<p>We have created our new template, and use it on a page. We should now add some more interesting code to the template to really loop over the content based on the portlet configuration. But before this it is important to talk about caching and code modification.</p>
-
-<h4>eXo Template and Cache</h4>
-
-<p>To improve performances and a running system, the compiled version of the template is by default cached. This is why when you are modifying a template you do not see any change. We have two ways to work around this:</p>
-
-<ul>
-<li>Run eXo Platform in Debug mode, in this case nothing is cached</li>
-<li>Invalidate the cache manually using JMX</li>
-</ul>
-
-
-<p>Since working with no cache at all is not an option, here is the MBean you have to use to invalidate the Template Service cache:</p>
-
-<ul>
-<li><code>exo:portal="portal",service=cache,name="TemplateService"</code>, then call the <code>clearCache</code> operation on it</li>
-</ul>
-
-
-<p>I do use JConsole for this, but you can use any method to call your MBeans operation.</p>
-
-<p><img src="http://1.bp.blogspot.com/-ZuMQz-VHBYY/TbldhSRY2NI/AAAAAAAAAP8/pb09UoA9_b4/s200/TemplateServiceCacheMbean.png"></p>
-
-<p>Do not forget to call this operation each time you modify your template to be sure eXo recompile the template.</p>
-
-<h4>Accessing Content in the template</h4>
-
-<p>The current code of the template is really simple, you need now to add code to print the content in the page. For this we will be using some eXo Content programming, once again in the IDE.</p>
-
-<p>If you are not interested to have detailed explanation of the code you can go to the complete source code <a href="javascript:%20alert(">here</a>.</p>
-
-<p>The template used by the Content List portlet is based on the following Java class <code>org.exoplatform.wcm.webui.clv.UICLVPresentation</code>, this class is responsible to set the complete context that you can use in the template such as:</p>
-
-<ul>
-<li>The folder or category that contains the content to show. The &ldquo;Folder Path&rdquo; field in the preference screen</li>
-<li>The display settings: title, number of documents, elements to show, &hellip;</li>
-</ul>
-
-
-<p>Here is the code to access these preferences:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="c1">// import all the classes need in the template</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">javax.jcr.Node</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.wcm.webui.clv.UICLVPortlet</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.wcm.webui.Utils</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">org.exoplatform.services.wcm.core.NodeLocation</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// get the portlet preferences</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">header</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getHeader</span><span class="o">();</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowRssLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowRssLink</span><span class="o">();</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowHeader</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_HEADER</span><span class="o">);</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowRefresh</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_REFRESH_BUTTON</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowTitle</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_TITLE</span><span class="o">);</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowDate</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_DATE_CREATED</span><span class="o">);</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_LINK</span><span class="o">);</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowReadmore</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_READMORE</span><span class="o">);</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowImage</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_ILLUSTRATION</span><span class="o">)</span> <span class="o">;</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">isShowSummary</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">isShowField</span><span class="o">(</span><span class="n">UICLVPortlet</span><span class="o">.</span><span class="na">PREFERENCE_SHOW_SUMMARY</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <span style="font-family: &quot;Courier New&quot;,Courier,monospace;">uicomponent</span> object is defined by the container class of the portlet that calls the template. This class contains many utility methods. In the code above I retrieve all the preferences of the portlet, since the name are self-explanatory it is not necessary to detail them, especially when you look at the preferences screen below:</p>
-
-<p><img src="http://3.bp.blogspot.com/-bDIJtSVaD9A/TblkjTr2wMI/AAAAAAAAAQE/6mRLmEYqpsE/s320/preference-screen.png"></p>
-
-<p>Now that the template has all the preferences, it is time to loop on the content on print the information.</p>
-
-<p>The eXo Content Service provides API to manipulate the content, including pagination of content. The idea behind this is to let the Content Service manage the JCR query, sorting, caching and pagination of data. So in your template you will mainly manage two classes to loop through the content to show:</p>
-
-<ul>
-<li><code>uicomponent.getUIPageIterator()</code> a paginator object that is configured based on the portlet preferences</li>
-<li><code>uicomponent.getCurrentPageData()</code>contains a list of the content (JCR Nodes) that should print on the current page</li>
-</ul>
-
-
-<p>So let&rsquo;s print all the content of the page as a simple HTML list:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;ul</span> <span class="na">style=</span><span class="s">&quot;margin: 20px&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="err">&lt;</span>%
-</span><span class='line'>for (viewNode in uicomponent.getCurrentPageData()) {
-</span><span class='line'>  def title = viewNode.getProperty(&quot;exo:title&quot;).getString();
-</span><span class='line'>  print(&quot;<span class="nt">&lt;li&gt;</span>$title<span class="nt">&lt;/li&gt;</span>&quot;);
-</span><span class='line'>}
-</span><span class='line'>%&gt;
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Just  copy this code in your template, save it, refresh the cache&hellip; and go to your page. You should see the list of the content in a simple HTML list.</p>
-
-<p>On each content (Node), eXo Content API provides some helper method to easily manipulate the content and avoid using the JCR API directly. In the following code you can see the most important methods accessing content properties:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">def</span> <span class="n">itemName</span> <span class="o">=</span> <span class="n">viewNode</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
-</span><span class='line'><span class="n">def</span> <span class="n">itemLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getURL</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">def</span> <span class="n">webdDavLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getWebdavURL</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">def</span> <span class="n">itemDateCreated</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getCreatedDate</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">def</span> <span class="n">itemModifiedDate</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getModifiedDate</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">def</span> <span class="n">itemAuthor</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getAuthor</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">def</span> <span class="n">imgSrc</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getIllustrativeImage</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">def</span> <span class="n">itemTitle</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getTitle</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">def</span> <span class="n">itemSummary</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getSummary</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>One important point is the fact that these methods are responsible of many things, for example: formatting dates, returning complete URLs depending of the context of the portlet.</p>
-
-<p>Based on these methods you can now work on the presentation of the information on the page. Let&rsquo;s for example print the image, the title and allow user to click on the title to go in the detail view of the article. This is done simply using the following code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;%</span>
-</span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">viewNode</span> <span class="n">in</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getCurrentPageData</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemName</span> <span class="o">=</span> <span class="n">viewNode</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getURL</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">webdDavLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getWebdavURL</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemDateCreated</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getCreatedDate</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemModifiedDate</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getModifiedDate</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemAuthor</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getAuthor</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">imgSrc</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getIllustrativeImage</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemTitle</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getTitle</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemSummary</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getSummary</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">%&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="n">div</span> <span class="n">style</span><span class="o">=</span><span class="s">&quot;overflow: auto;&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="n">img</span> <span class="n">src</span><span class="o">=</span><span class="s">&quot;$imgSrc&quot;</span> <span class="n">align</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;$itemLink&quot;</span><span class="o">&gt;</span><span class="n">$itemTitle</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="n">$itemSummary</span>
-</span><span class='line'>  <span class="o">&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">&lt;%</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="o">%&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>For simplicity reason, this code does not manage any null value. Also the template do not deal with the portlet preferences such as the &ldquo;Header&rdquo;, &ldquo;RSS&rdquo; links and so on, do not hesitate to do it if you want.</p>
-
-<p>The Web site should look like the following image:</p>
-
-<p><img src="http://3.bp.blogspot.com/-JvoTBERVTH0/Tbmf9tYRcUI/AAAAAAAAAQM/sdUy2gs39ks/s320/new-site-001.png"></p>
-
-<p>The last important point is to add the support for the in context editing that allows the user to edit the content directly from the template. Once again this is done with a method of the <code>uicomponent</code> object, that create a DIV around the content. Let&rsquo;s add this to the template:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;%</span>
-</span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">viewNode</span> <span class="n">in</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getCurrentPageData</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemName</span> <span class="o">=</span> <span class="n">viewNode</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getURL</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">webdDavLink</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getWebdavURL</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemDateCreated</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getCreatedDate</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemModifiedDate</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getModifiedDate</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemAuthor</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getAuthor</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">imgSrc</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getIllustrativeImage</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemTitle</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getTitle</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">def</span> <span class="n">itemSummary</span> <span class="o">=</span> <span class="n">uicomponent</span><span class="o">.</span><span class="na">getSummary</span><span class="o">(</span><span class="n">viewNode</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">%&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="n">div</span> <span class="n">style</span><span class="o">=</span><span class="s">&quot;overflow: auto;&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;%=</span><span class="n">uicomponent</span><span class="o">.</span><span class="na">addQuickEditDiv</span><span class="o">(</span><span class="s">&quot;MyTemplateContentEditor&quot;</span><span class="o">,</span> <span class="n">viewNode</span><span class="o">)%&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="n">img</span> <span class="n">src</span><span class="o">=</span><span class="s">&quot;$imgSrc&quot;</span> <span class="n">align</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="n">h3</span><span class="o">&gt;&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;$itemLink&quot;</span><span class="o">&gt;</span><span class="n">$itemTitle</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;&lt;/</span><span class="n">h3</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="n">$itemSummary</span>
-</span><span class='line'>  <span class="o">&lt;</span> <span class="o">/</span><span class="n">div</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">&lt;%</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="o">%&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The lines 15 and 19 are new in this template and provide support for Quick Edit feature.</p>
-
-<p>Done! We have created a new template for eXo Platform Content Service using embedded IDE.</p>
-
-<h4>Conclusion</h4>
-
-<p>In this article you have learned how to create a new template for eXo Content Service, with some basic steps:</p>
-
-<ul>
-<li>Create a new Groovy Template using the eXo IDE</li>
-<li>Edit this template using the eXo Java Content API</li>
-<li>Configure your Content List portlet instance on a page to select the new template</li>
-</ul>
-
-
-<p>You can now create your own templates and use your imagination to add cool features to your site (for example the carrousels you see on the <a href="http://www.exoplatform.com/">eXo site</a> are using custom CLV template.)</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/6">&larr; Older</a>
@@ -1281,6 +1186,10 @@ You can see the list of all the templates available for the Content List portlet
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
       </li>
     
@@ -1294,10 +1203,6 @@ You can see the list of all the templates available for the Content List portlet
     
       <li class="post">
         <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
       </li>
     
   </ul>

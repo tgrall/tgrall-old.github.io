@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="As you may remember, Oracle acquired few months back a data integration solution from Sunopsis, and has integrated it in our product under the name & &hellip;">
+  <meta name="description" content="Graeme, the Grails Project Lead has published a very interesting benchmark of Grails versus Rails applications, that is available on the Grails wiki &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,45 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/03/23/grails-vs-rails-performance-benchmark/">Grails vs Rails Performance Benchmark</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-03-23T02:56:21+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2007</span></span> <span class='time'>2:56 am</span></time>
+        
+           | <a href="/blog/2007/03/23/grails-vs-rails-performance-benchmark/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/03/23/grails-vs-rails-performance-benchmark/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Graeme, the Grails Project Lead has published a very interesting benchmark of Grails versus Rails applications, that is available on the Grails wiki:</p>
+
+<ul>
+<li><a href="http://grails.org/Grails+vs+Rails+Benchmark">Grails vs Rails Performance Benchmarking</a>I let you read and comment on the Wiki the results&hellip; Grails development team is open to comment and improvement of the bench to capture as much information as possible.</li>
+</ul>
+
+
+<p>It is also important to note that performances, productivity are very important when choosing a development environment; but something that is also key for enterprises, is the fact that Grails/Groovy &ldquo;are&rdquo; Java/J2EE based. This means that a Grails application is packaged, deployed, administered and monitored like any applications that already exist in the information system on J2EE application servers.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -559,169 +598,6 @@ This will give a result like:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/02/15/oracle-web-services-sharing-session-between-client-calls/">Oracle Web Services: Sharing Session Between Client Calls</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2007-02-15T09:50:01+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>9:50 am</span></time>
-        
-           | <a href="/blog/2007/02/15/oracle-web-services-sharing-session-between-client-calls/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2007/02/15/oracle-web-services-sharing-session-between-client-calls/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>OracleAS Web Services Runtime provides a support for stateful Web Services that is based on HTTP /Servlet session. Some people will probably say that Web Services should not be stateful, or at least not based on the protocol&hellip; However, today most of Web Services are using HTTP, and in some specific cases it is very useful to be able to have a state.</p>
-
-<p>In this post, I am not explaining how to enable stateful services and clients, since it is documented in the <a href="http://download.oracle.com/docs/cd/B31017_01/web.1013/b28974/devjavaclass.htm#BEIDDAFG">Java Classes and Stateful Web Wervices</a> chapter of the developer guide. Here I am show you how you can using client side programming share the same state (session) between different web services calls (even different services running in the same server side application).</p>
-
-<p>The tip used here is about the association of cookies to the client instance (JAX-WS Stub or Call object). Here the code you have to write to do that using DII, will be very similar when using static Stub</p></p>
-
-<p>1- Enable the state management</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">Service</span> <span class="n">service</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="na">createService</span><span class="o">(</span><span class="n">qName</span><span class="o">);</span>
-</span><span class='line'><span class="n">QName</span> <span class="n">port</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">QName</span><span class="o">(</span><span class="s">&quot;CartService&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">Call</span> <span class="n">call</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">createCall</span><span class="o">(</span><span class="n">port</span><span class="o">);</span>
-</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Stub</span><span class="o">.</span><span class="na">SESSION_MAINTAIN_PROPERTY</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="kc">true</span><span class="o">));</span>  <span class="c1">// this is necessary to be able to manipulate cookie</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p> 2- Create a Map that contains the Cookies and assign it to the call (or Stub)</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
-</span><span class='line'> <span class="n">Map</span> <span class="n">cookieMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HashMap</span><span class="o">();</span>
-</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">,</span> <span class="n">cookieMap</span><span class="o">);</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This specific step associates a map that will contains all the cookie with the call/stub instance. You will be able then to manipulate the Map to get or set the cookies.</p>
-
-<p> 3- How to get the <code>JSESSION</code> cookie</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">Cookie</span> <span class="nf">getJSessionCookie</span><span class="o">(</span><span class="n">Call</span> <span class="n">call</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">Map</span> <span class="n">cookies</span> <span class="o">=</span> <span class="o">(</span><span class="n">Map</span><span class="o">)</span><span class="n">call</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">cookies</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">cookies</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">Iterator</span> <span class="n">it</span> <span class="o">=</span>  <span class="n">cookies</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">iterator</span><span class="o">();</span>
-</span><span class='line'>    <span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">Cookie</span> <span class="n">cookie</span> <span class="o">=</span> <span class="o">(</span><span class="n">Cookie</span><span class="o">)</span><span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">cookie</span><span class="o">.</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;JSESSIONID&quot;</span><span class="o">))</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">cookie</span><span class="o">;</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Note that the Cookie object is an instance of Oracle <span style="font-family:courier new;">HTTPClient.Cookie</span>.</p>
-
-<p>4- Utilizing the Cookie</p>
-
-<p>So now you have all the information to be able to get the Session information when the stateful conversation has started;</p>
-
-<p>In this example each time the call.invoke() is done, a counter is incremented on the server.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Call</span> <span class="n">call</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">createCall</span><span class="o">(</span><span class="n">port</span><span class="o">);</span>
-</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Stub</span><span class="o">.</span><span class="na">SESSION_MAINTAIN_PROPERTY</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="kc">true</span><span class="o">));</span>  <span class="c1">// this is necessary to be able to manipulate cookie</span>
-</span><span class='line'><span class="n">Map</span> <span class="n">cookieMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HashMap</span><span class="o">();</span>
-</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">,</span> <span class="n">cookieMap</span><span class="o">);</span>
-</span><span class='line'><span class="o">...</span> <span class="c1">// The session will only be created after the first invoke</span>
-</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">invoke</span><span class="o">(...);</span> <span class="c1">// counter = 1 call.invoke(...); // counter = 2 since on the same session</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">...</span> <span class="c1">// the session is now created so you can get the cookie</span>
-</span><span class='line'><span class="n">Cookie</span> <span class="n">mySession</span> <span class="o">=</span> <span class="n">getJSessionCookie</span><span class="o">(</span><span class="n">call</span><span class="o">)</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can now use the cookie in another call using the following code:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mySession</span> <span class="o">..</span>  <span class="c1">// was extracted from the call #1</span>
-</span><span class='line'><span class="o">...</span><span class="c1">// now I am creating a new call instance (myNewCall) that could be in another class</span>
-</span><span class='line'><span class="n">Call</span> <span class="n">myNewCall</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">createCall</span><span class="o">(</span><span class="n">port</span><span class="o">);</span>
-</span><span class='line'><span class="n">myNewCall</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Stub</span><span class="o">.</span><span class="na">SESSION_MAINTAIN_PROPERTY</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="kc">true</span><span class="o">));</span>  <span class="c1">// this is necessary to be able to manipulate cookie</span>
-</span><span class='line'><span class="n">Map</span> <span class="n">cookieMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HashMap</span><span class="o">();</span>
-</span><span class='line'><span class="c1">// add the cookie to the map this will add the cookie to the HTTP request so it will be associated to the same session (/state)</span>
-</span><span class='line'><span class="n">cookieMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">mySession</span><span class="o">,</span><span class="n">mySession</span><span class="o">);</span><span class="c1">// associate the cookie Map to the call</span>
-</span><span class='line'><span class="n">myNewCall</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">,</span> <span class="n">cookieMap</span><span class="o">);</span>
-</span><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="n">myNewCall</span><span class="o">.</span><span class="na">invoke</span><span class="o">;</span>  <span class="c1">// counter = 3 since we share the same session</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Using this sample you have 2 instances of a client calling a service and reusing the same session -state-.  You can also use the same approach to have 2 different clients talking to different services and share the same session. To do that you will have on the server side to use the HTTP Session directly to store your data between calls, and share it between services.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/13">&larr; Older</a>
@@ -739,6 +615,10 @@ This will give a result like:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
       </li>
     
@@ -752,10 +632,6 @@ This will give a result like:</p>
     
       <li class="post">
         <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
       </li>
     
   </ul>

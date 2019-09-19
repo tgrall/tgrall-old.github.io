@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="When preparing a complex topology, where you have multiple HTTP servers ,talking with many OC4J instances, it is sometimes hard to understand what is &hellip;">
+  <meta name="description" content="OracleAS Web Services Runtime provides a support for stateful Web Services that is based on HTTP /Servlet session. Some people will probably say that &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,169 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/15/oracle-web-services-sharing-session-between-client-calls/">Oracle Web Services: Sharing Session Between Client Calls</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-02-15T09:50:01+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>9:50 am</span></time>
+        
+           | <a href="/blog/2007/02/15/oracle-web-services-sharing-session-between-client-calls/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/02/15/oracle-web-services-sharing-session-between-client-calls/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>OracleAS Web Services Runtime provides a support for stateful Web Services that is based on HTTP /Servlet session. Some people will probably say that Web Services should not be stateful, or at least not based on the protocol&hellip; However, today most of Web Services are using HTTP, and in some specific cases it is very useful to be able to have a state.</p>
+
+<p>In this post, I am not explaining how to enable stateful services and clients, since it is documented in the <a href="http://download.oracle.com/docs/cd/B31017_01/web.1013/b28974/devjavaclass.htm#BEIDDAFG">Java Classes and Stateful Web Wervices</a> chapter of the developer guide. Here I am show you how you can using client side programming share the same state (session) between different web services calls (even different services running in the same server side application).</p>
+
+<p>The tip used here is about the association of cookies to the client instance (JAX-WS Stub or Call object). Here the code you have to write to do that using DII, will be very similar when using static Stub</p></p>
+
+<p>1- Enable the state management</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">Service</span> <span class="n">service</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="na">createService</span><span class="o">(</span><span class="n">qName</span><span class="o">);</span>
+</span><span class='line'><span class="n">QName</span> <span class="n">port</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">QName</span><span class="o">(</span><span class="s">&quot;CartService&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">Call</span> <span class="n">call</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">createCall</span><span class="o">(</span><span class="n">port</span><span class="o">);</span>
+</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Stub</span><span class="o">.</span><span class="na">SESSION_MAINTAIN_PROPERTY</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="kc">true</span><span class="o">));</span>  <span class="c1">// this is necessary to be able to manipulate cookie</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> 2- Create a Map that contains the Cookies and assign it to the call (or Stub)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
+</span><span class='line'> <span class="n">Map</span> <span class="n">cookieMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HashMap</span><span class="o">();</span>
+</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">,</span> <span class="n">cookieMap</span><span class="o">);</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This specific step associates a map that will contains all the cookie with the call/stub instance. You will be able then to manipulate the Map to get or set the cookies.</p>
+
+<p> 3- How to get the <code>JSESSION</code> cookie</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">Cookie</span> <span class="nf">getJSessionCookie</span><span class="o">(</span><span class="n">Call</span> <span class="n">call</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">Map</span> <span class="n">cookies</span> <span class="o">=</span> <span class="o">(</span><span class="n">Map</span><span class="o">)</span><span class="n">call</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">cookies</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">cookies</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Iterator</span> <span class="n">it</span> <span class="o">=</span>  <span class="n">cookies</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">iterator</span><span class="o">();</span>
+</span><span class='line'>    <span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Cookie</span> <span class="n">cookie</span> <span class="o">=</span> <span class="o">(</span><span class="n">Cookie</span><span class="o">)</span><span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">cookie</span><span class="o">.</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;JSESSIONID&quot;</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">cookie</span><span class="o">;</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note that the Cookie object is an instance of Oracle <span style="font-family:courier new;">HTTPClient.Cookie</span>.</p>
+
+<p>4- Utilizing the Cookie</p>
+
+<p>So now you have all the information to be able to get the Session information when the stateful conversation has started;</p>
+
+<p>In this example each time the call.invoke() is done, a counter is incremented on the server.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Call</span> <span class="n">call</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">createCall</span><span class="o">(</span><span class="n">port</span><span class="o">);</span>
+</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Stub</span><span class="o">.</span><span class="na">SESSION_MAINTAIN_PROPERTY</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="kc">true</span><span class="o">));</span>  <span class="c1">// this is necessary to be able to manipulate cookie</span>
+</span><span class='line'><span class="n">Map</span> <span class="n">cookieMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HashMap</span><span class="o">();</span>
+</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">,</span> <span class="n">cookieMap</span><span class="o">);</span>
+</span><span class='line'><span class="o">...</span> <span class="c1">// The session will only be created after the first invoke</span>
+</span><span class='line'><span class="n">call</span><span class="o">.</span><span class="na">invoke</span><span class="o">(...);</span> <span class="c1">// counter = 1 call.invoke(...); // counter = 2 since on the same session</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">...</span> <span class="c1">// the session is now created so you can get the cookie</span>
+</span><span class='line'><span class="n">Cookie</span> <span class="n">mySession</span> <span class="o">=</span> <span class="n">getJSessionCookie</span><span class="o">(</span><span class="n">call</span><span class="o">)</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can now use the cookie in another call using the following code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mySession</span> <span class="o">..</span>  <span class="c1">// was extracted from the call #1</span>
+</span><span class='line'><span class="o">...</span><span class="c1">// now I am creating a new call instance (myNewCall) that could be in another class</span>
+</span><span class='line'><span class="n">Call</span> <span class="n">myNewCall</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">createCall</span><span class="o">(</span><span class="n">port</span><span class="o">);</span>
+</span><span class='line'><span class="n">myNewCall</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Stub</span><span class="o">.</span><span class="na">SESSION_MAINTAIN_PROPERTY</span><span class="o">,</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="kc">true</span><span class="o">));</span>  <span class="c1">// this is necessary to be able to manipulate cookie</span>
+</span><span class='line'><span class="n">Map</span> <span class="n">cookieMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HashMap</span><span class="o">();</span>
+</span><span class='line'><span class="c1">// add the cookie to the map this will add the cookie to the HTTP request so it will be associated to the same session (/state)</span>
+</span><span class='line'><span class="n">cookieMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">mySession</span><span class="o">,</span><span class="n">mySession</span><span class="o">);</span><span class="c1">// associate the cookie Map to the call</span>
+</span><span class='line'><span class="n">myNewCall</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">ClientConstants</span><span class="o">.</span><span class="na">COOKIE_MAP</span><span class="o">,</span> <span class="n">cookieMap</span><span class="o">);</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="n">myNewCall</span><span class="o">.</span><span class="na">invoke</span><span class="o">;</span>  <span class="c1">// counter = 3 since we share the same session</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using this sample you have 2 instances of a client calling a service and reusing the same session -state-.  You can also use the same approach to have 2 different clients talking to different services and share the same session. To do that you will have on the server side to use the HTTP Session directly to store your data between calls, and share it between services.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -570,167 +733,6 @@ help you to learn more about ODI using a comprehensive scenario.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/07/how-to-use-soap-compression-using-jax-rpc/">How to Use SOAP Compression Using JAX-RPC</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2007-01-07T16:54:43+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>4:54 pm</span></time>
-        
-           | <a href="/blog/2007/01/07/how-to-use-soap-compression-using-jax-rpc/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2007/01/07/how-to-use-soap-compression-using-jax-rpc/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>HTTP compression has improved a lot the download time of content from
-servers. In the context of Web Service it could be very interesting to
-also use HTTP compression to improve the network traffic. Firs, I am
-explaining how to compress a SOAP response when you have a Web Service
-running in Oracle Containers for J2EE (OC4J) using a generic servlet
-filter. I have to give credit to <a href="http://www.thomas-bayer.com/">http://www.thomas-bayer.com/</a>
-since he has created the Filter and documented how to do such thing
-using Axis.&nbsp;</p>
-
-<p>So you can take a look to the following article for more details, you
-can read the 2 following article, or jump to the next paragraph that
-explains how to configure your JAX-RPC based service to send compressed
-HTTP response.</p>
-
-<ul>
-<li><a href="http://www.thomas-bayer.com/soap-compression-howto.htm">How to Use SOAP Compression with Apache Axis</a></li>
-<li><a href="http://www.thomas-bayer.com/gzip-compression-filter.htm">2Way HTTP Compression Servlet Filter</a></li>
-</ul>
-
-
-<p>In this sample I am showing how to compress the SOAP response
-using a servlet filter, it is also possible to use some other Oracle
-infrastructure element to achieve that such as Oracle HTTP
-Server/Apache, or Oracle Webcache.</p>
-
-<h4>1- Install the compression filter library in your application</h4>
-
-<p>Download the compression filter library <a href="http://www.thomas-bayer.com/resources/gzip-compression-filter/2wayfilter-1.2.jar">2wayfilter-1.2.jar</a>
-and copy it into the Web application&rsquo;s<code>WEB-INF/lib</code> folder</p>
-
-<h4>2- Configure your application to use the filter</h4>
-
-<p>The configuration of a servlet filter is done using
-the web.xml where you reference which servlet or URL will be using the
-filter. As you may knowin JAX-RPC, the HTTP endpoint of a service are
-exposed as servlet and defined in the web.xml. You can choose to
-compress all the endpoint/URL or create a new servlet mapping, that
-will become a new SOAP endpoint and only compress this one. If you take
-the option of creating a new endpoint keep in mind that it will not be
-added to the WSDL automatically, so the client application will have to
-point explicitly to the compressed endpoint URL to take benefits of it.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;web-app</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-</span><span class='line'>  <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd&quot;</span>
-</span><span class='line'>  <span class="na">version=</span><span class="s">&quot;2.4&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;servlet&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;description&gt;</span>Web Service CustomerServiceSoapHttpPort<span class="nt">&lt;/description&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;display-name&gt;</span>Web Service CustomerServiceSoapHttpPort<span class="nt">&lt;/display-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;servlet-name&gt;</span>CustomerServiceSoapHttpPort<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;servlet-class&gt;</span>demo.oracle.CustomerServiceImpl<span class="nt">&lt;/servlet-class&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/servlet&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;servlet-name&gt;</span>CustomerServiceSoapHttpPort<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>CustomerServiceSoapHttpPort<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c">&lt;!-- New servlet mapping to handle compressed SOAP Messages --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;servlet-mapping&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;servlet-name&gt;</span>CustomerServiceSoapHttpPort<span class="nt">&lt;/servlet-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>CompressedCustomerServiceSoapHttpPort<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/servlet-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>  <span class="c">&lt;!-- Filter definition with mapping on the compressed endpoint --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;filter&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>2WayFilter<span class="nt">&lt;/filter-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-class&gt;</span>com.osmoticweb.gzipfilter.GZIP2WayFilter<span class="nt">&lt;/filter-class&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/filter&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;filter-mapping&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;filter-name&gt;</span>2WayFilter<span class="nt">&lt;/filter-name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;url-pattern&gt;</span>CompressedCustomerServiceSoapHttpPort<span class="nt">&lt;/url-pattern&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/filter-mapping&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/web-app&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can now package and deploy your application.</p>
-
-<h4>3- Create &amp; Invoke the service</h4>
-
-<p>In this basic configuration you have only changed the servlet that is
-the HTTP endpoint of your service. So the compressed endpoint is not
-present in the WSDL, but you can use any of the URL to create your
-proxy.</p>
-
-<p>When you have created your proxy, if you want to access the endpoint
-that will return the compressed response you must be sure that you are
-calling the correct endpoint. You can set the endpoint using the <code>setEndpoint</code> method, of your Web
-Service client.</p>
-
-<p>This is it!</p>
-
-<p>I will in a next post explain how you can using the Oracle Web Service
-client API send a compressed request that will have to be uncompressed
-on the server using the same filter.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/14">&larr; Older</a>
@@ -748,6 +750,10 @@ on the server using the same filter.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
       </li>
     
@@ -761,10 +767,6 @@ on the server using the same filter.</p>
     
       <li class="post">
         <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/20/getting-started-with-kafka-rest-proxy-for-mapr-streams/">Getting Started With Kafka REST Proxy for MapR Streams</a>
       </li>
     
   </ul>
