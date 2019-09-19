@@ -1,9 +1,9 @@
 ---
 layout: post
 title: "Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)"
-date: 2019-09-17 09:05:23 +0200
+date: 2019-09-19 05:05:23 +0200
 comments: true
-categories: 
+categories: redis nosql cloud cf pivotal java cluster failover ha
 ---
 
 
@@ -206,6 +206,11 @@ All the nodes of the clusters are now updated to the latest version of Redis Ent
 The update of the database is done automatically, so after a while if your run the command `sudo rladmin status databases extra redis_version` you will see something like:
 
 {%img center /images/posts/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/steps/004-rladmin-cluster-db-version.png %}
+
+
+> In this example I am doing a “minor upgrade”, from Redis Cluster 5.4.0/Redis 5.0.2 to Redis Cluster 5.4.4/Redis 5.0.4, and everything is done automatically.
+>
+> If you are doing a major upgrade for example from 4.x to 5.x, the cluster will automatically be updated to the proper release, but you will have to manually update the existing databases as documented here.
 
 #### Updating Redis on PCF Services
 
