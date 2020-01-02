@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ssl | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/ssl/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2020-01-02T17:50:47+01:00</updated>
+  <updated>2020-01-02T17:56:59+01:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -260,10 +260,13 @@ client.info( "SERVER", function (err, reply) {
 
 <p>The trustore will be used later with the <code>-javax.net.ssl.trustStore</code> system property in the Java application.</p>
 
-<pre><code>-Djavax.net.ssl.keyStore=/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-keystore.p12
--Djavax.net.ssl.keyStorePassword=secret
--Djavax.net.ssl.trustStore=/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-truststore.p12
--Djavax.net.ssl.trustStorePassword=secret
+<p>You can now run the Java application with the following environment variables:</p>
+
+<pre><code>java -Djavax.net.ssl.keyStore=/path_to/certificates/java/client-keystore.p12 \
+-Djavax.net.ssl.keyStorePassword=secret \
+-Djavax.net.ssl.trustStore=/path_to/certificates/java/client-truststore.p12 \
+-Djavax.net.ssl.trustStorePassword=secret \
+-jar MyApp.jar
 </code></pre>
 
 <p>For this example and simplicity, I will hard code these property in the Java code itself:</p>

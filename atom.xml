@@ -4,7 +4,7 @@
   <title><![CDATA[Tug's Blog]]></title>
   <link href="http://tgrall.github.io/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2020-01-02T17:50:47+01:00</updated>
+  <updated>2020-01-02T17:56:59+01:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -359,18 +359,7 @@ You should adapt the connections/TLS information based on your certificate confi
 
 <p>The trustore will be used later with the <code>-javax.net.ssl.trustStore</code> system property in the Java application.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">keyStore</span><span class="o">=</span><span class="err">/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-keystore.p12</span>
-</span><span class='line'><span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">keyStorePassword</span><span class="o">=</span><span class="nx">secret</span>
-</span><span class='line'><span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">trustStore</span><span class="o">=</span><span class="err">/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-truststore.p12</span>
-</span><span class='line'><span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">trustStorePassword</span><span class="o">=</span><span class="nx">secret</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>For this example and simplicity, I will hard code these property in the Java code itself:</p>
+<p>You can now run the Java application with the following environment variables:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -380,48 +369,45 @@ You should adapt the connections/TLS information based on your certificate confi
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">redis.clients.jedis.Jedis</span><span class="o">;</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">java.net.URI</span><span class="o">;</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">java</span> <span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">keyStore</span><span class="o">=</span><span class="err">/path_to/certificates/java/client-keystore.p12 \</span>
+</span><span class='line'><span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">keyStorePassword</span><span class="o">=</span><span class="nx">secret</span> <span class="o">\</span>
+</span><span class='line'><span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">trustStore</span><span class="o">=</span><span class="err">/path_to/certificates/java/client-truststore.p12 \</span>
+</span><span class='line'><span class="o">-</span><span class="nx">Djavax</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nx">ssl</span><span class="p">.</span><span class="nx">trustStorePassword</span><span class="o">=</span><span class="nx">secret</span> <span class="o">\</span>
+</span><span class='line'><span class="o">-</span><span class="nx">jar</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">jar</span>
+</span><span class='line'> <span class="err">```</span>
 </span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SSLTest</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.keyStore&quot;</span><span class="o">,</span> <span class="s">&quot;/path_to/certificates/client-keystore.p12&quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.keyStorePassword&quot;</span><span class="o">,</span> <span class="s">&quot;secret&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.trustStore&quot;</span><span class="o">,</span><span class="s">&quot;/path_to/certificates/client-truststore.p12&quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="s">&quot;javax.net.ssl.trustStorePassword&quot;</span><span class="o">,</span><span class="s">&quot;secret&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">URI</span> <span class="n">uri</span> <span class="o">=</span> <span class="n">URI</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">&quot;rediss://127.0.0.1:12000&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">Jedis</span> <span class="n">jedis</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Jedis</span><span class="o">(</span><span class="n">uri</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">jedis</span><span class="o">.</span><span class="na">auth</span><span class="o">(</span><span class="s">&quot;secretdb01&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">jedis</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;SERVER&quot;</span><span class="o">));</span>
-</span><span class='line'>        <span class="n">jedis</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nx">For</span> <span class="k">this</span> <span class="nx">example</span> <span class="nx">and</span> <span class="nx">simplicity</span><span class="p">,</span> <span class="nx">I</span> <span class="nx">will</span> <span class="nx">hard</span> <span class="nx">code</span> <span class="nx">these</span> <span class="nx">property</span> <span class="k">in</span> <span class="nx">the</span> <span class="nx">Java</span> <span class="nx">code</span> <span class="nx">itself</span><span class="o">:</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p>java</p>
+
+<p>import redis.clients.jedis.Jedis;
+import java.net.URI;</p>
+
+<p>public class SSLTest {</p>
+
+<pre><code>public static void main(String[] args) {
+
+    System.setProperty("javax.net.ssl.keyStore", "/path_to/certificates/client-keystore.p12");
+    System.setProperty("javax.net.ssl.keyStorePassword", "secret");
+
+    System.setProperty("javax.net.ssl.trustStore","/path_to/certificates/client-truststore.p12");
+    System.setProperty("javax.net.ssl.trustStorePassword","secret");
+
+    URI uri = URI.create("rediss://127.0.0.1:12000");
+
+    Jedis jedis = new Jedis(uri);
+    jedis.auth("secretdb01");
+
+
+    System.out.println(jedis.info("SERVER"));
+    jedis.close();
+}
+</code></pre>
+
+<p>}
+&#8220;`</p>
 
 <ul>
 <li>line 8-12, the system environment variables are set to point to the keystore and trust store (this should be externalized)</li>
