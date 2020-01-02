@@ -14,7 +14,7 @@ This is when I discovered [Redis Streams](https://redis.io/topics/streams-intro)
 
 Redis Streams is a Redis Data Type, that represents a log so you can add new information/message in an append-only mode *(this is not 100% accurate since you can remove messages from the log)*. Using Redis Streams you can build "Kafka Like" applications, what I mean by that you can:
 
-* create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redi Pub/Sub)
+* create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redis Pub/Sub)
 * consume messages that are published even when your client application (consumer) is not running. This is a big difference with Redis Pub/Sub
 * consume messages starting a specific offset, for example, read the whole history, or only new messages
 
