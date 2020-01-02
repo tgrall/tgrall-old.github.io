@@ -9,7 +9,7 @@ categories: nosql redis security java node python authentication ssl
 {%img center /images/posts/how-to-use-ssl-slash-tls-with-redis-enterprise/000_header.jpeg%}
 
 
-In this article I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production it is a good practise to use SSL to protect the data that are moving between various computers (client applications and Redis servers). Transport Level Security (TLS) guarantee that only allowed applications/computers are connected to the database, and also that data are not viewed or altered by a middle man process.
+In this article, I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production, it is a good practice to use SSL to protect the data that are moving between various computers (client applications and Redis servers). Transport Level Security (TLS) guarantees that only allowed applications/computers are connected to the database, and also that data is not viewed or altered by a middle man process.
 
 You can secure the connections between your client applications and Redis cluster using:
 
@@ -22,9 +22,9 @@ In this article, I will focus on the Two-Way SSL, and using Redis Enterprise.
 
 Prerequisites:
 
-* A Redis Enterprise 5.4.x database, *(my database is protected by the password `secretdb01`, and listening on port `12000`)*
-* `redis-cli` to run basis commands
-* Python, Node and Java installed if you want to test various languages.
+* A Redis Enterprise 5.4.x database, (my database is protected by the password `secretdb01`, and listening on port `12000`)
+* `redis-cli` to run basic commands
+* Python, Node, and Java installed if you want to test various languages.
 
 
 **Simple  Test**
@@ -40,7 +40,7 @@ This should print the Server information.
 
 #### 1- Get the Certificate from Redis Cluster
 
-You have access to the Redis Enterprise Cluster, you go to one of the to retrieve the certificate (that is a self generated one by default).
+You have access to the Redis Enterprise Cluster, you go to one of the nodes to retrieve the certificate (that is a self-generated one by default).
 
 The cluster certificate is located at: `/etc/opt/redislabs/proxy_cert.pem`.
 
@@ -54,11 +54,11 @@ docker cp redis-node1:/etc/opt/redislabs/proxy_cert.pem ./certificates
 
 #### 2- Generate a New Client Certificate
 
-Using the Two-Way SSL you need to have a certificate for the client that will be use by Redis database proxy to trust the client.
+Using the Two-Way SSL you need to have a certificate for the client that will be used by Redis database proxy to trust the client.
 
-In this article I will use a self signed certificate using OpenSSL,in this example we care creating a certificate for an application named `app_001`.
+In this article I will use a self-signed certificate using OpenSSL, in this example, we are creating a certificate for an application named `app_001`.
 
-You can create as many certificate as you want, or reuse this one for all servers/applications.
+You can create as many certificates as you want, or reuse this one for all servers/applications.
 
 Open a terminal and run the following commands:
 
@@ -74,10 +74,10 @@ openssl req \
 
 ```
 
-This command generate a new ckient key (`client_key_001.pem`) and certificate (`client_cert_001.pem`) with no passphrase.
+This command generate a new client key (`client_key_001.pem`) and certificate (`client_cert_001.pem`) with no passphrase.
 
 
-#### 3- Configure the Redis Datatabse
+#### 3- Configure the Redis Database
 
 The next step is to take the certificate and add it to the database you want to protect. 
 
@@ -108,7 +108,7 @@ Go to the Redis Enterprise Admin Web Console and enable TLS on your database:
 1. Check "Enforce client authentication"
 1. Paste the certificate in the text area
 1. Click the Save button to save the certificate
-1. Clic the Udpate button to save the configuration.
+1. Click the Update button to save the configuration.
 
 {%img center /images/posts/how-to-use-ssl-slash-tls-with-redis-enterprise/001-tls-configuration.png%}
 
@@ -123,7 +123,7 @@ redis-cli -p 12000 -a secretdb01 INFO SERVER
 
 #### 4- Connect to the Database using the Certificate
 
-In all these example, I am using a "self-signed" certificate, so I do not check the validity of the hostname. 
+In all following examples, I am using a "self-signed" certificate, so I do not check the validity of the hostname. 
 You should adapt the connections/TLS information based on your certificate configuration.
 
 #### 4.1 Using Redis-CLI
@@ -142,6 +142,11 @@ client = yes
 accept = 127.0.0.1:6380
 connect = 127.0.0.1:12000
 
+```
+Start stunnel using the command
+
+```
+stunnel ./stunnel.conf
 ```
 
 This will start a process that listen to port `6380` and used as a proxy to the Redis Enterprise database on port `12000`.
@@ -214,7 +219,7 @@ client.info( "SERVER", function (err, reply) {
 
 More information in the documentation "[Using Redis with Node.js](https://redislabs.com/lp/node-js-redis/)".
 
-### 4.4 Using Java
+##### 4.4 Using Java
 
 In Java, to be able to connect using SSL, you have to install all the certificates in the Java environment using the [keytool](https://docs.oracle.com/en/java/javase/11/tools/keytool.html) utility.
 
@@ -231,10 +236,10 @@ openssl pkcs12 -export \
 
 As you can see the keystore is used to store the credentials associated with you client; it will be used later with the `-javax.net.ssl.keyStore` system property in the Java application.
 
-In addition to the keys tore, you also have to create a trustore, that is used to store other credential for example in our case the redis cluster certificate.
+In addition to the keys tore, you also have to create a trust store, that is used to store other credentials for example in our case the redis cluster certificate.
 
 
-Create a **trustore** file and add the Redis cluster certificate to it
+Create a **trust store** file and add the Redis cluster certificate to it
 
 ```
 keytool -genkey \
@@ -294,7 +299,7 @@ public class SSLTest {
 }
 ```
 
-* line 8-12, the system environment variable are set to point to the keystore and trustore (this should be externalized)
+* line 8-12, the system environment variables are set to point to the keystore and trust store (this should be externalized)
 * line 14, the Redis URL start with `rediss` with 2 s to indicate that the connection should be encrypted
 * line 17, set the database password
 
