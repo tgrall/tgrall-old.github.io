@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Node | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2020-01-02T17:37:30+01:00</updated>
+  <updated>2020-01-02T17:50:47+01:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -134,7 +134,7 @@ clip &lt; client_cert_app_001.pem
 
 <h4>4- Connect to the Database using the Certificate</h4>
 
-<p>In all these example, I am using a &ldquo;self-signed&rdquo; certificate, so I do not check the validity of the hostname.
+<p>In all following examples, I am using a &ldquo;self-signed&rdquo; certificate, so I do not check the validity of the hostname.
 You should adapt the connections/TLS information based on your certificate configuration.</p>
 
 <h4>4.1 Using Redis-CLI</h4>
@@ -151,6 +151,11 @@ client = yes
 [redislabs]
 accept = 127.0.0.1:6380
 connect = 127.0.0.1:12000
+</code></pre>
+
+<p>Start stunnel using the command</p>
+
+<pre><code>stunnel ./stunnel.conf
 </code></pre>
 
 <p>This will start a process that listen to port <code>6380</code> and used as a proxy to the Redis Enterprise database on port <code>12000</code>.</p>
@@ -218,7 +223,7 @@ client.info( "SERVER", function (err, reply) {
 
 <p>More information in the documentation &ldquo;<a href="https://redislabs.com/lp/node-js-redis/">Using Redis with Node.js</a>&rdquo;.</p>
 
-<h3>4.4 Using Java</h3>
+<h5>4.4 Using Java</h5>
 
 <p>In Java, to be able to connect using SSL, you have to install all the certificates in the Java environment using the <a href="https://docs.oracle.com/en/java/javase/11/tools/keytool.html">keytool</a> utility.</p>
 
@@ -233,9 +238,9 @@ client.info( "SERVER", function (err, reply) {
 
 <p>As you can see the keystore is used to store the credentials associated with you client; it will be used later with the <code>-javax.net.ssl.keyStore</code> system property in the Java application.</p>
 
-<p>In addition to the keys tore, you also have to create a trustore, that is used to store other credential for example in our case the redis cluster certificate.</p>
+<p>In addition to the keys tore, you also have to create a trust store, that is used to store other credentials for example in our case the redis cluster certificate.</p>
 
-<p>Create a <strong>trustore</strong> file and add the Redis cluster certificate to it</p>
+<p>Create a <strong>trust store</strong> file and add the Redis cluster certificate to it</p>
 
 <pre><code>keytool -genkey \
   -dname "cn=CLIENT_APP_01" \
@@ -291,7 +296,7 @@ public class SSLTest {
 </code></pre>
 
 <ul>
-<li>line 8-12, the system environment variable are set to point to the keystore and trustore (this should be externalized)</li>
+<li>line 8-12, the system environment variables are set to point to the keystore and trust store (this should be externalized)</li>
 <li>line 14, the Redis URL start with <code>rediss</code> with 2 s to indicate that the connection should be encrypted</li>
 <li>line 17, set the database password</li>
 </ul>
