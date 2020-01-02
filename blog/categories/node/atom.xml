@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Node | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2020-01-02T17:13:18+01:00</updated>
+  <updated>2020-01-02T17:37:30+01:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -20,7 +20,7 @@
     <id>http://tgrall.github.io/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise</id>
     <content type="html"><![CDATA[<p><img class="center" src="/images/posts/how-to-use-ssl-slash-tls-with-redis-enterprise/000_header.jpeg"></p>
 
-<p>In this article I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production it is a good practise to use SSL to protect the data that are moving between various computers (client applications and Redis servers). Transport Level Security (TLS) guarantee that only allowed applications/computers are connected to the database, and also that data are not viewed or altered by a middle man process.</p>
+<p>In this article, I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production, it is a good practice to use SSL to protect the data that are moving between various computers (client applications and Redis servers). Transport Level Security (TLS) guarantees that only allowed applications/computers are connected to the database, and also that data is not viewed or altered by a middle man process.</p>
 
 <p>You can secure the connections between your client applications and Redis cluster using:</p>
 
@@ -38,9 +38,9 @@
 <p>Prerequisites:</p>
 
 <ul>
-<li>A Redis Enterprise 5.4.x database, <em>(my database is protected by the password <code>secretdb01</code>, and listening on port <code>12000</code>)</em></li>
-<li><code>redis-cli</code> to run basis commands</li>
-<li>Python, Node and Java installed if you want to test various languages.</li>
+<li>A Redis Enterprise 5.4.x database, (my database is protected by the password <code>secretdb01</code>, and listening on port <code>12000</code>)</li>
+<li><code>redis-cli</code> to run basic commands</li>
+<li>Python, Node, and Java installed if you want to test various languages.</li>
 </ul>
 
 
@@ -55,7 +55,7 @@
 
 <h4>1- Get the Certificate from Redis Cluster</h4>
 
-<p>You have access to the Redis Enterprise Cluster, you go to one of the to retrieve the certificate (that is a self generated one by default).</p>
+<p>You have access to the Redis Enterprise Cluster, you go to one of the nodes to retrieve the certificate (that is a self-generated one by default).</p>
 
 <p>The cluster certificate is located at: <code>/etc/opt/redislabs/proxy_cert.pem</code>.</p>
 
@@ -68,11 +68,11 @@
 
 <h4>2- Generate a New Client Certificate</h4>
 
-<p>Using the Two-Way SSL you need to have a certificate for the client that will be use by Redis database proxy to trust the client.</p>
+<p>Using the Two-Way SSL you need to have a certificate for the client that will be used by Redis database proxy to trust the client.</p>
 
-<p>In this article I will use a self signed certificate using OpenSSL,in this example we care creating a certificate for an application named <code>app_001</code>.</p>
+<p>In this article I will use a self-signed certificate using OpenSSL, in this example, we are creating a certificate for an application named <code>app_001</code>.</p>
 
-<p>You can create as many certificate as you want, or reuse this one for all servers/applications.</p>
+<p>You can create as many certificates as you want, or reuse this one for all servers/applications.</p>
 
 <p>Open a terminal and run the following commands:</p>
 
@@ -86,9 +86,9 @@ openssl req \
  -out client_cert_app_001.pem
 </code></pre>
 
-<p>This command generate a new ckient key (<code>client_key_001.pem</code>) and certificate (<code>client_cert_001.pem</code>) with no passphrase.</p>
+<p>This command generate a new client key (<code>client_key_001.pem</code>) and certificate (<code>client_cert_001.pem</code>) with no passphrase.</p>
 
-<h4>3- Configure the Redis Datatabse</h4>
+<h4>3- Configure the Redis Database</h4>
 
 <p>The next step is to take the certificate and add it to the database you want to protect.</p>
 
@@ -120,7 +120,7 @@ clip &lt; client_cert_app_001.pem
 <li>Check &ldquo;Enforce client authentication&rdquo;</li>
 <li>Paste the certificate in the text area</li>
 <li>Click the Save button to save the certificate</li>
-<li>Clic the Udpate button to save the configuration.</li>
+<li>Click the Update button to save the configuration.</li>
 </ol>
 
 
