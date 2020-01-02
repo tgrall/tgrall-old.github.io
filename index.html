@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Introduction In this article, I will show you how to update Redis Enterprise on PCF and see how Redis Enterprise cluster will guarantee a service &hellip;">
+  <meta name="description" content="In this article I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production it is a good practise to use SSL &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-01-02T10:47:13+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2020</span></span> <span class='time'>10:47 am</span></time>
+        
+           | <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="center" src="/images/posts/how-to-use-ssl-slash-tls-with-redis-enterprise/000_header.jpeg"></p>
+
+<p>In this article I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production it is a good practise to use SSL to protect the data that are moving between various computers (client applications and Redis servers). Transport Level Security (TLS) guarantee that only allowed applications/computers are connected to the database, and also that data are not viewed or altered by a middle man process.</p>
+
+<p>You can secure the connections between your client applications and Redis cluster using:</p>
+
+<ul>
+<li>One-Way SSL: the client (your application) get the certificate from the server (Redis cluster), validate it, and then all communications are encrypted</li>
+<li>Two-Way SSL: (aka mutual SSL) here both the client and the server authenticate each other and validate that both ends are trusted.</li>
+</ul>
+
+
+<p>In this article, I will focus on the Two-Way SSL, and using Redis Enterprise.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -208,7 +257,7 @@
 <p>Redis Streams is a Redis Data Type, that represents a log so you can add new information/message in an append-only mode <em>(this is not 100% accurate since you can remove messages from the log)</em>. Using Redis Streams you can build &ldquo;Kafka Like&rdquo; applications, what I mean by that you can:</p>
 
 <ul>
-<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redi Pub/Sub)</li>
+<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redis Pub/Sub)</li>
 <li>consume messages that are published even when your client application (consumer) is not running. This is a big difference with Redis Pub/Sub</li>
 <li>consume messages starting a specific offset, for example, read the whole history, or only new messages</li>
 </ul>
@@ -540,45 +589,6 @@ this article use the same code and approach than the <a href="http://tgrall.gith
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/09/26/streaming-analytics-in-a-digitally-industrialized-world/">Streaming Analytics in a Digitally Industrialized World</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-09-26T15:30:20+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:30 pm</span></time>
-        
-           | <a href="/blog/2016/09/26/streaming-analytics-in-a-digitally-industrialized-world/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2016/09/26/streaming-analytics-in-a-digitally-industrialized-world/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Get an introduction to streaming analytics, which allows you real-time insight from captured events and big data. There are applications across industries, from finance to wine making, though there are two primary challenges to be addressed.</p>
-
-<p>Did you know that a plane flying from Texas to London can generate 30 million data points per flight? As Jim Daily of GE Aviation notes, that equals <a href="https://www.ge.com/digital/blog/industrial-iot-improving-airline-economics">10 billion data points</a> in one year. And we’re talking about one plane alone. So you can understand why <a href="http://cloudblog.ericsson.com/cloud-scalability-combined-with-speed-inside-ges-cloud-transformation">another top GE executive recently told Ericsson Business Review</a> that &ldquo;Cloud is the future of IT,&rdquo; with a focus on supporting challenging applications in industries such as aviation and energy.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/09/26/streaming-analytics-in-a-digitally-industrialized-world/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -594,6 +604,10 @@ this article use the same code and approach than the <a href="http://tgrall.gith
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
       </li>
     
@@ -607,10 +621,6 @@ this article use the same code and approach than the <a href="http://tgrall.gith
     
       <li class="post">
         <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
       </li>
     
   </ul>
@@ -666,7 +676,7 @@ data-ad-slot="9144931072"></ins>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2019 - Tug Grall -
+  Copyright &copy; 2020 - Tug Grall -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

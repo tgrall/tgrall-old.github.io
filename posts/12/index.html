@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Graeme, the Grails Project Lead has published a very interesting benchmark of Grails versus Rails applications, that is available on the Grails wiki &hellip;">
+  <meta name="description" content="During The Server Side Symposium in Vegas, Thomas Kurian announced that Oracle is acquiring Tangosol, during the keynote, Cameron Purdy (Tangosol& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,45 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/03/23/tangosol-is-joining-the-oracle-family/">Tangosol Is Joining the Oracle Family</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-03-23T11:03:42+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2007</span></span> <span class='time'>11:03 am</span></time>
+        
+           | <a href="/blog/2007/03/23/tangosol-is-joining-the-oracle-family/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/03/23/tangosol-is-joining-the-oracle-family/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>During The Server Side Symposium in Vegas, Thomas Kurian announced that Oracle is acquiring <a href="http://tangosol.com/">Tangosol</a>, during the keynote, Cameron Purdy (Tangosol&rsquo;s CEO) has demonstrated how cool Coherence can be, and they have presented how it could be used in the context of XTP (Extreme Transaction Processing).</p>
+
+<p>Soon more to come about this in the different technical side and blog of the Oracle&rsquo;s community.</p>
+
+<ul>
+<li>See <a href="http://www.oracle.com/tangosol/index.html">Oracle and Tangosol page</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -517,87 +556,6 @@ This will give a result like:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/02/18/groovy-101-importing-xml-in-your-database/">Groovy 101: Importing XML in Your Database</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2007-02-18T02:46:47+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>2:46 am</span></time>
-        
-           | <a href="/blog/2007/02/18/groovy-101-importing-xml-in-your-database/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2007/02/18/groovy-101-importing-xml-in-your-database/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A friend of mine was looking for an easy way to import some XML content in his database. You have many ways to do it. But the easiest for a Java/Groovy developer is to use Groovy, and I have create this small example for him.</p>
-
-<p>Groovy provides really simple solution to parse XML and manipulate your database. The following sample reads an RSS new feed and import the title and link in a table named NEWS that contains two columns TITLE and LINK.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">import</span> <span class="nn">groovy.sql.Sql</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">def</span> <span class="n">rssFeed</span> <span class="o">=</span> <span class="s2">&quot;http://www.javablogs.com/ViewDaysBlogs.action?view=rss&quot;</span><span class="o">;</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">xmlFeed</span>      <span class="o">=</span> <span class="k">new</span> <span class="n">XmlParser</span><span class="o">().</span><span class="na">parse</span><span class="o">(</span><span class="n">rssFeed</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">def</span> <span class="n">sql</span> <span class="o">=</span> <span class="n">Sql</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="s2">&quot;jdbc:oracle:thin:@//tgrall-linux:1521/XE&quot;</span><span class="o">,</span>
-</span><span class='line'><span class="s2">&quot;GROOVY&quot;</span><span class="o">,</span>
-</span><span class='line'><span class="s2">&quot;GROOVY&quot;</span><span class="o">,</span>
-</span><span class='line'><span class="s2">&quot;oracle.jdbc.driver.OracleDriver&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="kt">def</span> <span class="n">set</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="na">dataSet</span><span class="o">(</span><span class="s2">&quot;NEWS&quot;</span><span class="o">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">(</span><span class="mi">0</span><span class="o">..&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">xmlFeed</span><span class="o">.</span><span class="na">channel</span><span class="o">.</span><span class="na">item</span><span class="o">.</span><span class="na">size</span><span class="o">()).</span><span class="na">each</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kt">def</span> <span class="n">item</span> <span class="o">=</span> <span class="n">xmlFeed</span><span class="o">.</span><span class="na">channel</span><span class="o">.</span><span class="na">item</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">it</span><span class="o">);</span>
-</span><span class='line'>  <span class="kt">def</span> <span class="n">title</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="na">title</span><span class="o">.</span><span class="na">value</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
-</span><span class='line'>  <span class="kt">def</span> <span class="n">link</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="na">link</span><span class="o">.</span><span class="na">value</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
-</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="s2">&quot;Importing $title ...&quot;</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="nl">TITLE:</span> <span class="n">title</span><span class="o">,</span> <span class="nl">LINK:</span> <span class="n">link</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>First I create a Groovy SQL object and a DataSet to manipulate my data <code>sql.dataSet("NEWS")</code>. Do not forget, if like me you are using Oracle database, to add the Oracle JDBC driver to your classpath ;-)</p>
-
-<p>Then I create a loop on each items of the RSS feed I am using: <code>(0..&amp;gt; xmlFeed.channel.item.size()).each {...}</code>. As you see, Groovy XML help me to parse, and navigate the XML document.</p>
-
-<p>Like any Groovy iterator you have access to an implicit object available in the loop &ldquo;<code>it</code>&rdquo;, so I can get the item using the Groovy XML : <code>xmlFeed.channel.item.get(it)</code></p>
-
-<p>Then you can get the different values you want of the  item element.Using the dataset.add method, you can insert them in the table.This is done using the  value pairs notation <em>column:value</em>, this looks like: <code>set.add(TITLE: title, LINK: link)</code></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/13">&larr; Older</a>
@@ -615,6 +573,10 @@ This will give a result like:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
       </li>
     
@@ -628,10 +590,6 @@ This will give a result like:</p>
     
       <li class="post">
         <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
       </li>
     
   </ul>
@@ -687,7 +645,7 @@ data-ad-slot="9144931072"></ins>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2019 - Tug Grall -
+  Copyright &copy; 2020 - Tug Grall -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://tgrall.github.io/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/</loc>
+<lastmod>2020-01-02T10:47:13+01:00</lastmod>
+</url>
+<url>
 <loc>http://tgrall.github.io/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/</loc>
 <lastmod>2019-09-19T05:05:23+02:00</lastmod>
 </url>
@@ -1312,5 +1316,14 @@
 </url>
 <url>
 <loc>http://tgrall.github.io/blog/categories/ha/</loc>
+</url>
+<url>
+<loc>http://tgrall.github.io/blog/categories/python/</loc>
+</url>
+<url>
+<loc>http://tgrall.github.io/blog/categories/authentication/</loc>
+</url>
+<url>
+<loc>http://tgrall.github.io/blog/categories/ssl/</loc>
 </url>
 </urlset>

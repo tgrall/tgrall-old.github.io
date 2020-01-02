@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Windows | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/windows/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-27T15:06:57+02:00</updated>
+  <updated>2020-01-02T17:13:18+01:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -329,7 +329,7 @@ driver.connect({
 <li>Execute the <code>service_stop.bat</code></li>
 <li><p>Edit the Service Register script</p></li>
 <li><p>Open <code>service_register.bat</code></p></li>
-<li>Edit the line 9 to replace <code>%IP_ADDR%`` by your hostname (or your IP address), the line should look like:</code>set NS_NAME=<a href="&#109;&#x61;&#x69;&#108;&#x74;&#x6f;&#58;&#110;&#x73;&#95;&#x31;&#64;&#99;&#111;&#x75;&#x63;&#x68;&#98;&#x61;&#x73;&#101;&#45;&#x6e;&#x6f;&#x64;&#101;&#x31;&#46;&#x6d;&#x79;&#x63;&#x6f;&#109;&#112;&#x61;&#x6e;&#121;&#x2e;&#x63;&#x6f;&#x6d;">&#110;&#x73;&#x5f;&#49;&#64;&#99;&#x6f;&#117;&#x63;&#104;&#98;&#x61;&#x73;&#x65;&#x2d;&#110;&#x6f;&#x64;&#x65;&#49;&#46;&#109;&#121;&#x63;&#x6f;&#x6d;&#x70;&#x61;&#110;&#121;&#46;&#99;&#x6f;&#109;</a>`</li>
+<li>Edit the line 9 to replace <code>%IP_ADDR%`` by your hostname (or your IP address), the line should look like:</code>set NS_NAME=<a href="&#x6d;&#97;&#105;&#108;&#116;&#x6f;&#x3a;&#x6e;&#115;&#x5f;&#49;&#64;&#x63;&#x6f;&#x75;&#99;&#104;&#x62;&#97;&#115;&#x65;&#45;&#x6e;&#111;&#x64;&#101;&#x31;&#46;&#x6d;&#121;&#x63;&#x6f;&#109;&#x70;&#x61;&#110;&#121;&#x2e;&#99;&#x6f;&#109;">&#110;&#x73;&#x5f;&#x31;&#64;&#99;&#111;&#117;&#99;&#104;&#x62;&#97;&#x73;&#x65;&#45;&#x6e;&#x6f;&#100;&#x65;&#x31;&#x2e;&#109;&#x79;&#x63;&#x6f;&#x6d;&#x70;&#97;&#x6e;&#121;&#x2e;&#x63;&#x6f;&#109;</a>`</li>
 <li>Save the file3.  Delete the content of: <code>C:\Program Files\Couchbase\Server\var\lib\couchbase\mnesia</code></li>
 <li>Execute the `service_reregister.bat</li>
 </ol>

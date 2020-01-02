@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Streaming | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/streaming/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-27T15:06:57+02:00</updated>
+  <updated>2020-01-02T17:13:18+01:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -27,7 +27,7 @@
 <p>Redis Streams is a Redis Data Type, that represents a log so you can add new information/message in an append-only mode <em>(this is not 100% accurate since you can remove messages from the log)</em>. Using Redis Streams you can build &ldquo;Kafka Like&rdquo; applications, what I mean by that you can:</p>
 
 <ul>
-<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redi Pub/Sub)</li>
+<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redis Pub/Sub)</li>
 <li>consume messages that are published even when your client application (consumer) is not running. This is a big difference with Redis Pub/Sub</li>
 <li>consume messages starting a specific offset, for example, read the whole history, or only new messages</li>
 </ul>

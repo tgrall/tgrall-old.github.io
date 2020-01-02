@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="TL;DR: Look at the Couchbase Ansible Playbook on my Github. Introduction When I was looking for a more effective way to create my cluster I asked &hellip;">
+  <meta name="description" content="TL;DR: Look at the project on Github. Introduction During my last interactions with the Couchbase community, I had the question how can I easily &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,302 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase/">SQL to NoSQL : Copy Your Data From MySQL to Couchbase</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-07-03T11:52:56+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2013</span></span> <span class='time'>11:52 am</span></time>
+        
+           | <a href="/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2013/07/03/sql-to-nosql-copy-your-data-from-mysql-to-couchbase/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>TL;DR:</strong> Look at the <a href="https://github.com/tgrall/couchbase-sql-importer">project on Github</a>.</p>
+
+<h3>Introduction</h3>
+
+<p>During my last interactions with the Couchbase community, I had the question how can I easily import my data from my current database into Couchbase. And my answer was always the same:</p>
+
+<ul>
+<li>Take an ETL such as Talend to do it</li>
+<li>Just write a small program to copy the data from your RDBMS to Couchbase&hellip;</li>
+</ul>
+
+
+<p>So I have written this small program that allows you to import the content of a RDBMS into Couchbase. This tools could be used as it is, or you can look at the code to adapt it to your application.</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/xzqBjhYKCLY?color=white&theme=light"></iframe>
+
+
+<h3>The Tool: Couchbase SQL Importer</h3>
+
+<p>The Couchbase SQL Importer, available <a href="http://github.com/tgrall/couchbase-sql-importer">here</a>, allows you with a simple command line to copy all -or part of- your SQL schema into Couchbase. Before explaining how to run this command, let&rsquo;s see how the data are stored into Couchbase when they are imported:</p>
+
+<ul>
+<li>Each table row is imported a single JSON document
+
+<ul>
+<li>where each table column becomes a JSON attribute</li>
+</ul>
+</li>
+<li>Each document as a key made of the name of the table and a counter (increment)</li>
+</ul>
+
+
+<p>The following concrete example, based on the <a href="http://dev.mysql.com/doc/world-setup/en/index.html">MySQL World sample database</a>, will help you to understand how it works. This database contains 3 tables : City, Country, CountryLanguage. The City table looks like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+-------------+----------+------+-----+---------+----------------+
+</span><span class='line'>| Field       | Type     | Null | Key | Default | Extra          |
+</span><span class='line'>+-------------+----------+------+-----+---------+----------------+
+</span><span class='line'>| ID          | int(11)  | NO   | PRI | NULL    | auto_increment |
+</span><span class='line'>| Name        | char(35) | NO   |     |         |                |
+</span><span class='line'>| CountryCode | char(3)  | NO   |     |         |                |
+</span><span class='line'>| District    | char(20) | NO   |     |         |                |
+</span><span class='line'>| Population  | int(11)  | NO   |     | 0       |                |
+</span><span class='line'>+-------------+----------+------+-----+---------+----------------+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The JSON document that matches this table looks like the following:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">city:</span><span class="mi">3805</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;San Francisco&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;District&quot;</span><span class="p">:</span> <span class="s2">&quot;California&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;ID&quot;</span><span class="p">:</span> <span class="mi">3805</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;Population&quot;</span><span class="p">:</span> <span class="mi">776733</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;CountryCode&quot;</span><span class="p">:</span> <span class="s2">&quot;USA&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You see that here I am simply taking all the rows and &ldquo;moving&rdquo; them into Couchbase. This is a good first step to play with your dataset into Couchbase, but it is probably not the final model you want to use for your application; most of the time you will have to see when to use embedded documents, list of values, .. into your JSON documents.</p>
+
+<p>In addition to the JSON document the tool create views based on the following logic:</p>
+
+<ul>
+<li>a view that list all imported documents with the name of the &ldquo;table&rdquo; (aka type) as key</li>
+<li>a view for each table with the primary key columns</li>
+</ul>
+
+
+<p>View: all/by_type</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;rows&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">4079</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">239</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage&quot;</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">984</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see this view allows you to get with a single Couchbase query the number of document by type.</p>
+
+<p>Also for each table/document type, a view is created where the key of the index is built from the table primary key. Let&rsquo;s for example query the &ldquo;City&rdquo; documents.</p>
+
+<p>View: city/by_pk?reduce=false&amp;limit=5</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;total_rows&quot;</span><span class="p">:</span> <span class="mi">4079</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;rows&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:1&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:2&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:3&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:4&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;city:5&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The index key matches the value of the <code>City.ID</code> column.  When the primary key is made of multiple columns the key looks like:</p>
+
+<p>View: CountryLanguage/by_pk?reduce=false&amp;limit=5</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;total_rows&quot;</span><span class="p">:</span> <span class="mi">984</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;rows&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:1&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;Dutch&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:2&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;English&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:3&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;Papiamento&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:4&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ABW&quot;</span><span class="p">,</span> <span class="s2">&quot;Spanish&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+</span><span class='line'>  <span class="p">{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;countrylanguage:5&quot;</span><span class="p">,</span> <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;AFG&quot;</span><span class="p">,</span> <span class="s2">&quot;Balochi&quot;</span><span class="p">],</span> <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This view is built from the CountryLanguage table primary key made of <code>CountryLanguage.CountryCode and </code>CountryLanguage.Language` columns.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">+-------------+---------------+------+-----+---------+-------+</span>
+</span><span class='line'><span class="err">|</span> <span class="err">Field</span>       <span class="err">|</span> <span class="err">Type</span>          <span class="err">|</span> <span class="err">Null</span> <span class="err">|</span> <span class="err">Key</span> <span class="err">|</span> <span class="err">Default</span> <span class="err">|</span> <span class="err">Extra</span> <span class="err">|</span>
+</span><span class='line'><span class="err">+-------------+---------------+------+-----+---------+-------+</span>
+</span><span class='line'><span class="err">|</span> <span class="err">CountryCode</span> <span class="err">|</span> <span class="err">char(</span><span class="mi">3</span><span class="err">)</span>       <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span> <span class="err">PRI</span> <span class="err">|</span>         <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">|</span> <span class="err">Language</span>    <span class="err">|</span> <span class="err">char(</span><span class="mi">30</span><span class="err">)</span>      <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span> <span class="err">PRI</span> <span class="err">|</span>         <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">|</span> <span class="err">IsOfficial</span>  <span class="err">|</span> <span class="err">enum(&#39;T&#39;,&#39;F&#39;)</span> <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span>     <span class="err">|</span> <span class="err">F</span>       <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">|</span> <span class="err">Percentage</span>  <span class="err">|</span> <span class="err">float(</span><span class="mi">4</span><span class="err">,</span><span class="mi">1</span><span class="err">)</span>    <span class="err">|</span> <span class="err">NO</span>   <span class="err">|</span>     <span class="err">|</span> <span class="mf">0.0</span>     <span class="err">|</span>       <span class="err">|</span>
+</span><span class='line'><span class="err">+-------------+---------------+------+-----+---------+-------+</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>How to use Couchbase SQL Importer tool? </strong></p>
+
+<p>The importer is a simple Java based command line utility, quite simple to use:</p>
+
+<p>1- Download the <a href="http://goo.gl/IF89e">CouchbaseSqlImporter.jar file from here</a>. This file is contains all the dependencies to work with Couchbase: the Java Couchbase Client, and GSON.
+2- Download the JDBC driver for the database you are using as data source. For this example I am using MySQL and I have download the driver for MySQL Site.
+3- Configure the import using a properties file.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">##</span> <span class="err">SQL</span> <span class="err">Information</span> <span class="err">##</span>
+</span><span class='line'><span class="err">sql.connection=jdbc:mysql://</span><span class="mf">192.168</span><span class="err">.</span><span class="mf">99.19</span><span class="err">:</span><span class="mi">3306</span><span class="err">/world</span>
+</span><span class='line'><span class="err">sql.username=root</span>
+</span><span class='line'><span class="err">sql.password=password</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">##</span> <span class="err">Couchbase</span> <span class="err">Information</span> <span class="err">##</span>
+</span><span class='line'><span class="err">cb.uris=http://localhost:</span><span class="mi">8091</span><span class="err">/pools</span>
+</span><span class='line'><span class="err">cb.bucket=default</span>
+</span><span class='line'><span class="err">cb.password=</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">##</span> <span class="err">Import</span> <span class="err">information</span>
+</span><span class='line'><span class="err">import.tables=ALL</span>
+</span><span class='line'><span class="err">import.createViews=</span><span class="kc">true</span>
+</span><span class='line'><span class="err">import.typefield=type</span>
+</span><span class='line'><span class="err">import.fieldcase=lower</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This sample properties file contains three sections :</p>
+
+<ul>
+<li>The two first sections are used to configure the connections to your SQL database and Couchbase cluster (note that the bucket must be created first)</li>
+<li>The third section allow you to configure the import itself</li>
+</ul>
+
+
+<p>4- Run the tool !</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="err">java</span> <span class="err">-cp</span> <span class="s2">&quot;./CouchbaseSqlImporter.jar:./mysql-connector-java-5.1.25-bin.jar&quot;</span> <span class="err">com.couchbase.util.SqlImporter</span> <span class="err">import.properties</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So you run the Java command with the proper classpath (-cp parameter).</p>
+
+<p>And you are done, you can get your data from your SQL database into Couchbase.</p>
+
+<p>If you are interested to see how it is working internally, you can take a look to the next paragraph.</p>
+
+<h3>The Code: How it works?</h3>
+
+<p>The main class of the tool is really simple  <a href="https://github.com/tgrall/couchbase-sql-importer/blob/master/sql-importer-lib/src/main/java/com/couchbase/util/SqlImporter.java">com.couchbase.util.SqlImporter</a>, the process is:</p>
+
+<ol>
+<li>Connect to the SQL database</li>
+<li>Connect to Couchbase</li>
+<li>Get the list of tables</li>
+<li>For each tables execute a &ldquo;select * from table&rdquo;
+ 4.1. Analyze the ResultSetMetadata to get the list of columns
+ 4.2. Create a Java map for each rows where the key is the name of the columns and the value…is the value
+ 4.3. Serialize this Map into a GSON document and save it into Couchbase</li>
+</ol>
+
+
+<p>The code is available in the <a href="https://github.com/tgrall/couchbase-sql-importer/blob/master/sql-importer-lib/src/main/java/com/couchbase/util/SqlImporter.java#L212">ImportTable(String table)</a> Java method.</p>
+
+<p>One interesting point is that you can use and extend the code to deal with your application.</p>
+
+<h3>Conclusion</h3>
+
+<p>I have created this tool quickly to help some people in the community, if you are using it and need new features, let me know, using comment or pull request.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1492,57 +1788,6 @@ To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt)
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/12/01/new-adventure-dot-dot-dot/">New Adventure&#8230;</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2012-12-01T02:25:00+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2012</span></span> <span class='time'>2:25 am</span></time>
-        
-           | <a href="/blog/2012/12/01/new-adventure-dot-dot-dot/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2012/12/01/new-adventure-dot-dot-dot/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Yesterday was my last day at eXo&hellip; I have been working at eXo since 2008, and we have achieved many exciting things such as building <a href="http://www.exoplatform.com/">eXo Platform</a>, the open source social platform, and the <a href="http://www.cloud-ide.com/">Cloud-IDE</a> allowing developers to build, test, and deploy applications online.</p>
-
-<p>It was a great experience for me, but it is time for me to jump into a new adventure&hellip;</p>
-
-<p>I am joining <a href="http://www.couchbase.com/">Couchbase</a>&nbsp;as a Technical Evangelist for the EMEA Region. When I have started to work with NoSQL engines (starting with Google BigTable for <a href="http://www.resultri.com/">Resultri</a>) I really enjoyed the experience and the flexibility that it gives to the developers. Then I choose to work on a documented oriented database because it looks very natural to me, and evaluate the clustering capabilities.&nbsp;This is how I discovered&nbsp;<a href="http://www.couchbase.com/">Couchbase</a>&nbsp;and its community.</p>
-
-<p>This new job is a great opportunity for me to do the things that I really like about software:</p>
-
-<ul>
-<li>Coding applications using different languages and frameworks</li>
-<li>Understanding the sysops/devops related challenges when using a new product/technology</li>
-<li>And finally probably the most important part; sharing it with others!</li>
-</ul>
-
-
-<p>I look forward to sharing what I like about NoSQL and Couchbase and discuss with others about their experience or needs around NoSQL.&nbsp;</p>
-
-<p>See you soon online and in real life during conferences and meetups!</p>
-
-<p><img src="http://4.bp.blogspot.com/-jxz50giRSQM/ULnaWxkHkyI/AAAAAAAAAZM/s0y7CFw4jUk/s320/couch-logo-company-page.png" title="&#34;Couchbase Logo&#34;" alt="&#34;Couchbase Logo&#34;"></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/5">&larr; Older</a>
@@ -1560,6 +1805,10 @@ To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
       </li>
     
@@ -1573,10 +1822,6 @@ To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt)
     
       <li class="post">
         <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
       </li>
     
   </ul>
@@ -1632,7 +1877,7 @@ data-ad-slot="9144931072"></ins>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2019 - Tug Grall -
+  Copyright &copy; 2020 - Tug Grall -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

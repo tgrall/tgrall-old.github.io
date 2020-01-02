@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nosql | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/nosql/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2019-09-27T15:06:57+02:00</updated>
+  <updated>2020-01-02T17:13:18+01:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -12,6 +12,306 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to Use SSL/TLS With Redis Enterprise]]></title>
+    <link href="http://tgrall.github.io/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/"/>
+    <updated>2020-01-02T10:47:13+01:00</updated>
+    <id>http://tgrall.github.io/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise</id>
+    <content type="html"><![CDATA[<p><img class="center" src="/images/posts/how-to-use-ssl-slash-tls-with-redis-enterprise/000_header.jpeg"></p>
+
+<p>In this article I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production it is a good practise to use SSL to protect the data that are moving between various computers (client applications and Redis servers). Transport Level Security (TLS) guarantee that only allowed applications/computers are connected to the database, and also that data are not viewed or altered by a middle man process.</p>
+
+<p>You can secure the connections between your client applications and Redis cluster using:</p>
+
+<ul>
+<li>One-Way SSL: the client (your application) get the certificate from the server (Redis cluster), validate it, and then all communications are encrypted</li>
+<li>Two-Way SSL: (aka mutual SSL) here both the client and the server authenticate each other and validate that both ends are trusted.</li>
+</ul>
+
+
+<p>In this article, I will focus on the Two-Way SSL, and using Redis Enterprise.</p>
+
+<!-- more -->
+
+
+<p>Prerequisites:</p>
+
+<ul>
+<li>A Redis Enterprise 5.4.x database, <em>(my database is protected by the password <code>secretdb01</code>, and listening on port <code>12000</code>)</em></li>
+<li><code>redis-cli</code> to run basis commands</li>
+<li>Python, Node and Java installed if you want to test various languages.</li>
+</ul>
+
+
+<p><strong>Simple  Test</strong></p>
+
+<p>Let&rsquo;s make sure that the database is available:</p>
+
+<pre><code>redis-cli -p 12000 -a secretdb01 INFO SERVER
+</code></pre>
+
+<p>This should print the Server information.</p>
+
+<h4>1- Get the Certificate from Redis Cluster</h4>
+
+<p>You have access to the Redis Enterprise Cluster, you go to one of the to retrieve the certificate (that is a self generated one by default).</p>
+
+<p>The cluster certificate is located at: <code>/etc/opt/redislabs/proxy_cert.pem</code>.</p>
+
+<p>You have to copy it on each client machine; note that once it is done you can use this certificate to connect using &ldquo;One-Way SSL&rdquo;, but not the purpose of this article.</p>
+
+<p>In my demonstration I am using Docker and copy the certificate using this command from my host:</p>
+
+<pre><code>docker cp redis-node1:/etc/opt/redislabs/proxy_cert.pem ./certificates
+</code></pre>
+
+<h4>2- Generate a New Client Certificate</h4>
+
+<p>Using the Two-Way SSL you need to have a certificate for the client that will be use by Redis database proxy to trust the client.</p>
+
+<p>In this article I will use a self signed certificate using OpenSSL,in this example we care creating a certificate for an application named <code>app_001</code>.</p>
+
+<p>You can create as many certificate as you want, or reuse this one for all servers/applications.</p>
+
+<p>Open a terminal and run the following commands:</p>
+
+<pre><code class="bash ">
+openssl req \
+  -nodes \
+ -newkey rsa:2048 \
+ -keyout client_key_app_001.pem \
+ -x509 \
+ -days 36500 \
+ -out client_cert_app_001.pem
+</code></pre>
+
+<p>This command generate a new ckient key (<code>client_key_001.pem</code>) and certificate (<code>client_cert_001.pem</code>) with no passphrase.</p>
+
+<h4>3- Configure the Redis Datatabse</h4>
+
+<p>The next step is to take the certificate and add it to the database you want to protect.</p>
+
+<p>Let&rsquo;s copy the certificate and paste it into the Redis Enterprise Web Console.</p>
+
+<p>Copy the certificate in your clipboard:</p>
+
+<p>Mac:
+<code>bash
+pbcopy &lt; client_cert_app_001.pem
+</code></p>
+
+<p>Linux:
+<code>bash
+ xclip -sel clip &lt; client_cert_app_001.pem
+</code></p>
+
+<p>Windows:
+<code>bash
+clip &lt; client_cert_app_001.pem
+</code></p>
+
+<p>Go to the Redis Enterprise Admin Web Console and enable TLS on your database:</p>
+
+<ol>
+<li>Edit the database configuration</li>
+<li>Check TLS</li>
+<li>Select &ldquo;Require TLS for All communications&rdquo;</li>
+<li>Check &ldquo;Enforce client authentication&rdquo;</li>
+<li>Paste the certificate in the text area</li>
+<li>Click the Save button to save the certificate</li>
+<li>Clic the Udpate button to save the configuration.</li>
+</ol>
+
+
+<p><img class="center" src="/images/posts/how-to-use-ssl-slash-tls-with-redis-enterprise/001-tls-configuration.png"></p>
+
+<p>The database is now protected, and it is mandatory to use the SSL certificate to connect to it.</p>
+
+<pre><code>redis-cli -p 12000 -a secretdb01 INFO SERVER
+(error) ERR unencrypted connection is prohibited
+</code></pre>
+
+<h4>4- Connect to the Database using the Certificate</h4>
+
+<p>In all these example, I am using a &ldquo;self-signed&rdquo; certificate, so I do not check the validity of the hostname.
+You should adapt the connections/TLS information based on your certificate configuration.</p>
+
+<h4>4.1 Using Redis-CLI</h4>
+
+<p>To connect to a SSL protected database using <code>redis-cli</code> you have to use <a href="https://www.stunnel.org/index.html"><code>stunnel</code></a>.</p>
+
+<p>Create a <code>stunnel.conf</code> file with the following content:</p>
+
+<pre><code>cert = /path_to/certificates/client_cert_app_001.pem
+key = /path_to/certificates/client_key_app_001.pem
+cafile = /path_to/certificates/proxy_cert.pem
+client = yes
+
+[redislabs]
+accept = 127.0.0.1:6380
+connect = 127.0.0.1:12000
+</code></pre>
+
+<p>This will start a process that listen to port <code>6380</code> and used as a proxy to the Redis Enterprise database on port <code>12000</code>.</p>
+
+<pre><code>redis-cli -p 6380 -a secretdb01 INFO SERVER
+</code></pre>
+
+<h5>4.2 Using Python</h5>
+
+<p>Using Python, you have to set the SSL connection parameters:</p>
+
+<pre><code class="python">#!/usr/local/bin/python3
+
+import redis
+import pprint
+
+try:
+  r = redis.StrictRedis(
+    password='secretdb01',
+    decode_responses=True,
+    host='localhost',
+    port=12000,
+    ssl=True, 
+    ssl_keyfile='./client_key_app_001.pem', 
+    ssl_certfile='./client_cert_app_001.pem', 
+    ssl_cert_reqs='required', 
+    ssl_ca_certs='./proxy_cert.pem',
+    )
+
+  info = r.info()
+  pprint.pprint(info)
+
+except Exception as err:
+  print("Error connecting to Redis: {}".format(err))
+</code></pre>
+
+<p>More information in the documentation &ldquo;<a href="https://redislabs.com/lp/python-redis/">Using Redis with Python</a>&rdquo;.</p>
+
+<h5>4.3 Using Node.JS</h5>
+
+<p>For <a href="http://redis.js.org/">Node Redis</a>, use the <a href="https://nodejs.org/api/tls.html">TLS</a> library to configure the client connection:</p>
+
+<pre><code class="javascript">var redis = require("redis");
+var tls = require('tls');
+var fs = require('fs');
+
+var ssl = {
+    key: fs.readFileSync('../certificates/client_key_app_001.pem',encoding='ascii'),
+    cert: fs.readFileSync('../certificates/client_cert_app_001.pem',encoding='ascii'),
+    ca: [ fs.readFileSync('../certificates/proxy_cert.pem',encoding='ascii') ],
+    checkServerIdentity: () =&gt; { return null; },
+};
+
+var client = redis.createClient(12000,'127.0.0.1', 
+    {
+      password : 'secretdb01',
+      tls: ssl
+    }
+);
+
+client.info( "SERVER", function (err, reply) {
+    console.log(reply);
+} );
+</code></pre>
+
+<p>More information in the documentation &ldquo;<a href="https://redislabs.com/lp/node-js-redis/">Using Redis with Node.js</a>&rdquo;.</p>
+
+<h3>4.4 Using Java</h3>
+
+<p>In Java, to be able to connect using SSL, you have to install all the certificates in the Java environment using the <a href="https://docs.oracle.com/en/java/javase/11/tools/keytool.html">keytool</a> utility.</p>
+
+<p>Create a <strong>keystore</strong> file that stores the key and certificate you have created earlier:</p>
+
+<pre><code>openssl pkcs12 -export \
+  -in ./client_cert_app_001.pem \
+  -inkey ./client_key_app_001.pem \
+  -out client-keystore.p12 \
+  -name "APP_01_P12"
+</code></pre>
+
+<p>As you can see the keystore is used to store the credentials associated with you client; it will be used later with the <code>-javax.net.ssl.keyStore</code> system property in the Java application.</p>
+
+<p>In addition to the keys tore, you also have to create a trustore, that is used to store other credential for example in our case the redis cluster certificate.</p>
+
+<p>Create a <strong>trustore</strong> file and add the Redis cluster certificate to it</p>
+
+<pre><code>keytool -genkey \
+  -dname "cn=CLIENT_APP_01" \
+  -alias truststorekey \
+  -keyalg RSA \
+  -keystore ./client-truststore.p12 \
+  -keypass secret
+  -storepass secret
+  -storetype pkcs12
+</code></pre>
+
+<pre><code>keytool -import \
+  -keystore ./client-truststore.p12 \
+  -file ./proxy_cert.pem \
+  -alias redis-cluster-crt
+</code></pre>
+
+<p>The trustore will be used later with the <code>-javax.net.ssl.trustStore</code> system property in the Java application.</p>
+
+<pre><code>-Djavax.net.ssl.keyStore=/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-keystore.p12
+-Djavax.net.ssl.keyStorePassword=secret
+-Djavax.net.ssl.trustStore=/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-truststore.p12
+-Djavax.net.ssl.trustStorePassword=secret
+</code></pre>
+
+<p>For this example and simplicity, I will hard code these property in the Java code itself:</p>
+
+<pre><code class="java">
+import redis.clients.jedis.Jedis;
+import java.net.URI;
+
+public class SSLTest {
+
+    public static void main(String[] args) {
+
+        System.setProperty("javax.net.ssl.keyStore", "/path_to/certificates/client-keystore.p12");
+        System.setProperty("javax.net.ssl.keyStorePassword", "secret");
+
+        System.setProperty("javax.net.ssl.trustStore","/path_to/certificates/client-truststore.p12");
+        System.setProperty("javax.net.ssl.trustStorePassword","secret");
+
+        URI uri = URI.create("rediss://127.0.0.1:12000");
+
+        Jedis jedis = new Jedis(uri);
+        jedis.auth("secretdb01");
+
+
+        System.out.println(jedis.info("SERVER"));
+        jedis.close();
+    }
+
+}
+</code></pre>
+
+<ul>
+<li>line 8-12, the system environment variable are set to point to the keystore and trustore (this should be externalized)</li>
+<li>line 14, the Redis URL start with <code>rediss</code> with 2 s to indicate that the connection should be encrypted</li>
+<li>line 17, set the database password</li>
+</ul>
+
+
+<p>More information in the documentation &ldquo;<a href="https://redislabs.com/lp/redis-java/">Using Redis with Java</a>&rdquo;.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this article, you have learned how to:</p>
+
+<ul>
+<li>retrieve the Redis Server certificate</li>
+<li>generate a client certificate</li>
+<li>protect your database to enforce transport level security (TLS) with 2 ways authentication</li>
+<li>connect to the database from <code>redis-cli</code>, Python, Node and Java</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)]]></title>
@@ -565,7 +865,7 @@ redislabs/redis
 <p>Redis Streams is a Redis Data Type, that represents a log so you can add new information/message in an append-only mode <em>(this is not 100% accurate since you can remove messages from the log)</em>. Using Redis Streams you can build &ldquo;Kafka Like&rdquo; applications, what I mean by that you can:</p>
 
 <ul>
-<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redi Pub/Sub)</li>
+<li>create applications that publish and consume messages (nothing extraordinary here, you could already do that with Redis Pub/Sub)</li>
 <li>consume messages that are published even when your client application (consumer) is not running. This is a big difference with Redis Pub/Sub</li>
 <li>consume messages starting a specific offset, for example, read the whole history, or only new messages</li>
 </ul>
@@ -990,222 +1290,6 @@ MapR Extension Package 5.0 (MEP) introduced the MapR-DB JSON REST API that allow
 
 
 <p>You can now use the API to create MapR-DB JSON Application using your favorite language.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Getting Started With MapR-DB Table Replication]]></title>
-    <link href="http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication/"/>
-    <updated>2017-08-08T10:01:19+02:00</updated>
-    <id>http://tgrall.github.io/blog/2017/08/08/getting-started-with-mapr-db-table-replication</id>
-    <content type="html"><![CDATA[<h2>Introduction</h2>
-
-<p>MapR-DB Table Replication allows data to be replicated to another table that could be on on the same cluster or in another cluster. This is different from the automatic and intra-cluster replication that copies the data into different physical nodes for high availability and prevent data loss.</p>
-
-<p>This tutorial focuses on the MapR-DB Table Replication that replicates data between tables on different clusters.</p>
-
-<p>Replicating data between different clusters allows you to:</p>
-
-<ul>
-<li>provide another level of disaster recovery that protects your data and applications against global data center failure,</li>
-<li>push data close to the applications and users,</li>
-<li>aggregate the data from mutliple datacenters.</li>
-</ul>
-
-
-<p><strong>Replication Topologies</strong></p>
-
-<p>MapR-DB Table Replication provides various topologies to adapt the replication to the business and technical requirements:</p>
-
-<ul>
-<li><em>Master-slave replication</em> : in this topology, you replicate one way from source tables to replicas. The replicas can be in a remote cluster or in the cluster where the source tables are located.</li>
-<li><em>Multi-Master replication</em> : in this replication topology, there are two master-slave relationships, with each table playing both the role of a master and a slave. Client applications update both tables and each table replicates updates to the other.</li>
-</ul>
-
-
-<p>In this example you will learn how to setup multi-master replication.</p>
-
-<!-- more -->
-
-
-<h3>Prerequisites</h3>
-
-<ul>
-<li>2 MapR Clusters 5.x with Enterprise Edition license
-
-<ul>
-<li>in this demonstration they are called <code>cluster1</code> and <code>cluster2</code></li>
-</ul>
-</li>
-</ul>
-
-
-<h2>Setting Up Replication</h2>
-
-<p>In the next steps you will configure your clusters to enable mutip-master replication as follow:</p>
-
-<p><img src="http://tgrall.github.io/images/posts/maprdb-replication/replication.png" alt="Architecture" /></p>
-
-<h3>Configuring the clusters</h3>
-
-<p>Each node of the source cluster must communicate with the destination cluster&rsquo;s CLDB nodes. On each node of your source cluster edit the <code>mapr-clusters.conf</code> file and add the destination cluster information.</p>
-
-<p><em>Cluster 1 Configuration</em></p>
-
-<p>In all the nodes of <code>cluster1</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster2</code> configuration. The file should look like the following:</p>
-
-<pre><code>cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
-
-cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
-</code></pre>
-
-<p><em>Cluster 2 Configuration</em></p>
-
-<p>In all the nodes of <code>cluster2</code>, edit the  <code>/opt/mapr/conf/mapr-clusters.conf</code> file and add the <code>cluster1</code> configuration. The file should look like the following:</p>
-
-<pre><code>cluster2 secure=false cluster2-node1:7222 cluster2-node2:7222 cluster2-node3:7222
-
-cluster1 secure=false cluster1-node1:7222 cluster1-node2:7222 cluster1-node2:7222
-</code></pre>
-
-<p>You can find information about the <code>mapr-clusters.conf</code> format in <a href="http://maprdocs.mapr.com/home/ReferenceGuide/mapr-clusters.conf.html">the documentation</a>.</p>
-
-<p>Open a terminal window on one of the <code>cluster1</code> node using <code>mapr</code> user, and do the following:</p>
-
-<pre><code>$ ls /mapr/cluster1/
-apps   hbase  installer  opt  tmp  user  var
-
-$ ls /mapr/cluster2/
-apps   hbase  installer  opt  tmp  user  var
-</code></pre>
-
-<h3>Installing and Configuring the MapR Gateway</h3>
-
-<p>A MapR gateway mediates one-way communication between a source MapR cluster and a destination MapR cluster. In this example you will use mult-master replication, this means that data will be replicated from <code>cluster1</code> to <code>cluster2</code> and from <code>cluster2</code> to <code>cluster1</code>.</p>
-
-<p>The good practice is to install the MapR-Gateway to the destination cluster, so in our case let&rsquo;s install one gateway on one of the <code>cluster1</code> node, and one gateway on one of the <code>cluster2</code> node. Note that this configuration will not be highly available, and usually you will deploy more than 1 gateway by cluster.</p>
-
-<h4>Installing the MapR-Gateway</h4>
-
-<p>As root on one node of the <code>cluster1</code>, adapt the command to your linux environment, for example on the node <code>cluster1-node2</code></p>
-
-<pre><code>$ yum install mapr-gateway
-
-
-# Update MapR configuration
-$ /opt/mapr/server/configure.sh -N cluster1 -C cluster1-node1:7222,cluster1-node2:7222,cluster1-node3:7222 -R
-</code></pre>
-
-<p>Do the same on <code>cluster2</code>, for example on the node <code>cluster2-node2</code>:</p>
-
-<pre><code>$ yum install mapr-gateway
-
-
-# Update MapR configuration
-$ /opt/mapr/server/configure.sh -N cluster1 -C cluster2-node1:7222,cluster2-node2:7222,cluster2-node3:7222 -R
-</code></pre>
-
-<h4>Registering the Gateway to the Clusters</h4>
-
-<p>Now that we have a gateway running on each cluster, you have to <strong><em>register the gateway</em></strong> in each cluster.</p>
-
-<p>On <code>cluster1</code> run the following command to register the <code>cluster2</code> gateway as destination:</p>
-
-<pre><code>$ maprcli cluster gateway set -dstcluster cluster2 -gateways cluster2-node2
-
-# Check the configuration
-$ maprcli cluster gateway list
-</code></pre>
-
-<p>On <code>cluster2</code> run the following command to register the <code>cluster1</code> gateway as destination:</p>
-
-<pre><code>$ maprcli cluster gateway set -dstcluster cluster1 -gateways cluster1-node2
-
-# Check the configuration
-$ maprcli cluster gateway list
-</code></pre>
-
-<h3>Creating Table with Replication</h3>
-
-<p>In a terminal window, as <code>mapr</code> user on <code>cluster1</code>, create a table and insert documents:</p>
-
-<pre><code>$ maprcli table create -path /apps/user_profiles  -tabletype json
-</code></pre>
-
-<p>This create a new JSON table; it is also possible to use <code>/mapr/cluster1/apps/user_profiles</code>.</p>
-
-<p>Let&rsquo;s now add documents using MapR-DB Shell:</p>
-
-<pre><code>$ mapr dbshell
-
-maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user001" , "first_name":"John", "last_name":"Doe"}'
-
-maprdb mapr:&gt; find /apps/user_profiles
-</code></pre>
-
-<h4>Adding Table Replication</h4>
-
-<p>Let&rsquo;s now enable replication between <code>user_profiles</code> on <code>cluster1</code> to a <code>user_profiles</code> table in <code>cluster2</code>.</p>
-
-<p>In <code>cluster1</code>, on a terminal window as <code>mapr</code> run the following command:</p>
-
-<pre><code>$ maprcli table replica autosetup -path /apps/user_profiles -replica /mapr/cluster2/apps/user_profiles -multimaster yes
-</code></pre>
-
-<p>You can get information about the replication configuration for the table using the following command:</p>
-
-<pre><code>$ maprcli table replica list -path /apps/user_profiles -json
-</code></pre>
-
-<h4>Testing Replication</h4>
-
-<p>Open another terminal in <code>cluster2</code> and use MapR-DB Shell to look at the replicated data:</p>
-
-<pre><code>$ mapr dbshell
-
-maprdb mapr:&gt; find /apps/user_profiles
-{"_id":"user001","first_name":"John","last_name":"Doe"}
-1 document(s) found.
-</code></pre>
-
-<p>You can also use the full path <code>/mapr/cluster2/apps/user_profiles</code></p>
-
-<p>In <code>cluster1</code> add a new document using MapR-DB Shell:</p>
-
-<pre><code>$ mapr dbshell
-
-maprdb mapr:&gt; insert /apps/user_profiles --value '{"_id":"user002" , "first_name":"Simon", "last_name":"Dupont"}'
-
-maprdb mapr:&gt; find /apps/user_profiles
-</code></pre>
-
-<p>Do a find in <code>cluster2</code> table, and you will see that the data have been replicated.</p>
-
-<p>You can insert or delete a document in <code>cluster2</code> and do a find in <code>cluster1</code>, you will see that the new document is also replicated in the other direction.</p>
-
-<p>Note, for this demonstration, we use 2 terminals connected to each cluster you can do some test using the Global Namespace in a single MapR-DB Shell.</p>
-
-<h2>Conclusion</h2>
-
-<p>In this tutorial you have learned how to setup the MapR-DB Multi-Master replication to have data automatically replicated between 2 clusters.</p>
-
-<p>MapR-DB Table Replication provides many options, not only in term of topology (master-slave/mult-master), but also some options and commands to:</p>
-
-<ul>
-<li>replicate some columns/attributes or column family</li>
-<li>configure replication in a secured cluster</li>
-<li>pause replication.</li>
-</ul>
-
-
-<p>You can find more information about the MapR-DB Table Replication, and MapR-Gateway in the documentation:</p>
-
-<ul>
-<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ReplicatingMapR-DBTables.html">Table Replication</a></li>
-<li><a href="http://maprdocs.mapr.com/home/MapR-DB/ConfiguringMapRClustersForTR.html">Setting up Table Replication</a></li>
-<li><a href="http://maprdocs.mapr.com/home/Gateways/MapRGateways.html">Configuring and Managing MapR Gateways</a></li>
-</ul>
-
 ]]></content>
   </entry>
   

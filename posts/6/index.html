@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Introduction eXo Platform provide many powerful features to manipulate and expose any type of content on a page. This is due to the fact that eXo &hellip;">
+  <meta name="description" content="Last week I have been struggling with a small issue while developing a service using Jersey. The goal of this service is to provide JSON object to my &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,65 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/09/02/jax-rs-jersey-and-json-single-element-arrays/">JAX-RS: Jersey and JSON Single Element Arrays</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-09-02T15:30:26+02:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2011</span></span> <span class='time'>3:30 pm</span></time>
+        
+           | <a href="/blog/2011/09/02/jax-rs-jersey-and-json-single-element-arrays/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2011/09/02/jax-rs-jersey-and-json-single-element-arrays/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last week I have been struggling with a small issue while developing a service using Jersey.</p>
+
+<p>The goal of this service is to provide JSON object to my Web application, so called directly from the browser. This service returns in a JSON array a list of Employees, something like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span><span class="s2">&quot;employee&quot;</span><span class="o">:</span><span class="p">[</span>
+</span><span class='line'><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="o">:</span><span class="s2">&quot;jdoe@example.com&quot;</span><span class="p">,</span><span class="s2">&quot;firstName&quot;</span><span class="o">:</span><span class="s2">&quot;John&quot;</span><span class="p">,</span><span class="s2">&quot;lastName&quot;</span><span class="o">:</span><span class="s2">&quot;Doe&quot;</span><span class="p">},</span>
+</span><span class='line'><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="o">:</span><span class="s2">&quot;mmajor@example.com&quot;</span><span class="p">,</span><span class="s2">&quot;firstName&quot;</span><span class="o">:</span><span class="s2">&quot;Mary&quot;</span><span class="p">,</span><span class="s2">&quot;lastName&quot;</span><span class="o">:</span><span class="s2">&quot;Major&quot;</span><span class="p">}</span>
+</span><span class='line'><span class="p">]}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So an &ldquo;employee&rdquo; array, this is perfect and expected, but when my service returns a single element the returned object looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span><span class="s2">&quot;employee&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="o">:</span><span class="s2">&quot;jdoe@example.com&quot;</span><span class="p">,</span><span class="s2">&quot;firstName&quot;</span><span class="o">:</span><span class="s2">&quot;John&quot;</span><span class="p">,</span><span class="s2">&quot;lastName&quot;</span><span class="o">:</span><span class="s2">&quot;Doe&quot;</span><span class="p">}}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see brackets <strong>[&hellip;]</strong> are missing around the employee item. This is an issue since your client code is expecting an array.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/09/02/jax-rs-jersey-and-json-single-element-arrays/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1345,60 +1404,6 @@ So using the JCR API you just need to get the content length using the following
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/">USI2009: The Geek and Boss French Conference</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2009-07-08T08:53:57+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>8:53 am</span></time>
-        
-           | <a href="/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2009/07/08/usi2009-the-geek-and-boss-french-conference/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This year I was lucky enough to have a presentation at the second edition of the &ldquo;<a href="http://www.universite-du-si.com/">Université du SI</a>&rdquo;, organized by <a href="http://octo.com/">Octo Technologies</a>. I have to say that this conference is one of the best that I have attended, for sure it is the best in France. Unfortunately I was only able to attend the first day of the conference, but even in one day, I was very happy with the content of the presentations, keynotes, and networking opportunities.</p>
-
-<p>I won&rsquo;t go in details in all the presentations that I have seen, Google for the Enterprise, Application Server Future, Usability concerns, and keynotes. If you want to have a good feedback about this conference I invite you to read, in French, the reports from <a href="http://www.touilleur-express.fr/tag/usi/">Le Touilleur Express</a>.</p>
-
-<p>Let me just share the presentation that I gave with <a href="http://massol.net/">Vincent Massol</a> from <a href="http://www.xwiki.com/">XWiki</a>, about CMS vs Wiki.</p>
-
-<p><strong>Wiki vs CMS duel</strong></p>
-
-<p>First of all, the room was packed, so it looks like it is an interesting subject for many of you, so do not hesitate to post comments or question on this entry. Vincent and I will be pleased to update our presentation for a new event.</p>
-
-<p>The main message of the talk was:</p>
-
-<ul>
-<li><strong>For collaboration on content</strong> the wiki is king</li>
-<li><strong>For publication of content</strong> the CMS is king</li>
-</ul>
-
-
-<iframe src="http://www.slideshare.net/slideshow/embed_code/1678352 " width="595" height="446" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen></iframe>
-
-
-<p>
-<a href="http://www.slideshare.net/tgrall/wiki-vs-cms-1678352" title="Wiki vs CMS ">Wiki vs CMS </a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/7">&larr; Older</a>
@@ -1416,6 +1421,10 @@ So using the JCR API you just need to get the content length using the following
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
       </li>
     
@@ -1429,10 +1438,6 @@ So using the JCR API you just need to get the content length using the following
     
       <li class="post">
         <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/08/08/getting-started-with-mapr-db-table-replication/">Getting Started With MapR-DB Table Replication</a>
       </li>
     
   </ul>
@@ -1488,7 +1493,7 @@ data-ad-slot="9144931072"></ins>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2019 - Tug Grall -
+  Copyright &copy; 2020 - Tug Grall -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
