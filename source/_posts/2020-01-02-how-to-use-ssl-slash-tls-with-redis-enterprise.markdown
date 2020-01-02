@@ -261,13 +261,15 @@ keytool -import \
 
 The trustore will be used later with the `-javax.net.ssl.trustStore` system property in the Java application.
 
+You can now run the Java application with the following environment variables:
 
 ```
--Djavax.net.ssl.keyStore=/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-keystore.p12
--Djavax.net.ssl.keyStorePassword=secret
--Djavax.net.ssl.trustStore=/Users/tgrall/projects/demos/ssl/blog/certificates/java/client-truststore.p12
--Djavax.net.ssl.trustStorePassword=secret
-```
+java -Djavax.net.ssl.keyStore=/path_to/certificates/java/client-keystore.p12 \
+-Djavax.net.ssl.keyStorePassword=secret \
+-Djavax.net.ssl.trustStore=/path_to/certificates/java/client-truststore.p12 \
+-Djavax.net.ssl.trustStorePassword=secret \
+-jar MyApp.jar
+ ```
 
 For this example and simplicity, I will hard code these property in the Java code itself:
 
