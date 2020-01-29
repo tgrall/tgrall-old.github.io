@@ -169,7 +169,11 @@ Let's see how you use this in Java.
             );
 
             if (!messages.isEmpty()) {
-                System.out.println( messages );
+                for (StreamMessage<String, String> message : messages) {
+                    System.out.println(message);
+                    // Confirm that the message has been processed using XACK
+                    syncCommands.xack(STREAMS_KEY, "application_1",  message.getId());
+                }
             }
 
 
@@ -184,12 +188,14 @@ This code is a subset of the `main()` method I have removed the connection manag
     * is used to create a new group called `application_1`,
     * consume messages from the stream `weather_sensor:wind` 
     * starting at the first message in the stream, this is indicated using the message ID `0-0`. *Note that it is also possible to indicate to the group to start to read at a specific message ID, or only the new messages that arrive after the creating of the consumer group using `$` special ID (or the helper method `XReadArgs.StreamOffset.latest()`*.
-* line 15 to 27, in this example we use an infinite loop (`while(true)`) to wait for any new messages published to the streams
+* line 15 to 30, in this example we use an infinite loop (`while(true)`) to wait for any new messages published to the streams
 * line 17 to 20, the method `xreadgroup()` returns the messages based on the group configuration
     * line 18 define the consumer named `consumer_1` that is associated with the group `application_1`: you can create new group do distribute the read to multiple clients
     * line 19 indicates where to start, in this case, `StreamOffset.lastConsumed("weather_sensor:wind")` the consumer will consume messages that have not been read already. With the current configuration of the group (offset `0-0`), when the consumer will start for the first time, it will read all the existing messages.
     * the [XREADGROUP](https://redis.io/commands/xreadgroup) command by default sends an acknowledgment for each consumed message.
-
+* line 22 to 28, the application iterates on each messages, and:
+    * line 24, process the message, a simple print in this case
+    * line 26, sends a acknowledgment using `xack()` command. You have to use the ack command to confirm that a message has been read and processed. The [`XACK`](https://redis.io/commands/xack) command removes the message from the pending list of the consumer group.
 
 The complete consumer code is available [here](https://github.com/tgrall/redis-streams-101-java/blob/master/src/main/java/com/kanibl/redis/streams/simple/RedisStreams101Consumer.java).
 
