@@ -269,7 +269,7 @@ java -Djavax.net.ssl.keyStore=/path_to/certificates/java/client-keystore.p12 \
 -Djavax.net.ssl.trustStore=/path_to/certificates/java/client-truststore.p12 \
 -Djavax.net.ssl.trustStorePassword=secret \
 -jar MyApp.jar
- ```
+```
 
 For this example and simplicity, I will hard code these property in the Java code itself:
 
