@@ -192,7 +192,6 @@ This code is a subset of the `main()` method I have removed the connection manag
 * line 17 to 20, the method `xreadgroup()` returns the messages based on the group configuration
     * line 18 define the consumer named `consumer_1` that is associated with the group `application_1`: you can create new group do distribute the read to multiple clients
     * line 19 indicates where to start, in this case, `StreamOffset.lastConsumed("weather_sensor:wind")` the consumer will consume messages that have not been read already. With the current configuration of the group (offset `0-0`), when the consumer will start for the first time, it will read all the existing messages.
-    * the [XREADGROUP](https://redis.io/commands/xreadgroup) command by default sends an acknowledgment for each consumed message.
 * line 22 to 28, the application iterates on each messages, and:
     * line 24, process the message, a simple print in this case
     * line 26, sends a acknowledgment using `xack()` command. You have to use the ack command to confirm that a message has been read and processed. The [`XACK`](https://redis.io/commands/xack) command removes the message from the pending list of the consumer group.
