@@ -7,9 +7,25 @@ sharing: true
 footer: true
 ---
 
+### 2020
+
+* 2020-01-23 - [Poitou JUG](http://www.poitoucharentesjug.org/) : Redis: From Key/Value to Multimodal database
+* 2020-01-20 - [Nantes JUG](https://nantesjug.org) : Redis: From Key/Value to Multimodal database
+* 2020-01-09 - [Société Generale](https://www.societegenerale.com/) :Fast Cars, Big Data - How Streaming Can Help Formula 1 (Private Event: Streaming Day)
+
 ### 2019
 
+* 2019-12-19 - [SII Nantes](http://nantes.groupe-sii.com/) : Introduction to Redis (Private Event: Speak'Up)
+* 2019-12-18 - [Zenika lille](http://zenika.com) : Redis Workshop(Private Event: Lunch&Learn)
+* 2019-12-17 - [Ch'ti JUG](https://www.meetup.com/ChtiJUG/) : Redis: From Key/Value to Multimodal database
+* 2019-12-17 - [AXA](https://axa.fr) : Fast Cars, Big Data - How Streaming Can Help Formula 1 (Private Event: Lunch&Learn)
+* 2019-12-13 - [SopraSteria](https://www.soprasteria.com/) : Redis: From Key/Value to Multimodal database (Private Event: Lunch&Learn)
 * 2019-11-12 - [Code Motion Berlin](https://events.codemotion.com/conferences/berlin/2019/) : Fast Cars, Big Data - How Streaming Can Help Formula 1
+* 2019-12-03 - [Containers Today Stockholm](https://www.containerstoday.com/) : Redis - run the most loved database in your containers infrastructure
+* 2019-11-27 - [Kanoma](https://www.kanoma.com/) : NoSQL Introduction with Redis (Meetup)
+* 2019-11-15 - [Cap Gemini](https://www.capgemini.com/) : Redis: From Key/Value to Multimodal database (Private Event: Lunch&Learn)
+* 2019-10-18 - [Micropole](https://www.micropole.com/) : NoSQL Introduction with Redis (Private Event: Lunch&Learn)
+* 2019-07-24 - [Kanoma](https://www.kanoma.com/) : Introduction to Apache Kafka and Streaming Architecture (Meetup)
 * 2019-05-20 - [NantesJug](https://nantesjug.org) : Quarkus Introduction
 * 2019-05-15 - [Riviera Dev](https://rivieradev.fr) : Développement Cloud-Natif Java avec Spring Boot, ISTIO et Eclipse Che
 * 2019-04-18 - [Devoxx France - Paris](https://devoxx.fr) : Développement et déploiement sur le cloud avec Spring Boot, ISTIO et Eclipse Che
