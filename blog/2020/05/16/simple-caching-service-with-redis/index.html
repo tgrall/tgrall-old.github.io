@@ -1,0 +1,604 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Simple Caching Service With Redis - Tug&#8217;s Blog</title>
+  <meta name="author" content="Tug Grall">
+
+  
+  <meta name="description" content="One of the most common use cases for Redis is to use it the database as a caching layer for your data, but Redis can do a lot more (I will publish &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Tug's Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-1520374-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tug&#8217;s Blog</a></h1>
+  
+    <h2>Redis, NoSQL and more&#8230;</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="tgrall.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/talks">Talks</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Simple Caching Service With Redis</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-05-16T17:33:15+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>5:33 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="center" src="/images/posts/simple-caching-with-redis/001-ws-caching.png"></p>
+
+<p>One of the most common use cases for Redis is to use it the database as a caching layer for your data, but Redis can do a lot more <em>(I will publish new articles later)</em>!</p>
+
+<p>In this article, you will learn using a straightforward service, how to cache the result on some REST API calls to accelerate the data access, and also reduce the number of calls to external services.</p>
+
+<p>For this example, I am using the &ldquo;Redis Movie Database&rdquo; application, a microservice-based application that I created to showcase and explain various features of Redis and Redis Enterprise.</p>
+
+<p>You can see the caching service in action in this video:</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/2X6hmXGbLbg?color=white&theme=light"></iframe>
+
+
+<h3>Architecture Overview</h3>
+
+<p>The application uses a third party API provided by the &ldquo;<a href="http://www.omdbapi.com/">OMDb API</a>&rdquo; to retrieve the ratings of the movie using its IMDb identifier. The frontend application call the <code>/caching/rating/</code> service to get the rating information from OMDB.</p>
+
+<p>This service is doing the following:</p>
+
+<ol>
+<li>Check if the rating data is already cached retrieve from the cache</li>
+<li>If the information is not cached, the system calls the OMDB API with the proper key and Movie ID</li>
+<li>The result is cached in Redis with a time to live of 120 seconds</li>
+<li>The ratings are returned to the client.</li>
+</ol>
+
+
+<!-- more -->
+
+
+<p><strong>Prerequisites</strong></p>
+
+<ul>
+<li>Redis 5.x or later.</li>
+<li>Java 8 or later</li>
+<li>Apache Maven 3.6</li>
+<li>Git</li>
+</ul>
+
+
+<h3>Implementation</h3>
+
+<p>In the microservice demonstration project, you can find the caching service in the project below:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/redis-microservices-demo/tree/master/caching-service">Caching Service</a></li>
+</ul>
+
+
+<p>The Spring Boot application exposes a REST endpoint <a href="https://github.com/tgrall/redis-microservices-demo/blob/master/caching-service/src/main/java/io/redis/demos/services/caching/RestStatusController.java">RestStatusController.java</a> with the following key features:</p>
+
+<ul>
+<li><code>/api/1.0/caching/configuration/omdb_api</code> : to save the OMDb API key in Redis.</li>
+<li><code>/api/1.0/caching/ratings/{id}</code> : to retrieve the IMDB Rating information.</li>
+</ul>
+
+
+<h4>Data Structure</h4>
+
+<p>The Caching Service is pretty simple and using two sets of keys:</p>
+
+<ul>
+<li><code>ms:config</code>: is a Redis Hash that will be used to store all global configuration; for the caching service, the entry <code>OMDB_API_KEY</code> will contain the OMDb API key.</li>
+<li><code>ms:cache:ws:*</code> : one entry for each movie viewed by a user, where the IMDb movie id replaces the <code>*</code>. The hash contains the ratings, and each of the Movie Rating sites is a key in the hash (&ldquo;Internet Movie Database&rdquo;,  &ldquo;Rotten Tomatoes&rdquo;, &ldquo;Metacritic&rdquo;), and the value is the rating itself.</li>
+</ul>
+
+
+<h4>Code</h4>
+
+<p>The implementation of the caching layer is simple and located in the class below:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/redis-microservices-demo/blob/master/caching-service/src/main/java/io/redis/demos/services/caching/service/WebServiceCachingService.java"><code>WebServiceCachingService</code></a></li>
+</ul>
+
+
+<p><strong>Getting the Redis Connection</strong></p>
+
+<p>In this project, I have not used Redis/Spring integration <em>by choice</em>, I am only using Spring injection and Spring Boot Web features.</p>
+
+<ul>
+<li>the <code>afterConstruct()</code> method creates the JedisPool from the Spring Configuration</li>
+<li>then each time a connection is needed, the application calls <code>Jedis jedis = jedisPool.getResource()</code> to get a connection from the pool.</li>
+</ul>
+
+
+<h4>Setting &amp; Getting the OMDb API Key</h4>
+
+<p>As you have seen earlier, the OMDb API Key is stored in a hash associated with the Redis key <code>ms:config</code>.</p>
+
+<ul>
+<li>The method <code>saveOMDBAPIKey</code> is used to store the configuring with a  <code>hset</code> call.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">jedis</span> <span class="o">=</span> <span class="n">jedisPool</span><span class="o">.</span><span class="na">getResource</span><span class="o">();</span>
+</span><span class='line'><span class="n">jedis</span><span class="o">.</span><span class="na">hset</span><span class="o">(</span><span class="n">KEY_CONFIG</span><span class="o">,</span> <span class="n">OMDB_API_KEY</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+</span><span class='line'><span class="n">omdbAPIKEY</span> <span class="o">=</span> <span class="n">key</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>line 1: get the connection from the pool</li>
+<li>line 2: set the key in the hash *(as you can see the application uses static variables (<code>KEY_CONFIG</code> and <code>OMDB_API_KEY</code>)</li>
+<li>line 3: the key received as a method parameter is set to a class member <code>omdbAPIKEY</code> to avoid calling the hash each time.</li>
+</ul>
+
+
+<h4>Calling OMDb API and Caching (or not) the result</h4>
+
+<p>The method <code>getRatings</code> receives two parameters:</p>
+
+<ul>
+<li><code>imdbId</code> the IMDb id</li>
+<li><code>withCache</code> a boolean value to use or not Redis. The goal here is to show as a demonstration of the benefits of using Redis.</li>
+</ul>
+
+
+<p>Let&rsquo;s now look at the code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'> <span class="n">String</span> <span class="n">restCallKey</span> <span class="o">=</span> <span class="n">KEY_PREFIX</span> <span class="o">+</span> <span class="n">imdbId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">try</span> <span class="o">(</span><span class="n">Jedis</span> <span class="n">jedis</span> <span class="o">=</span> <span class="n">jedisPool</span><span class="o">.</span><span class="na">getResource</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">// Look in the map to see if the value has been cached</span>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">withCache</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">returnValue</span> <span class="o">=</span> <span class="n">jedis</span><span class="o">.</span><span class="na">hgetAll</span><span class="o">(</span><span class="n">restCallKey</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">returnValue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;imdb_id&quot;</span><span class="o">,</span> <span class="n">imdbId</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">CloseableHttpClient</span> <span class="n">httpClient</span> <span class="o">=</span> <span class="n">HttpClientBuilder</span><span class="o">.</span><span class="na">create</span><span class="o">().</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>                <span class="n">HttpGet</span> <span class="n">getRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpGet</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">getRequest</span><span class="o">.</span><span class="na">addHeader</span><span class="o">(</span><span class="s">&quot;accept&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">ResponseHandler</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">responseHandler</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">BasicResponseHandler</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">String</span> <span class="n">WsCall</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">getRequest</span><span class="o">,</span> <span class="n">responseHandler</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="n">jsonMapper</span><span class="o">.</span><span class="na">readValue</span><span class="o">(</span><span class="n">WsCall</span><span class="o">,</span> <span class="n">Map</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">ratings</span> <span class="o">=</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;)</span> <span class="n">map</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;Ratings&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">ratingAsMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+</span><span class='line'>                <span class="k">for</span> <span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">it</span> <span class="o">:</span> <span class="n">ratings</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="n">ratingAsMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;Source&quot;</span><span class="o">),</span> <span class="n">it</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;Value&quot;</span><span class="o">));</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">returnValue</span><span class="o">.</span><span class="na">putAll</span><span class="o">(</span><span class="n">ratingAsMap</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">jedis</span><span class="o">.</span><span class="na">hset</span><span class="o">(</span><span class="n">restCallKey</span><span class="o">,</span> <span class="n">returnValue</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">jedis</span><span class="o">.</span><span class="na">expire</span><span class="o">(</span><span class="n">restCallKey</span><span class="o">,</span> <span class="n">TTL</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">HttpResponseException</span> <span class="n">e</span><span class="o">){</span>
+</span><span class='line'>            <span class="c1">// Small hack to keep it simple</span>
+</span><span class='line'>            <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;Metacritic&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;p style=&#39;color:red&#39;&gt;Error: OMDBAPI Key is invalid -- see services page&lt;/p&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>            <span class="n">omdbAPIKEY</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// Small hack to keep it simple</span>
+</span><span class='line'>        <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;Metacritic&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;p style=&#39;color:red&#39;&gt;Error: OMDBAPI Key is not set, please configure it -- see services page&lt;/p&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kt">long</span> <span class="n">end</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;elapsedTimeMs&quot;</span><span class="o">,</span> <span class="n">Long</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="o">)</span> <span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">returnValue</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So if you look in the code carefully you see that only a few lines are related to the cache itself:
+* Line 1, the key is created from a prefix and the IMDb identifier.
+* Line 3, the application retrieves a connection from the Jedis Pool.
+* Line 7, if the cache is enabled,  the connection to get the value from Redis <code>returnValue = jedis.hgetAll(restCallKey)</code>
+* If a value is present in the cache, the value is returned to the caller
+* If <code>returnValue</code> is empty,  the OMDB REST service must be called (lines 11 to 25)
+* The result of the Web service call is stored in the <code>returnValue</code> variable, and save into Redis with a time to live (TTL) of 120 seconds (Line 27 to 29)
+* Finally, the value is returned to the caller (Line 47).</p>
+
+<p>Quite simple, no?</p>
+
+<p>It is possible to optimize a little bit the application/code with few additions:</p>
+
+<ul>
+<li>Make the TTL configurable by adding a new entry in the <code>ms:config</code> cache</li>
+<li>Use <a href="https://redis.io/topics/pipelining">pipelining</a> to reduce the round trip time (RTT)</li>
+</ul>
+
+
+<h3>Running the application</h3>
+
+<p>In the project, the service connects to a <code>local</code> instance of Redis on port <code>6379</code>. If you want to use a different instance or configure a password/user, you have to edit the <code>/redis-microservices-demo/caching-service/application.properties</code>.</p>
+
+<h4>Cloning and Building</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">git</span> <span class="n">clone</span> <span class="nl">https:</span><span class="c1">//github.com/tgrall/redis-microservices-demo.git</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">cd</span> <span class="n">redis</span><span class="o">-</span><span class="n">microservices</span><span class="o">-</span><span class="n">demo</span><span class="o">/</span><span class="n">caching</span><span class="o">-</span><span class="n">service</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">mvn</span> <span class="n">clean</span> <span class="kn">package</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Running the application</h4>
+
+<p>The application is a Spring Boot application, run the following command to start it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">mvn</span> <span class="n">spring</span><span class="o">-</span><span class="nl">boot:</span><span class="n">run</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then you should save your <a href="https://www.patreon.com/join/omdb">OMDB API key</a> in Redis using the following call:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="nl">http:</span><span class="c1">//localhost:8084/api/1.0/caching/configuration/omdb_api\?key\=[YOUR_KEY]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you can call the service itself to retrieve the ratings of the movie &ldquo;WarGames&rdquo;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="nl">http:</span><span class="c1">//localhost:8084/api/1.0/caching/ratings/tt0086567</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Call it multiple times, and you will see that the first call is *slow&#8221; (100ms or more). Then subsequent requests will be a lot faster, as the data are coming out of Redis. After tow minutes, the data is removed from the cache automatically (expiration), and the OMDB service will be called again.</p>
+
+<p>You can also force the service to no use the cache using the following call:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="nl">http:</span><span class="c1">//localhost:8084/api/1.0/caching/ratings/tt0086567?cache=0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>The pattern used here is called &ldquo;Cache-Aside&rdquo;; and usually pretty easy to implement. It is interesting to notice that many libraries such as Spring provide built-in features to implement such caches.</p>
+
+<p>That said, this is not a silver bullet, you still have to look at the following points when you are implementing such caching service:</p>
+
+<ul>
+<li>Loading the cache: in the example, the cache is populated when the service is called. This lazy loading approach is excellent since the cache is only filled with data that are used by the application. However, the first call is paying the price of higher latency, so on your application, you may require to load the data at startup to avoid any hit miss.</li>
+<li>Cache Invalidation and Lifetime: When caching data, it is essential to look at the invalidation strategy, when and how I can update the data in the cache, but also how long the data will stay in the cache. In the example above, each data will remain for two minutes.</li>
+</ul>
+
+
+<p>So now you are all set to implement a simple cache and have consistent fast access to your application data, independently of the backend.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Tug Grall</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2020-05-16T17:33:15+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>5:33 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/microservices/'>microservices</a>, <a class='category' href='/blog/categories/nosql/'>nosql</a>, <a class='category' href='/blog/categories/redis/'>redis</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/" data-via="tgrall" data-counturl="http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/" title="Previous Post: How to use SSL/TLS with Redis Enterprise">&laquo; How to use SSL/TLS with Redis Enterprise</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/09/19/redis-rolling-upgrade-on-pivotal-cloud-foundry-pcf/">Redis Rolling Upgrade on Pivotal Cloud Foundry (PCF)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/">Multi-Nodes Redis Cluster With Docker</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/tgrall">@tgrall</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'tgrall',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- blog2 -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:120px;height:240px"
+data-ad-client="ca-pub-0681046388042833"
+data-ad-slot="9144931072"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2020 - Tug Grall -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'true';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/';
+        var disqus_url = 'http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

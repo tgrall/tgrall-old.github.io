@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/</loc>
+<lastmod>2020-05-16T17:33:15+02:00</lastmod>
+</url>
+<url>
 <loc>http://tgrall.github.io/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/</loc>
 <lastmod>2020-01-02T10:47:13+01:00</lastmod>
 </url>
@@ -1325,6 +1329,9 @@
 </url>
 <url>
 <loc>http://tgrall.github.io/blog/categories/ssl/</loc>
+</url>
+<url>
+<loc>http://tgrall.github.io/blog/categories/microservices/</loc>
 </url>
 <url>
 <loc>http://tgrall.github.io/posts/2/</loc>

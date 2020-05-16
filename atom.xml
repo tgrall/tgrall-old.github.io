@@ -4,7 +4,7 @@
   <title><![CDATA[Tug's Blog]]></title>
   <link href="http://tgrall.github.io/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2020-02-03T11:26:03+01:00</updated>
+  <updated>2020-05-16T18:24:59+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -12,6 +12,317 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simple Caching Service With Redis]]></title>
+    <link href="http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/"/>
+    <updated>2020-05-16T17:33:15+02:00</updated>
+    <id>http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis</id>
+    <content type="html"><![CDATA[<p><img class="center" src="http://tgrall.github.io/images/posts/simple-caching-with-redis/001-ws-caching.png"></p>
+
+<p>One of the most common use cases for Redis is to use it the database as a caching layer for your data, but Redis can do a lot more <em>(I will publish new articles later)</em>!</p>
+
+<p>In this article, you will learn using a straightforward service, how to cache the result on some REST API calls to accelerate the data access, and also reduce the number of calls to external services.</p>
+
+<p>For this example, I am using the &ldquo;Redis Movie Database&rdquo; application, a microservice-based application that I created to showcase and explain various features of Redis and Redis Enterprise.</p>
+
+<p>You can see the caching service in action in this video:</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/2X6hmXGbLbg?color=white&theme=light"></iframe>
+
+
+<h3>Architecture Overview</h3>
+
+<p>The application uses a third party API provided by the &ldquo;<a href="http://www.omdbapi.com/">OMDb API</a>&rdquo; to retrieve the ratings of the movie using its IMDb identifier. The frontend application call the <code>/caching/rating/</code> service to get the rating information from OMDB.</p>
+
+<p>This service is doing the following:</p>
+
+<ol>
+<li>Check if the rating data is already cached retrieve from the cache</li>
+<li>If the information is not cached, the system calls the OMDB API with the proper key and Movie ID</li>
+<li>The result is cached in Redis with a time to live of 120 seconds</li>
+<li>The ratings are returned to the client.</li>
+</ol>
+
+
+<!-- more -->
+
+
+<p><strong>Prerequisites</strong></p>
+
+<ul>
+<li>Redis 5.x or later.</li>
+<li>Java 8 or later</li>
+<li>Apache Maven 3.6</li>
+<li>Git</li>
+</ul>
+
+
+<h3>Implementation</h3>
+
+<p>In the microservice demonstration project, you can find the caching service in the project below:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/redis-microservices-demo/tree/master/caching-service">Caching Service</a></li>
+</ul>
+
+
+<p>The Spring Boot application exposes a REST endpoint <a href="https://github.com/tgrall/redis-microservices-demo/blob/master/caching-service/src/main/java/io/redis/demos/services/caching/RestStatusController.java">RestStatusController.java</a> with the following key features:</p>
+
+<ul>
+<li><code>/api/1.0/caching/configuration/omdb_api</code> : to save the OMDb API key in Redis.</li>
+<li><code>/api/1.0/caching/ratings/{id}</code> : to retrieve the IMDB Rating information.</li>
+</ul>
+
+
+<h4>Data Structure</h4>
+
+<p>The Caching Service is pretty simple and using two sets of keys:</p>
+
+<ul>
+<li><code>ms:config</code>: is a Redis Hash that will be used to store all global configuration; for the caching service, the entry <code>OMDB_API_KEY</code> will contain the OMDb API key.</li>
+<li><code>ms:cache:ws:*</code> : one entry for each movie viewed by a user, where the IMDb movie id replaces the <code>*</code>. The hash contains the ratings, and each of the Movie Rating sites is a key in the hash (&ldquo;Internet Movie Database&rdquo;,  &ldquo;Rotten Tomatoes&rdquo;, &ldquo;Metacritic&rdquo;), and the value is the rating itself.</li>
+</ul>
+
+
+<h4>Code</h4>
+
+<p>The implementation of the caching layer is simple and located in the class below:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/redis-microservices-demo/blob/master/caching-service/src/main/java/io/redis/demos/services/caching/service/WebServiceCachingService.java"><code>WebServiceCachingService</code></a></li>
+</ul>
+
+
+<p><strong>Getting the Redis Connection</strong></p>
+
+<p>In this project, I have not used Redis/Spring integration <em>by choice</em>, I am only using Spring injection and Spring Boot Web features.</p>
+
+<ul>
+<li>the <code>afterConstruct()</code> method creates the JedisPool from the Spring Configuration</li>
+<li>then each time a connection is needed, the application calls <code>Jedis jedis = jedisPool.getResource()</code> to get a connection from the pool.</li>
+</ul>
+
+
+<h4>Setting &amp; Getting the OMDb API Key</h4>
+
+<p>As you have seen earlier, the OMDb API Key is stored in a hash associated with the Redis key <code>ms:config</code>.</p>
+
+<ul>
+<li>The method <code>saveOMDBAPIKey</code> is used to store the configuring with a  <code>hset</code> call.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">jedis</span> <span class="o">=</span> <span class="n">jedisPool</span><span class="o">.</span><span class="na">getResource</span><span class="o">();</span>
+</span><span class='line'><span class="n">jedis</span><span class="o">.</span><span class="na">hset</span><span class="o">(</span><span class="n">KEY_CONFIG</span><span class="o">,</span> <span class="n">OMDB_API_KEY</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span>
+</span><span class='line'><span class="n">omdbAPIKEY</span> <span class="o">=</span> <span class="n">key</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>line 1: get the connection from the pool</li>
+<li>line 2: set the key in the hash *(as you can see the application uses static variables (<code>KEY_CONFIG</code> and <code>OMDB_API_KEY</code>)</li>
+<li>line 3: the key received as a method parameter is set to a class member <code>omdbAPIKEY</code> to avoid calling the hash each time.</li>
+</ul>
+
+
+<h4>Calling OMDb API and Caching (or not) the result</h4>
+
+<p>The method <code>getRatings</code> receives two parameters:</p>
+
+<ul>
+<li><code>imdbId</code> the IMDb id</li>
+<li><code>withCache</code> a boolean value to use or not Redis. The goal here is to show as a demonstration of the benefits of using Redis.</li>
+</ul>
+
+
+<p>Let&rsquo;s now look at the code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'> <span class="n">String</span> <span class="n">restCallKey</span> <span class="o">=</span> <span class="n">KEY_PREFIX</span> <span class="o">+</span> <span class="n">imdbId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">try</span> <span class="o">(</span><span class="n">Jedis</span> <span class="n">jedis</span> <span class="o">=</span> <span class="n">jedisPool</span><span class="o">.</span><span class="na">getResource</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">// Look in the map to see if the value has been cached</span>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">withCache</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">returnValue</span> <span class="o">=</span> <span class="n">jedis</span><span class="o">.</span><span class="na">hgetAll</span><span class="o">(</span><span class="n">restCallKey</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">returnValue</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;imdb_id&quot;</span><span class="o">,</span> <span class="n">imdbId</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">CloseableHttpClient</span> <span class="n">httpClient</span> <span class="o">=</span> <span class="n">HttpClientBuilder</span><span class="o">.</span><span class="na">create</span><span class="o">().</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>                <span class="n">HttpGet</span> <span class="n">getRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">HttpGet</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">getRequest</span><span class="o">.</span><span class="na">addHeader</span><span class="o">(</span><span class="s">&quot;accept&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">ResponseHandler</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">responseHandler</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">BasicResponseHandler</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">String</span> <span class="n">WsCall</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">getRequest</span><span class="o">,</span> <span class="n">responseHandler</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="n">jsonMapper</span><span class="o">.</span><span class="na">readValue</span><span class="o">(</span><span class="n">WsCall</span><span class="o">,</span> <span class="n">Map</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">ratings</span> <span class="o">=</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;)</span> <span class="n">map</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;Ratings&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">ratingAsMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+</span><span class='line'>                <span class="k">for</span> <span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">it</span> <span class="o">:</span> <span class="n">ratings</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="n">ratingAsMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;Source&quot;</span><span class="o">),</span> <span class="n">it</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;Value&quot;</span><span class="o">));</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">returnValue</span><span class="o">.</span><span class="na">putAll</span><span class="o">(</span><span class="n">ratingAsMap</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">jedis</span><span class="o">.</span><span class="na">hset</span><span class="o">(</span><span class="n">restCallKey</span><span class="o">,</span> <span class="n">returnValue</span><span class="o">);</span>
+</span><span class='line'>                <span class="n">jedis</span><span class="o">.</span><span class="na">expire</span><span class="o">(</span><span class="n">restCallKey</span><span class="o">,</span> <span class="n">TTL</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">HttpResponseException</span> <span class="n">e</span><span class="o">){</span>
+</span><span class='line'>            <span class="c1">// Small hack to keep it simple</span>
+</span><span class='line'>            <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;Metacritic&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;p style=&#39;color:red&#39;&gt;Error: OMDBAPI Key is invalid -- see services page&lt;/p&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>            <span class="n">omdbAPIKEY</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// Small hack to keep it simple</span>
+</span><span class='line'>        <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;Metacritic&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;p style=&#39;color:red&#39;&gt;Error: OMDBAPI Key is not set, please configure it -- see services page&lt;/p&gt;&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="kt">long</span> <span class="n">end</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">returnValue</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;elapsedTimeMs&quot;</span><span class="o">,</span> <span class="n">Long</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="o">)</span> <span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">returnValue</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So if you look in the code carefully you see that only a few lines are related to the cache itself:
+* Line 1, the key is created from a prefix and the IMDb identifier.
+* Line 3, the application retrieves a connection from the Jedis Pool.
+* Line 7, if the cache is enabled,  the connection to get the value from Redis <code>returnValue = jedis.hgetAll(restCallKey)</code>
+* If a value is present in the cache, the value is returned to the caller
+* If <code>returnValue</code> is empty,  the OMDB REST service must be called (lines 11 to 25)
+* The result of the Web service call is stored in the <code>returnValue</code> variable, and save into Redis with a time to live (TTL) of 120 seconds (Line 27 to 29)
+* Finally, the value is returned to the caller (Line 47).</p>
+
+<p>Quite simple, no?</p>
+
+<p>It is possible to optimize a little bit the application/code with few additions:</p>
+
+<ul>
+<li>Make the TTL configurable by adding a new entry in the <code>ms:config</code> cache</li>
+<li>Use <a href="https://redis.io/topics/pipelining">pipelining</a> to reduce the round trip time (RTT)</li>
+</ul>
+
+
+<h3>Running the application</h3>
+
+<p>In the project, the service connects to a <code>local</code> instance of Redis on port <code>6379</code>. If you want to use a different instance or configure a password/user, you have to edit the <code>/redis-microservices-demo/caching-service/application.properties</code>.</p>
+
+<h4>Cloning and Building</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">git</span> <span class="n">clone</span> <span class="nl">https:</span><span class="c1">//github.com/tgrall/redis-microservices-demo.git</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">cd</span> <span class="n">redis</span><span class="o">-</span><span class="n">microservices</span><span class="o">-</span><span class="n">demo</span><span class="o">/</span><span class="n">caching</span><span class="o">-</span><span class="n">service</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">mvn</span> <span class="n">clean</span> <span class="kn">package</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Running the application</h4>
+
+<p>The application is a Spring Boot application, run the following command to start it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">mvn</span> <span class="n">spring</span><span class="o">-</span><span class="nl">boot:</span><span class="n">run</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then you should save your <a href="https://www.patreon.com/join/omdb">OMDB API key</a> in Redis using the following call:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="nl">http:</span><span class="c1">//localhost:8084/api/1.0/caching/configuration/omdb_api\?key\=[YOUR_KEY]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you can call the service itself to retrieve the ratings of the movie &ldquo;WarGames&rdquo;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="nl">http:</span><span class="c1">//localhost:8084/api/1.0/caching/ratings/tt0086567</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Call it multiple times, and you will see that the first call is *slow&#8221; (100ms or more). Then subsequent requests will be a lot faster, as the data are coming out of Redis. After tow minutes, the data is removed from the cache automatically (expiration), and the OMDB service will be called again.</p>
+
+<p>You can also force the service to no use the cache using the following call:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&gt;</span> <span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">GET</span> <span class="nl">http:</span><span class="c1">//localhost:8084/api/1.0/caching/ratings/tt0086567?cache=0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Conclusion</h3>
+
+<p>The pattern used here is called &ldquo;Cache-Aside&rdquo;; and usually pretty easy to implement. It is interesting to notice that many libraries such as Spring provide built-in features to implement such caches.</p>
+
+<p>That said, this is not a silver bullet, you still have to look at the following points when you are implementing such caching service:</p>
+
+<ul>
+<li>Loading the cache: in the example, the cache is populated when the service is called. This lazy loading approach is excellent since the cache is only filled with data that are used by the application. However, the first call is paying the price of higher latency, so on your application, you may require to load the data at startup to avoid any hit miss.</li>
+<li>Cache Invalidation and Lifetime: When caching data, it is essential to look at the invalidation strategy, when and how I can update the data in the cache, but also how long the data will stay in the cache. In the example above, each data will remain for two minutes.</li>
+</ul>
+
+
+<p>So now you are all set to implement a simple cache and have consistent fast access to your application data, independently of the backend.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to Use SSL/TLS With Redis Enterprise]]></title>
@@ -4909,438 +5220,6 @@ In document databases, like MongoDB, these relations are, most of the time, repr
 <p>In this article you have learn how to create/edit arrays in JSON documents.</p>
 
 <p>In addition to all the update operators, MongoDB provides many operators for querying arrays such as  <a href="5">$size</a> or <a href="4"><code>$elemMatch</code></a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Introduction to MongoDB Security]]></title>
-    <link href="http://tgrall.github.io/blog/2015/02/04/introduction-to-mongodb-security/"/>
-    <updated>2015-02-04T18:55:30+01:00</updated>
-    <id>http://tgrall.github.io/blog/2015/02/04/introduction-to-mongodb-security</id>
-    <content type="html"><![CDATA[<p>Last week at the Paris MUG, I had a quick chat about security and MongoDB, and I have decided to create this post that explains how to configure out of the box security available in MongoDB.</p>
-
-<p>You can find all information about MongoDB Security in following documentation chapter:</p>
-
-<ul>
-<li><a href="http://docs.mongodb.org/manual/security/">http://docs.mongodb.org/manual/security/</a></li>
-</ul>
-
-
-<p><img class="center" src="http://tgrall.github.io/images/posts/intro-mongodb-security/password.jpg"></p>
-
-<p>In this post, <em>I won&rsquo;t go</em> into the detail about how to deploy your database in a secured environment (DMZ/Network/IP/Location/&hellip;)</p>
-
-<p>I will focus on <strong>Authentication</strong> and <strong>Authorization</strong>, and provide you the steps to secure the access to your database and data.</p>
-
-<p>I have to mention that by default, when you install and start MongoDB, security is not enabled. Just to make it easier to work with.</p>
-
-<p>The first part of the security is the <strong>Authentication</strong>, you have multiple choices documented <a href="http://docs.mongodb.org/manual/core/authentication/">here</a>. Let&rsquo;s focus on &ldquo;MONGODB-CR&rdquo; mechanism.</p>
-
-<p>The second part is <strong>Authorization</strong> to select what a user can do or not once he is connected to the database. The documentation about authorization is available <a href="http://docs.mongodb.org/manual/core/authorization/">here</a>.</p>
-
-<p>Let&rsquo;s now document how-to:</p>
-
-<ol>
-<li>Create an Administrator User</li>
-<li>Create Application Users</li>
-</ol>
-
-
-<p>For each type of users I will show how to grant specific permissions.</p>
-
-<!-- more -->
-
-
-<h2>1. Start MongoDB</h2>
-
-<p>As I said before, by default security is not enabled when you start MongoDB; so the first think to do is to enable it using the <code>--auth</code> parameter.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; mkdir /data/db
-</span><span class='line'>
-</span><span class='line'>&gt; mongod --auth
-</span><span class='line'>
-</span><span class='line'>....
-</span><span class='line'>....
-</span><span class='line'>2015-02-04T06:56:37.875+0100 [conn1] note: no users configured in admin.system.users, allowing localhost access
-</span><span class='line'>...
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>MongoDB is starting, and until you have created a user you can connect from localhost to create some users (especially the administrator one). This is what is called the <em>localhost exception</em>.</p>
-
-<p>Note: I am here documenting security in simple configuration, I invite you to look to the documentation when deploying a <a href="http://docs.mongodb.org/v2.2/administration/sharded-clusters/#sharded-cluster-security-considerations">Sharded cluster</a>.</p>
-
-<p>Now that we have started MongoDB, we can create users.</p>
-
-<h2>2. Create Admin User</h2>
-
-<p>The first thing is to create an admin user, that can also create users, So we have to:</p>
-
-<ol>
-<li>go to the mongo shell</li>
-<li>connect to the `admin&#8217; database</li>
-<li>create a user and assign him the role <a href="http://docs.mongodb.org/manual/reference/built-in-roles/#userAdminAnyDatabase"><strong>userAdminAnyDatabase</strong></a></li>
-</ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>use admin
-</span><span class='line'>
-</span><span class='line'>var user = {
-</span><span class='line'>  "user" : "admin",
-</span><span class='line'>  "pwd" : "manager",
-</span><span class='line'>  roles : [
-</span><span class='line'>      {
-</span><span class='line'>          "role" : "userAdminAnyDatabase",
-</span><span class='line'>          "db" : "admin"
-</span><span class='line'>      }
-</span><span class='line'>  ]
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>db.createUser(user);
-</span><span class='line'>
-</span><span class='line'>exit</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now that you have created a user, in a MongoDB running with <code>--auth</code>, anonymous connections won&rsquo;t be able to do do anything with the database.</p>
-
-<p>You can test for example to execute <code>show dbs</code> or <code>db.coll.insert({'x':0})</code> commands, you&rsquo;ll see authorization errors.</p>
-
-<h3>Connect with the Admnistrator user</h3>
-
-<p>Now that we have an admin user you can connect to the database with this user:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>
-</span><span class='line'>&gt; mongo admin -u admin -p
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Our admin user, has the role <strong>userAdminAnyDatabase</strong>. With this role you can manage user; but this role cannot read/write data from application datatabases/collections.</p>
-
-<p>So we need now to create a new user for our &ldquo;eCommerce&rdquo; application.</p>
-
-<h2>3. Create Application User</h2>
-
-<p>Now we will create a new user <em>website</em> that is responsible of the ecommerce database.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; mongo admin -u admin -p
-</span><span class='line'>
-</span><span class='line'>use ecommerce
-</span><span class='line'>
-</span><span class='line'>var user = {
-</span><span class='line'>  "user" : "website",
-</span><span class='line'>  "pwd" : "abc123",
-</span><span class='line'>  roles : [
-</span><span class='line'>      {
-</span><span class='line'>          "role" : "readWrite",
-</span><span class='line'>          "db" : "ecommerce"
-</span><span class='line'>      }
-</span><span class='line'>  ]
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>db.createUser(user);
-</span><span class='line'>
-</span><span class='line'>exit
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This user will be able to read/write on the <em>ecommerce</em> database</p>
-
-<h3>Connect with the application user</h3>
-
-<p>Using the mongo shell you can now connect and create/query data</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; mongo ecommerce -u website -p
-</span><span class='line'>
-</span><span class='line'>db.products.insert({ "title" : "MongoDB in Action"  });
-</span><span class='line'>
-</span><span class='line'>db.products.findOne();
-</span><span class='line'>
-</span><span class='line'>db.products.update({}, {"$set" : { "type" : "book" } })
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As you can see this user has the perfect profile for your application.</p>
-
-<p>Note, that if you try to query or modify another database with this user you will receive authorization exceptions.</p>
-
-<h2>Create a reporting user (Read Only)</h2>
-
-<p>You may need in your application, user that can only read data, let&rsquo;s say in all databases. For this you just need to assign the role <strong>readAnyDatabase</strong>.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>
-</span><span class='line'>&gt; mongo admin -u admin -p
-</span><span class='line'>
-</span><span class='line'>var user = {
-</span><span class='line'>  "user" : "reporting",
-</span><span class='line'>  "pwd" : "abc123",
-</span><span class='line'>  roles : [
-</span><span class='line'>      {
-</span><span class='line'>          "role" : "readAnyDatabase",
-</span><span class='line'>          "db" : "admin"
-</span><span class='line'>      }
-</span><span class='line'>  ]
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>db.createUser(user);
-</span><span class='line'>
-</span><span class='line'>exit</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This user will be able to query all the databases and collections, including <code>show dbs</code> command.</p>
-
-<p>Let&rsquo;s connect with the reporting user:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; mongo admin -u reporting -p
-</span><span class='line'>
-</span><span class='line'>show dbs
-</span><span class='line'>
-</span><span class='line'>use ecommerce
-</span><span class='line'>
-</span><span class='line'>db.products.find();
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you try to inser/update/delete document you will receive an exception.</p>
-
-<h2>Add new role to a user</h2>
-
-<p>Let&rsquo;s now see how to add a new role to a user. For example I want to let the admin the power of read and write any database. For this I just need to add the role <strong>readWriteAnyDatabase</strong> to the admin user.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; mongo admin -u admin -p
-</span><span class='line'>
-</span><span class='line'>db.grantRolesToUser(
-</span><span class='line'>  "admin",
-</span><span class='line'>  [{ "role" : "readWriteAnyDatabase", "db" : "admin" }]
-</span><span class='line'>)
-</span><span class='line'>
-</span><span class='line'>db.getUser("admin");
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Using the <code>db.grantRolesToUser</code> command I have added the role to the admin user, and using the <code>db.getUser</code> I can look at the user profile.</p>
-
-<p>Now, admin user should be able to create new databases, collections and documents, let&rsquo;s try:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>use hr
-</span><span class='line'>
-</span><span class='line'>db.employees.insert({ "name":"John Doe", "hire_date" : new Date() });
-</span><span class='line'>
-</span><span class='line'>db.organization.insert({ "name" : "Development" });
-</span><span class='line'>
-</span><span class='line'>db.employees.findOne();
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Create and use custom roles</h2>
-
-<p>Another feature that is used a lot around security is related to the roles. In some case you want to provide multiple roles to a user, for example:</p>
-
-<ul>
-<li>all permission on database <em>ecommerce</em></li>
-<li>read the collection <em>employees</em> in database <em>hr</em></li>
-</ul>
-
-
-<p>For this you can create a role that provide all the permissions and assign it to users. Let&rsquo;s do that using admin user.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>use admin
-</span><span class='line'>
-</span><span class='line'>var role = {
-</span><span class='line'>  "role"  : "webSiteManagerRole",
-</span><span class='line'>  privileges : [
-</span><span class='line'>      {
-</span><span class='line'>          "resource": {"db" : "hr", "collection" : "employees"},
-</span><span class='line'>          "actions": ["find"]
-</span><span class='line'>      }
-</span><span class='line'>  ],
-</span><span class='line'>  "roles" : [
-</span><span class='line'>      {
-</span><span class='line'>          "role" : "readWrite",
-</span><span class='line'>          "db" : "ecommerce"
-</span><span class='line'>      }
-</span><span class='line'>  ]
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>db.createRole( role );
-</span><span class='line'>
-</span><span class='line'>var user = {
-</span><span class='line'>  "user" : "master",
-</span><span class='line'>  "pwd" : "abc123",
-</span><span class='line'>  roles : [
-</span><span class='line'>      {
-</span><span class='line'>          "role" : "webSiteManagerRole",
-</span><span class='line'>          "db" : "admin"
-</span><span class='line'>      }
-</span><span class='line'>  ]
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>db.createUser(user);
-</span><span class='line'>
-</span><span class='line'>exit
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you connect now with the user &ldquo;master&rdquo;, you will see that, the user:</p>
-
-<ul>
-<li>can do anything you want in the ecommerce database</li>
-<li>can read the &ldquo;hr.employees&rdquo; collection, on only this</li>
-<li>cannot do anything else.</li>
-</ul>
-
-
-<h2>Roles and Privileges</h2>
-
-<p>As you have seen in the previous section, you can create roles, and assign privileges to these roles. This is very powerful and you can really control each action on the database.</p>
-
-<p>I am inviting you to look in detail to the built-in roles and privileges, this will help you a lot to select the proper ones for your application:</p>
-
-<ul>
-<li><a href="http://docs.mongodb.org/manual/reference/built-in-roles/">Built-in Roles</a></li>
-<li><a href="http://docs.mongodb.org/manual/reference/privilege-actions/">Privileges</a></li>
-</ul>
-
-
-<h2>Conclusion</h2>
-
-<p>In this blog post I quickly explained, how to:</p>
-
-<ul>
-<li>Use MongoDB Authentication</li>
-<li>Create Users</li>
-<li>Assign Roles and Privileges for Users.</li>
-</ul>
-
-
-<p>It is interesting to know that everything that I have showed you in the shell could be done from a user interface in <a href="http://mms.mongodb.com">MMS</a></p>
 ]]></content>
   </entry>
   

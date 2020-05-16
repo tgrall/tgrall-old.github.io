@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Yesterday was my last day at eXo&hellip; I have been working at eXo since 2008, and we have achieved many exciting things such as building eXo &hellip;">
+  <meta name="description" content="Working with the Couchbase 2.0.0 release you may have issues when trying to access the Web Admin Console or simply starting the server. This is due &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,66 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/">What to Do if Your Couchbase Server Does Not Start?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-12-26T11:08:37+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>11:08 am</span></time>
+        
+           | <a href="/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Working with the Couchbase 2.0.0 release you may have issues when trying to access the Web Admin Console or simply starting the server. This is due to the way Couchbase Server uses the IP address/hostname during the installation process. So when you have one of the following errors :</p>
+
+<ul>
+<li>On Windows, Server is not working at all, even after installation. You can access the sever on port 8092 (Couchbase API port), but cannot on port 8091</li>
+<li>You have the following error when accessing the console <code>"[10:02:02] IP address seems to have changed. Unable to listen on 'ns_1@10.0.2.15'"</code></li>
+</ul>
+
+
+<p><img src="http://2.bp.blogspot.com/-OXj1bGEZTGg/UNs8QBx6X-I/AAAAAAAAAaI/TproFMOQXcE/s320/cb-20-ip-address-error.png"></p>
+
+<ul>
+<li>When you try to restart the server it does not start and you have the following error message in the error log :
+<code>"Configured address '10.0.2.15' seems to be invalid. Will refuse to start for safety reasons"</code></li>
+</ul>
+
+
+<p>Some of these issues are related to a known issue on Windows ( see <a href="http://www.couchbase.com/issues/browse/MB-7417">MB-7417</a> that will be fixed in 2.0.1) or the fact that Couchbase server does not support change of the IP address after installation.  This is documented in the section “<a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-bestpractice-cloud-ip.html">Using Couchbase in the Cloud: Handling Changes in IP Addresses</a>” of the Couchbase Server Manual. This article explains what should be done when configuring Couchbase Server on Windows, but you can do equivalent steps on any platform using the shell scripts available on Linux and/or Mac OS X.</p>
+
+<p>Once you have installed Couchbase, you can see in the console that the IP address of your server is used :
+  <img src="http://3.bp.blogspot.com/-7wJEnnsZNlA/ULzAYBU09tI/AAAAAAAAAZk/PxZGdUbqo6k/s320/Screen+Shot+2012-12-03+at+4.07.03+PM.png"></p>
+
+<p>Typically the address 192.168.0.97 is stored in the configuration of Couchbase. If your server receives a new address from the DHCP server, Couchbase will not work anymore. In this article you will see how you can configure Couchbase to use another IP address or Hostname.</p>
+
+<p><strong>Important:</strong> The steps that follow will completely destroy any data and configuration from the node, so it is best to start with a fresh Couchbase install. If you can not, you should backup your data using the file based backup-restore documented <a href="http://www.couchbase.com/docs/couchbase-manual-2.0/couchbase-backup-restore.html">here</a>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/12/26/what-to-do-if-your-couchbase-server-does-not-start/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1103,64 +1163,6 @@ steps of this tutorial are:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/">Installing Memcached on Mac OS X and Using It in Java</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-11-20T07:12:21+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>7:12 am</span></time>
-        
-           | <a href="/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>Introduction</h3>
-
-<p>In this article I will explain how you can:</p>
-
-<ol>
-<li>Install and Configure Memcached on Mac OS X</li>
-<li>Use Memcached in your Java Application</li>
-</ol>
-
-
-<p>I won&rsquo;t go in too much detail about the benefits of using a distributed cache in your applications, but let&rsquo;s at least provide some use cases for applications that are running in the context of an enterprise portal, eXo Platform in my case - <em>surprising isn&rsquo;t?</em> And I will show this in another post.</p>
-
-<p>We have many reasons to use a cache (distributed or not), in the context of enterprise portal, let&rsquo;s take a look to some of these reasons:</p>
-
-<ul>
-<li>A portal is used to aggregate data in a single page. These data could come from different sources : Web Services, Database, ERP, &hellip;.. and accessing the data in real time could be costly. So it will be quite interesting to cache the result of the call when possible.</li>
-<li>If the portal is used to aggregate many data from many sources, it is sometime necessary to jump into another application to continue some operation. A distributed and shared cache could be used to manage some context between different applications running in different processes (JVM or even technologies)
-These are two example where a shared cache could be interesting for your portal based applications, we can find many other reason.</li>
-</ul>
-
-
-<p>Note that the Portlet API (JSR-286) contains already a cache mechanism that cache the HTML fragment, and that eXo Platform also provide a <a href="http://docs.jboss.org/exojcr/1.14.0-CR4/developer/en-US/html/ch-cache.html">low level cache</a>, based on <a href="http://www.jboss.org/jbosscache">JBoss Cache</a>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/6">&larr; Older</a>
@@ -1178,6 +1180,10 @@ These are two example where a shared cache could be interesting for your portal 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -1191,10 +1197,6 @@ These are two example where a shared cache could be interesting for your portal 
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

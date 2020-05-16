@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Application Server Control Management and monitoring support is provided by a new version of Enterprise Manager Application Server Control which is &hellip;">
+  <meta name="description" content="You can find a new How-To Document that explains how to use OC4J and Eclipse together using the Lomboz plugin. You can download the server definition &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,40 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2004/12/20/eclipse-and-oc4j-using-the-lomboz-plugin/">Eclipse and OC4J Using the Lomboz Plugin</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2004-12-20T19:29:07+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2004</span></span> <span class='time'>7:29 pm</span></time>
+        
+           | <a href="/blog/2004/12/20/eclipse-and-oc4j-using-the-lomboz-plugin/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2004/12/20/eclipse-and-oc4j-using-the-lomboz-plugin/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>You can find a new <a href="http://www.oracle.com/technology/tech/java/oc4j/1013/howtos/how-to-configure-lomboz/doc/lomboz-howto-part-1.html">How-To Document</a> that explains how to use OC4J and Eclipse together using the Lomboz plugin.</p>
+
+<p>You can download the server definition files for the Production release of OC4J 10g (9.0.4) or for the J2EE 1.4 Developer Preview 10.1.3.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -403,71 +437,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2004/11/08/html-javascript-tip-refreshing-an-image-not-the-full-page/">HTML/Javascript Tip: Refreshing an Image Not the Full Page</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2004-11-08T16:43:18+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2004</span></span> <span class='time'>4:43 pm</span></time>
-        
-           | <a href="/blog/2004/11/08/html-javascript-tip-refreshing-an-image-not-the-full-page/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2004/11/08/html-javascript-tip-refreshing-an-image-not-the-full-page/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I was discussing with a friend about the creation of a monitoring dashboard in HTML. As any monitoring tool you want to be able to see the information in <em>real-time</em>, so you need to refresh the content&hellip;.</p>
-
-<p>One way of doing it is to refresh the whole page and this is easy, just use the meta tag:
-<code>&lt;META HTTP-EQUIV="Refresh" CONTENT="5; URL=http://www.grallandco.com/" &gt;</code>
-where 5 is the number of seconds between each refresh.</p>
-
-<p>Javascript allows you to easily refresh a specific image of your page (a chart for example):</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">&quot;myChartServlet&quot;</span> <span class="na">name=</span><span class="s">&quot;chart1&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;script </span><span class="na">language=</span><span class="s">&quot;JavaScript&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">loadImage</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">now</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">images</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nb">document</span><span class="p">.</span><span class="nx">images</span><span class="p">.</span><span class="nx">chart1</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="s1">&#39;myChartServlet?time=&#39;</span><span class="o">+</span><span class="nx">now</span><span class="p">.</span><span class="nx">getTime</span><span class="p">();</span> <span class="c1">// add the time to avoid caching</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="nx">setTimeout</span><span class="p">(</span><span class="s1">&#39;loadImage()&#39;</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="nx">setTimeout</span><span class="p">(</span><span class="s1">&#39;loadImage()&#39;</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
-</span><span class='line'><span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can obviously make the whole think dynamic and configurable&hellip;</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/23">&larr; Older</a>
@@ -485,6 +454,10 @@ where 5 is the number of seconds between each refresh.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -498,10 +471,6 @@ where 5 is the number of seconds between each refresh.</p>
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

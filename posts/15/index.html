@@ -9,7 +9,8 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="The Oracle Technology Network (OTN) &ldquo;Greatest Hits&rdquo; is a compilation of the most popular technical articles, software downloads, podcasts &hellip;">
+  <meta name="description" content="OracleAS 10gR3, so OC4J standalone, is using the standard Java logging framework. Some of the
+benefits are easy configuration, and extensibility. The &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +79,75 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2006/11/28/oc4j-sending-system-level-message-in-the-console-window/">OC4J: Sending System Level Message in the Console Window</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2006-11-28T20:46:33+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2006</span></span> <span class='time'>8:46 pm</span></time>
+        
+           | <a href="/blog/2006/11/28/oc4j-sending-system-level-message-in-the-console-window/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2006/11/28/oc4j-sending-system-level-message-in-the-console-window/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>OracleAS 10gR3, so OC4J standalone, is using the standard <a href="http://java.sun.com/j2se/1.4.2/docs/guide/util/logging/overview.html">Java logging framework</a>. Some of the
+benefits are easy configuration, and extensibility. The configuration of the level of logging of the different loggers has been exposes in
+the Oracle Application Server Console. To see the logger configuration, click on the Administration Tab and then Logger Configuration, you can then configure the different loggers.</p>
+
+<p><img src="http://static.flickr.com/106/304730770_8db9728d3a_o.png"></p>
+
+<p>By default the logger will write all the information in the default log.xml file, and for application lever logger it will go in the application.log. You may want to send the information in the console during development to debug/analyze your application. This is done using the configuration of the Handler. This information is currently not available in the Application Server Console, so I am documenting in the next steps how
+to send the information in the console (terminal window).</p>
+
+<p>The configuration of the OracleAS Logging is saved in the <code>$ORACLE_HOME/j2ee/home/config/j2ee-logging.xml</code> file. In this file you  can see that Oracle has defined
+various handlers where information can be sent:</p>
+
+<ul>
+<li><code>console-handler</code> : Log the information in the console (the one we want to use in this sample)</li>
+<li><code>oc4j-handler</code> : the default handler for most of the loggers, saving the information in the $ORACLE_HOME/j2ee/home/log/oc4j/log.xml using the Oracle Logger formatting</li>
+<li><code>oracle-webservices-management-auditing-handler</code> : the handler used by the Web Services Auditing feature in the $ORACLE_HOME/j2ee/home/log/wsmgmt/auditing/log.xml</li>
+<li><code>oracle-webservices-management-logging-handler</code> : the handler used by the Web Service Logging feature in the $ORACLE_HOME/j2ee/home/log/wsmgmt/logging/log.xml</li>
+</ul>
+
+
+<p>As you may know, OracleAS Web Service provides out of the box support for Auditing of the SOAP messages. You just need to go in the administration page of the Web Service and enable the auditing. By default the messages are logged in the auditing log pointed above. But during development it is really interesting to see the SOAP Messages in the console without having to configure a Proxy to capture the request/response. The easiest way to do that is to edit the <code>j2ee-logging.xml</code> file and associate the <code>console-handler</code> to the auditing logger using the following configuration:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;logger</span> <span class="na">name=</span><span class="s">&quot;oracle.webservices.management.auditing&quot;</span> <span class="na">level=</span><span class="s">&quot;NOTIFICATION:1&quot;</span> <span class="na">useParentHandlers=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;handler</span> <span class="na">name=</span><span class="s">&quot;oracle-webservices-management-auditing-handler&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;handler</span> <span class="na">name=</span><span class="s">&quot;console-handler&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/logger&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>by doing this you will see the SOAP Message in the OC4J console that is running in your system.</p>
+
+<p><img src="http://static.flickr.com/103/308538842_ed574a1c08_o.png"></p>
+
+<p>You can also use this configuration with any loggers available in OC4J.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1178,145 +1248,6 @@ connections.</li>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/04/23/oracle-bpel-debugging-internal-soap-messages/">Oracle BPEL: Debugging &#8216;Internal&#8217; SOAP Messages</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2006-04-23T21:35:38+02:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2006</span></span> <span class='time'>9:35 pm</span></time>
-        
-           | <a href="/blog/2006/04/23/oracle-bpel-debugging-internal-soap-messages/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2006/04/23/oracle-bpel-debugging-internal-soap-messages/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>When you develop applications
-that use SOAP based Web Services you very often use an HTTP proxy to
-capture the request and response that are exchanged between the clients
-and servers. For this you can use the Oracle HTTP Analyzer that is part
-of the toolset of Oracle JDeveloper, Axis TCP Monitor, or a packaged
-version of it that you have with Oracle BPEL Process Manager.</p>
-
-<p>BPELs are making extensive usage of SOAP messages, and it could be
-interesting to debug the different call to the partnerlinks. Oracle
-BPEL PM, to avoid HTTP calls and make optimized SOAP message when the
-partnerlink that you are invoking is deployed as a BPEL. So in the
-default configuration you do not see the different calls. In this
-article I explain how you can configure the server to be able to do it.</p>
-
-<p>For this I will be using:</p>
-
-<ul>
-<li>Oracle BPEL Process Manager developer install running in an OC4J 10g Stand Alone (10.1.2.0.2)</li>
-<li>obtunnel, that is a package version of Axis TCP Monitor located in <code>&amp;lt;BPEL_HOME&amp;gt;\bin\obtunnel.bat</code></li>
-<li>LoanFlow demo that you can install in 2 steps:</li>
-</ul>
-
-
-<h4>Starting the Oralce BPEL Tunneling tool:</h4>
-
-<p>Just run the command <code>&amp;lt;BPEL_HOME&amp;gt;\bin\obtunnel.bat</code> You will see the following application:</p>
-
-<p><img src="http://static.flickr.com/46/133968437_aa0d5804f6_o.png"></p>
-
-<p>By default the TCPMonitor launched from BPEL listens on the port 1234
-and proxies for the default Oracle BPEL port 9700. So in this context
-you will capture all the requests is you access the server on the port
-1234.</p>
-
-<p>It is not sufficiant here since the different partnerlinks endpoint are
-not dynamique and are set to the port 9700. So in this case you wont&rsquo;s
-see the request coming from the BPEL to a local partner link (and I am
-  not talking about the SOAP Optimization yet).</p>
-
-<p>One way that I use to work around this issue in development &ndash;<span style="font-style: italic;">may be we have more simple
-  solutions, but this is the one that I use</span>&ndash; is to change
-  the port of the OC4J and make the proxy listening on the port 9700. In
-  this case you will be able to capture the requests made from BPEL to
-  its partnerlinks.</p>
-
-<h4>Changing the Port of OC4J and the TCP Monitor</h4>
-
-<p><em>I. Change the HTTP port of OC4J used by BPEL</em></p>
-
-<ol>
-<li>Open <code>&amp;lt;BPEL_HOME&amp;gt;\system\appserver\oc4j\j2ee\home\config\http-web-site.xml</code></li>
-<li>Edit the <code>port</code> attribute of the root element <code>web-site</code> to enter a different value</li>
-</ol>
-
-
-<p>eg: <code>&amp;lt;web-site port="9701"...</code>.  Stop your BPEL Process Manager</p>
-
-<p><em>II. Start a new TCPMonitor on port 9700</em></p>
-
-<ol>
-<li>In the TCPMonitor sceen click on the Admin Tab</li>
-<li>Enter 9700 for the &ldquo;Listen Port #&rdquo; field (since we want to be sure the partnerlinks are called correctly)</li>
-<li>Enter 9701 (or the value you entered for the HTTP port) for &ldquo;Target Port #&rdquo;.</li>
-<li>Click Add</li>
-<li>Click on the new tab &ldquo;Port 9700&rdquo;. If you have an error message like &ldquo;<em>java.net.BindException: Address Already in use: JVM_Bind</em>&rdquo; this is simply because your BPEL process manager is not stopped. In this case stop the BPEL server, and start the TCPMonitor by clicking the Start button.</li>
-</ol>
-
-
-<p><em>III. Restart you BPEL Server</em></p>
-
-<p>Nothing special here you just need to start your server, and check that the BPEL PM is now listening on the HTTP port that you have entered, in my case 9701:</p>
-
-<ul>
-<li><code>http://localhost:9701/BPELConsole</code></li>
-</ul>
-
-
-<p>You can now go on the test page of the LoanFlow process (either on the port 9700 or 9701) and invoke the process. I am using 9701 since I want to capture the calls make by the Business Process to its partnerlinks.</p>
-
-<p>You can see some HTTP activities in your TCPMonitor, but if you look in
-        details you only see request to the different WSDLs used by the
-        LoanFlow&hellip;</p>
-
-<p>I was like you expecting to be able to see the different SOAP requests
-        and response, but BPEL does some optimization around local SOAP calls.
-        So to be able to capture these requests you just need to turn of this
-        optimization.</p>
-
-<h4>Turning Off the SOAP Shortcut</h4>
-
-<ol>
-<li>In the BPEL console, click on the &ldquo;<em>Manage BPEL Domain</em>&rdquo; link (topright)</li>
-<li>You arrive in the configuration tab, look for the <code>optSoapShortcut</code> property and set it to <code>false</code>.</li>
-<li>Click <code>Apply</code> You can now go on the test page of the LoanFlow process (either on the port 9700 or 9701) and invoke the process. I am using 9701 since I want to capture the calls make by the Business Process to its partnerlinks.</li>
-</ol>
-
-
-<p>Now you can see all the SOAP requests and responses between the LoanFlow BPEL and its partnerlinks.</p>
-
-<p><img src="http://static.flickr.com/46/133968438_d0dc761af0.jpg?v=0"></p>
-
-<p><img src="http://static.flickr.com/46/133968438_d0dc761af0_o.png"></p>
-
-<p><em>Update on 08/02/2007</em></p>
-
-<p>For people that are currently using <strong>Oracle BPEL 10.1.3.1</strong> the <em>optSoapShortcut</em> is not visible anymore in the console, but it is still possible to configure this by adding it manually in the domain configuration file available at:</p>
-
-<p><code>$BPEL_HOME/domains/&lt;domain&gt;/config/domain.xml</code></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/16">&larr; Older</a>
@@ -1334,6 +1265,10 @@ see the request coming from the BPEL to a local partner link (and I am
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -1347,10 +1282,6 @@ see the request coming from the BPEL to a local partner link (and I am
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

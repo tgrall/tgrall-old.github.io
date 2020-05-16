@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="A friend of mine asked me some questions about Oracle and acquisitions. He could not, remember all of them and when they occurred&hellip; If you have &hellip;">
+  <meta name="description" content="Now that I am back in consulting business, I often have customers where I am not allowed to connect my Mac on the network. Annoying!!!! But this is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,61 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2008/03/07/my-work-life-on-a-key-xwiki-and-other-portables-applications/">My (Work) Life on a Key: XWiki and Other Portables Applications</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2008-03-07T00:04:24+01:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2008</span></span> <span class='time'>12:04 am</span></time>
+        
+           | <a href="/blog/2008/03/07/my-work-life-on-a-key-xwiki-and-other-portables-applications/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2008/03/07/my-work-life-on-a-key-xwiki-and-other-portables-applications/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Now that I am back in consulting business, I often have customers where I am not allowed to connect my Mac on the network. Annoying!!!! But this is not a big issue since now it is easy to bring you environment on a USB key.</p>
+
+<h4>XWi<em>key</em>: my wiki on a key</h4>
+
+<p>On a daily business, I have installed my personal <a href="http://www.xwiki.com/">XWiki</a> on my 2Gb USB Key, and a JDK (for windows, on OSX I am using the default one). So with this solutions I have my personal CMS, Website and applications with me, and I can use it from any computer available. I work on any site, any meeting room directly on my Wiki even when I am not connected. I am using a packaged Entprise XWiki that comes with Jetty and HSQL, so it is a complete and self contained environment. I just changed the start and stop scripts to point to the JDK that is on the key. Nothing exceptional here, but it is very useful.</p>
+
+<h4>Others portable applications</h4>
+
+<p>I know that a Wiki is not enough most of the time to &ldquo; bring your life with you&rdquo;, and you may want more, such as Open Office, Mail and Web clients, &hellip; Some of the packages you can use:</p>
+
+<ul>
+<li><a href="http://portableapps.com/">PortableApps</a> take a look to <a href="http://portableapps.com/apps">the list of applications</a> that are available in a portable fashion</li>
+<li><a href="http://pendriveapps.com/">PenDriveApps</a></li>
+<li><a href="http://www.framakey.org/En/Index">Framakey</a></li>
+</ul>
+
+
+<p>The next test will be to run the OS from the key, I have not done it yet, have you? Some options for this:</p>
+
+<ul>
+<li><a href="http://www.pendrivelinux.com/">PenDriveLinux</a></li>
+<li><a href="http://flashlinux.org.uk/">FlashLinux</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -623,51 +678,6 @@ Base64 encoding <strong>is not efficient</strong>, since &ldquo;lot of&rdquo; CP
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/">Working on a Large XML or SOA Project: Think About &#8216;Separation of Concerns&#8217;</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2007-12-10T08:27:41+01:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>8:27 am</span></time>
-        
-           | <a href="/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>With XML and SOA becoming mainstream in the enterprise XML operation such as Schema validations, XSL transformations are now very common. These specific operations are CPU intensive and could become a performance bottleneck when directly applied on the middleware. It could be even worst now when using SOAP based Web Services and their related WS-* standards. For example with WS-Security, XML encryption and signature is now more and more used in SOA based applications.</p>
-
-<p>This is why many enterprise architects are bow looking for solutions to improve performances of XML centric applications.</p>
-
-<p>One of the think we learn when developing application, and that Aspect Oriented Programming has highlighted is the concept of “separation of concerns”. It is key to keep that in mind also in global architecture in our case by separating the XML processing from the business logic. Hopefully it is most of the time done directly by the various Web Services framework you are using, you do not code the SOAP request/response, it is hidden by the Web Services framework.</p>
-
-<p>However, in the current application server, the full XML treatment is made directly in the container, for example the XML Encryption is made in the same container that the place where the pure business logic is executed. So let’s find a solution to extract the most intensive XML processing into another part of the system.</p>
-
-<p>Vendors have now in their catalog appliances that could do the job. The same way that today we are using SSL accelerators to deal with SSL encryption/decryption, we can put XML appliance to deal with the intensive CPU processing operation: XML validations, transformation, Ws-Security enforcing point,&hellip;</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2007/12/10/working-on-a-large-xml-or-soa-project-think-about-separation-of-concerns/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/10">&larr; Older</a>
@@ -685,6 +695,10 @@ Base64 encoding <strong>is not efficient</strong>, since &ldquo;lot of&rdquo; CP
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -698,10 +712,6 @@ Base64 encoding <strong>is not efficient</strong>, since &ldquo;lot of&rdquo; CP
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="In this article, I will explain how to secure your Redis databases using SSL (Secure Sockets Layer). In production, it is a good practice to use SSL &hellip;">
+  <meta name="description" content="One of the most common use cases for Redis is to use it the database as a caching layer for your data, but Redis can do a lot more (I will publish &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,68 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-05-16T17:33:15+02:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>5:33 pm</span></time>
+        
+           | <a href="/blog/2020/05/16/simple-caching-service-with-redis/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="center" src="/images/posts/simple-caching-with-redis/001-ws-caching.png"></p>
+
+<p>One of the most common use cases for Redis is to use it the database as a caching layer for your data, but Redis can do a lot more <em>(I will publish new articles later)</em>!</p>
+
+<p>In this article, you will learn using a straightforward service, how to cache the result on some REST API calls to accelerate the data access, and also reduce the number of calls to external services.</p>
+
+<p>For this example, I am using the &ldquo;Redis Movie Database&rdquo; application, a microservice-based application that I created to showcase and explain various features of Redis and Redis Enterprise.</p>
+
+<p>You can see the caching service in action in this video:</p>
+
+<iframe width="560" height="420" src="http://www.youtube.com/embed/2X6hmXGbLbg?color=white&theme=light"></iframe>
+
+
+<h3>Architecture Overview</h3>
+
+<p>The application uses a third party API provided by the &ldquo;<a href="http://www.omdbapi.com/">OMDb API</a>&rdquo; to retrieve the ratings of the movie using its IMDb identifier. The frontend application call the <code>/caching/rating/</code> service to get the rating information from OMDB.</p>
+
+<p>This service is doing the following:</p>
+
+<ol>
+<li>Check if the rating data is already cached retrieve from the cache</li>
+<li>If the information is not cached, the system calls the OMDB API with the proper key and Movie ID</li>
+<li>The result is cached in Redis with a time to live of 120 seconds</li>
+<li>The ratings are returned to the client.</li>
+</ol>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2020/05/16/simple-caching-service-with-redis/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -546,49 +608,6 @@ this article use the same code and approach than the <a href="http://tgrall.gith
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/">Getting Started With Apache Flink and Kafka</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-10-12T04:54:17+02:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>4:54 am</span></time>
-        
-           | <a href="/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>Introduction</h2>
-
-<p><a href="https://flink.apache.org/">Apache Flink</a> is an open source platform for distributed stream and batch data processing. Flink is a streaming data flow engine with several APIs to create data streams oriented application.</p>
-
-<p>It is very common for Flink applications to use <a href="http://kafka.apache.org/">Apache Kafka</a> for data input and output. This article will guide you into  the steps to use Apache Flink with Kafka.</p>
-
-<p><img class="center" src="/images/posts/flink-kafka/flink-kafka.png" title="Flink-Kafka" ></p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2016/10/12/getting-started-with-apache-flink-and-kafka/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -604,6 +623,10 @@ this article use the same code and approach than the <a href="http://tgrall.gith
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -617,10 +640,6 @@ this article use the same code and approach than the <a href="http://tgrall.gith
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

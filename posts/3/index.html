@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Few days ago I have posted a joke on Twitter Moving my Java from Couchbase to MongoDB pic.twitter.com/Wnn3pXfMGi&mdash; Tugdual Grall (@tgrall) &hellip;">
+  <meta name="description" content="Last week at the Paris MUG, I had a quick chat about security and MongoDB, and I have decided to create this post that explains how to configure out &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,72 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/02/04/introduction-to-mongodb-security/">Introduction to MongoDB Security</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-02-04T18:55:30+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>6:55 pm</span></time>
+        
+           | <a href="/blog/2015/02/04/introduction-to-mongodb-security/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2015/02/04/introduction-to-mongodb-security/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last week at the Paris MUG, I had a quick chat about security and MongoDB, and I have decided to create this post that explains how to configure out of the box security available in MongoDB.</p>
+
+<p>You can find all information about MongoDB Security in following documentation chapter:</p>
+
+<ul>
+<li><a href="http://docs.mongodb.org/manual/security/">http://docs.mongodb.org/manual/security/</a></li>
+</ul>
+
+
+<p><img class="center" src="/images/posts/intro-mongodb-security/password.jpg"></p>
+
+<p>In this post, <em>I won&rsquo;t go</em> into the detail about how to deploy your database in a secured environment (DMZ/Network/IP/Location/&hellip;)</p>
+
+<p>I will focus on <strong>Authentication</strong> and <strong>Authorization</strong>, and provide you the steps to secure the access to your database and data.</p>
+
+<p>I have to mention that by default, when you install and start MongoDB, security is not enabled. Just to make it easier to work with.</p>
+
+<p>The first part of the security is the <strong>Authentication</strong>, you have multiple choices documented <a href="http://docs.mongodb.org/manual/core/authentication/">here</a>. Let&rsquo;s focus on &ldquo;MONGODB-CR&rdquo; mechanism.</p>
+
+<p>The second part is <strong>Authorization</strong> to select what a user can do or not once he is connected to the database. The documentation about authorization is available <a href="http://docs.mongodb.org/manual/core/authorization/">here</a>.</p>
+
+<p>Let&rsquo;s now document how-to:</p>
+
+<ol>
+<li>Create an Administrator User</li>
+<li>Create Application Users</li>
+</ol>
+
+
+<p>For each type of users I will show how to grant specific permissions.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2015/02/04/introduction-to-mongodb-security/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1026,51 +1092,6 @@ So this article will focus now on the 2d Sphere index with GeoJSON format to sto
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/">Deploy Your Node/Couchbase Application to the Cloud With Clever Cloud</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2013-07-11T06:47:51+02:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>6:47 am</span></time>
-        
-           | <a href="/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>Introduction</h3>
-
-<p><a href="http://www.clever-cloud.com/en/">Clever Cloud</a> is the first PaaS to provide Couchbase as a service allowing developers to run applications in a fully managed environment. This article shows how to deploy an existing application to Clever Cloud.</p>
-
-<p><img src="http://f.cl.ly/items/2L2M2k2O000e3g2N1z3z/couchbase_gradient_clever.png"></p>
-
-<p>I am using a very simple Node application that I have documented in a previous article: “<a href="http://tugdualgrall.blogspot.fr/2013/03/easy-application-development-with.html">Easy application development with Couchbase, Angular and Node</a>”.</p>
-
-<p>Clever Cloud provides support for various databases MySQL, PostgreSQL, but also and this is most important for me <a href="http://www.clever-cloud.com/en/services/couchbase.html">Couchbase</a>. No only Clever Cloud allows you to use database services but also you can deploy and host your application that could be developed in the language/technology of your choice : Java, Node, Scala, Python, PHP, … and all this in a secure, scalable and managed environment.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/07/11/deploy-your-node-slash-couchbase-application-to-the-cloud-with-clever-cloud/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/4">&larr; Older</a>
@@ -1088,6 +1109,10 @@ So this article will focus now on the 2d Sphere index with GeoJSON format to sto
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -1101,10 +1126,6 @@ So this article will focus now on the 2d Sphere index with GeoJSON format to sto
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

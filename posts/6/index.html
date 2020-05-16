@@ -9,7 +9,8 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Last week I have been struggling with a small issue while developing a service using Jersey. The goal of this service is to provide JSON object to my &hellip;">
+  <meta name="description" content="Introduction In this article I will explain how you can: Install and Configure Memcached on Mac OS X
+Use Memcached in your Java Application I won& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +79,64 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/">Installing Memcached on Mac OS X and Using It in Java</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-11-20T07:12:21+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>7:12 am</span></time>
+        
+           | <a href="/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Introduction</h3>
+
+<p>In this article I will explain how you can:</p>
+
+<ol>
+<li>Install and Configure Memcached on Mac OS X</li>
+<li>Use Memcached in your Java Application</li>
+</ol>
+
+
+<p>I won&rsquo;t go in too much detail about the benefits of using a distributed cache in your applications, but let&rsquo;s at least provide some use cases for applications that are running in the context of an enterprise portal, eXo Platform in my case - <em>surprising isn&rsquo;t?</em> And I will show this in another post.</p>
+
+<p>We have many reasons to use a cache (distributed or not), in the context of enterprise portal, let&rsquo;s take a look to some of these reasons:</p>
+
+<ul>
+<li>A portal is used to aggregate data in a single page. These data could come from different sources : Web Services, Database, ERP, &hellip;.. and accessing the data in real time could be costly. So it will be quite interesting to cache the result of the call when possible.</li>
+<li>If the portal is used to aggregate many data from many sources, it is sometime necessary to jump into another application to continue some operation. A distributed and shared cache could be used to manage some context between different applications running in different processes (JVM or even technologies)
+These are two example where a shared cache could be interesting for your portal based applications, we can find many other reason.</li>
+</ul>
+
+
+<p>Note that the Portlet API (JSR-286) contains already a cache mechanism that cache the HTML fragment, and that eXo Platform also provide a <a href="http://docs.jboss.org/exojcr/1.14.0-CR4/developer/en-US/html/ch-cache.html">low level cache</a>, based on <a href="http://www.jboss.org/jbosscache">JBoss Cache</a>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/11/20/installing-memcached-on-mac-os-x-and-using-it-in-java/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -1358,52 +1417,6 @@ So using the JCR API you just need to get the content length using the following
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/">NantesJUG: Next Meeting Friday November 13th About &#8216;Google Technologies&#8217;</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2009-11-08T22:27:15+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>8</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>10:27 pm</span></time>
-        
-           | <a href="/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2009/11/08/nantesjug-next-meeting-friday-november-13th-about-google-technologies/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://sites.google.com/site/nantesjug/_/rsrc/1222637453551/config/app/images/customLogo/customLogo.gif?revision=2"></p>
-
-<p>This Friday , the Nantes JUG is pleased to organize a conference about &ldquo;Google Technologies&rdquo;. Didier Girard, <a href="http://twitter.com/dgirard">http://twitter.com/dgirard</a> , will be presenting and demoing cool stuff from Google:</p>
-
-<ul>
-<li>GWT 2</li>
-<li>Android</li>
-<li>Wave</li>
-<li>App Engine</li>
-</ul>
-
-
-<p>Want to come? Register for free <a href="http://jugevents.jugpadova.it/jugevents/event/registration.form?event.id=20744">here</a></p>
-
-<p>The event will occur at the &ldquo;<a href="http://maps.google.com/maps?f=q&amp;amp;source=s_q&amp;amp;hl=en&amp;amp;geocode=&amp;amp;q=ecole+des+mines+de+nantes&amp;amp;sll=47.176415,-1.340556&amp;amp;sspn=0.078063,0.181103&amp;amp;ie=UTF8&amp;amp;hq=%C3%89cole+des+mines+de+Nantes&amp;amp;hnear=%C3%89cole+des+mines+de+Nantes,+France&amp;amp;ll=47.283363,-1.520834&amp;amp;spn=0.019476,0.045276&amp;amp;t=h&amp;amp;z=15&amp;amp;iwloc=near">Ecole des Mines de Nantes</a>&rdquo; one of our sponsor from 7 to 9 pm.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/7">&larr; Older</a>
@@ -1421,6 +1434,10 @@ So using the JCR API you just need to get the content length using the following
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -1434,10 +1451,6 @@ So using the JCR API you just need to get the content length using the following
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

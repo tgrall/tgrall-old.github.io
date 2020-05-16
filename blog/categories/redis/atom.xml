@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Redis | Tug's Blog]]></title>
   <link href="http://tgrall.github.io/blog/categories/redis/atom.xml" rel="self"/>
   <link href="http://tgrall.github.io/"/>
-  <updated>2020-02-03T11:26:03+01:00</updated>
+  <updated>2020-05-16T18:24:59+02:00</updated>
   <id>http://tgrall.github.io/</id>
   <author>
     <name><![CDATA[Tug Grall]]></name>
@@ -12,6 +12,250 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simple Caching Service With Redis]]></title>
+    <link href="http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis/"/>
+    <updated>2020-05-16T17:33:15+02:00</updated>
+    <id>http://tgrall.github.io/blog/2020/05/16/simple-caching-service-with-redis</id>
+    <content type="html"><![CDATA[<p><img class="center" src="/images/posts/simple-caching-with-redis/001-ws-caching.png"></p>
+
+<p>One of the most common use cases for Redis is to use it the database as a caching layer for your data, but Redis can do a lot more <em>(I will publish new articles later)</em>!</p>
+
+<p>In this article, you will learn using a straightforward service, how to cache the result on some REST API calls to accelerate the data access, and also reduce the number of calls to external services.</p>
+
+<p>For this example, I am using the &ldquo;Redis Movie Database&rdquo; application, a microservice-based application that I created to showcase and explain various features of Redis and Redis Enterprise.</p>
+
+<p>You can see the caching service in action in this video:</p>
+
+<p><iframe width="560" height="420" src="http://www.youtube.com/embed/2X6hmXGbLbg?color=white&theme=light"></iframe></p>
+
+<h3>Architecture Overview</h3>
+
+<p>The application uses a third party API provided by the &ldquo;<a href="http://www.omdbapi.com/">OMDb API</a>&rdquo; to retrieve the ratings of the movie using its IMDb identifier. The frontend application call the <code>/caching/rating/</code> service to get the rating information from OMDB.</p>
+
+<p>This service is doing the following:</p>
+
+<ol>
+<li>Check if the rating data is already cached retrieve from the cache</li>
+<li>If the information is not cached, the system calls the OMDB API with the proper key and Movie ID</li>
+<li>The result is cached in Redis with a time to live of 120 seconds</li>
+<li>The ratings are returned to the client.</li>
+</ol>
+
+
+<!-- more -->
+
+
+<p><strong>Prerequisites</strong></p>
+
+<ul>
+<li>Redis 5.x or later.</li>
+<li>Java 8 or later</li>
+<li>Apache Maven 3.6</li>
+<li>Git</li>
+</ul>
+
+
+<h3>Implementation</h3>
+
+<p>In the microservice demonstration project, you can find the caching service in the project below:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/redis-microservices-demo/tree/master/caching-service">Caching Service</a></li>
+</ul>
+
+
+<p>The Spring Boot application exposes a REST endpoint <a href="https://github.com/tgrall/redis-microservices-demo/blob/master/caching-service/src/main/java/io/redis/demos/services/caching/RestStatusController.java">RestStatusController.java</a> with the following key features:</p>
+
+<ul>
+<li><code>/api/1.0/caching/configuration/omdb_api</code> : to save the OMDb API key in Redis.</li>
+<li><code>/api/1.0/caching/ratings/{id}</code> : to retrieve the IMDB Rating information.</li>
+</ul>
+
+
+<h4>Data Structure</h4>
+
+<p>The Caching Service is pretty simple and using two sets of keys:</p>
+
+<ul>
+<li><code>ms:config</code>: is a Redis Hash that will be used to store all global configuration; for the caching service, the entry <code>OMDB_API_KEY</code> will contain the OMDb API key.</li>
+<li><code>ms:cache:ws:*</code> : one entry for each movie viewed by a user, where the IMDb movie id replaces the <code>*</code>. The hash contains the ratings, and each of the Movie Rating sites is a key in the hash (&ldquo;Internet Movie Database&rdquo;,  &ldquo;Rotten Tomatoes&rdquo;, &ldquo;Metacritic&rdquo;), and the value is the rating itself.</li>
+</ul>
+
+
+<h4>Code</h4>
+
+<p>The implementation of the caching layer is simple and located in the class below:</p>
+
+<ul>
+<li><a href="https://github.com/tgrall/redis-microservices-demo/blob/master/caching-service/src/main/java/io/redis/demos/services/caching/service/WebServiceCachingService.java"><code>WebServiceCachingService</code></a></li>
+</ul>
+
+
+<p><strong>Getting the Redis Connection</strong></p>
+
+<p>In this project, I have not used Redis/Spring integration <em>by choice</em>, I am only using Spring injection and Spring Boot Web features.</p>
+
+<ul>
+<li>the <code>afterConstruct()</code> method creates the JedisPool from the Spring Configuration</li>
+<li>then each time a connection is needed, the application calls <code>Jedis jedis = jedisPool.getResource()</code> to get a connection from the pool.</li>
+</ul>
+
+
+<h4>Setting &amp; Getting the OMDb API Key</h4>
+
+<p>As you have seen earlier, the OMDb API Key is stored in a hash associated with the Redis key <code>ms:config</code>.</p>
+
+<ul>
+<li>The method <code>saveOMDBAPIKey</code> is used to store the configuring with a  <code>hset</code> call.</li>
+</ul>
+
+
+<pre><code class="java">    jedis = jedisPool.getResource();
+    jedis.hset(KEY_CONFIG, OMDB_API_KEY, key);
+    omdbAPIKEY = key;
+</code></pre>
+
+<ul>
+<li>line 1: get the connection from the pool</li>
+<li>line 2: set the key in the hash *(as you can see the application uses static variables (<code>KEY_CONFIG</code> and <code>OMDB_API_KEY</code>)</li>
+<li>line 3: the key received as a method parameter is set to a class member <code>omdbAPIKEY</code> to avoid calling the hash each time.</li>
+</ul>
+
+
+<h4>Calling OMDb API and Caching (or not) the result</h4>
+
+<p>The method <code>getRatings</code> receives two parameters:</p>
+
+<ul>
+<li><code>imdbId</code> the IMDb id</li>
+<li><code>withCache</code> a boolean value to use or not Redis. The goal here is to show as a demonstration of the benefits of using Redis.</li>
+</ul>
+
+
+<p>Let&rsquo;s now look at the code:</p>
+
+<pre><code class="java"> String restCallKey = KEY_PREFIX + imdbId;
+
+        try (Jedis jedis = jedisPool.getResource()) {
+
+            // Look in the map to see if the value has been cached
+            if (withCache) {
+                returnValue = jedis.hgetAll(restCallKey);
+            }
+
+            if (returnValue.isEmpty()) {
+                returnValue.put("imdb_id", imdbId);
+                CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+                HttpGet getRequest = new HttpGet(url);
+                getRequest.addHeader("accept", "application/json");
+                ResponseHandler&lt;String&gt; responseHandler = new BasicResponseHandler();
+
+                String WsCall = httpClient.execute(getRequest, responseHandler);
+
+                Map&lt;String, Object&gt; map = jsonMapper.readValue(WsCall, Map.class);
+                List&lt;Map&lt;String, String&gt;&gt; ratings = (List&lt;Map&lt;String, String&gt;&gt;) map.get("Ratings");
+
+                Map&lt;String, String&gt; ratingAsMap = new HashMap&lt;&gt;();
+                for (Map&lt;String, String&gt; it : ratings) {
+                    ratingAsMap.put(it.get("Source"), it.get("Value"));
+                }
+
+                returnValue.putAll(ratingAsMap);
+
+                jedis.hset(restCallKey, returnValue);
+                jedis.expire(restCallKey, TTL);
+            }
+
+        } catch(HttpResponseException e){
+            // Small hack to keep it simple
+            returnValue.put("Metacritic", "&lt;p style='color:red'&gt;Error: OMDBAPI Key is invalid -- see services page&lt;/p&gt;");
+            omdbAPIKEY = null;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    } else {
+        // Small hack to keep it simple
+        returnValue.put("Metacritic", "&lt;p style='color:red'&gt;Error: OMDBAPI Key is not set, please configure it -- see services page&lt;/p&gt;");
+    }
+    long end = System.currentTimeMillis();
+    returnValue.put("elapsedTimeMs", Long.toString(end - start) );
+    return returnValue;
+</code></pre>
+
+<p>So if you look in the code carefully you see that only a few lines are related to the cache itself:
+* Line 1, the key is created from a prefix and the IMDb identifier.
+* Line 3, the application retrieves a connection from the Jedis Pool.
+* Line 7, if the cache is enabled,  the connection to get the value from Redis <code>returnValue = jedis.hgetAll(restCallKey)</code>
+* If a value is present in the cache, the value is returned to the caller
+* If <code>returnValue</code> is empty,  the OMDB REST service must be called (lines 11 to 25)
+* The result of the Web service call is stored in the <code>returnValue</code> variable, and save into Redis with a time to live (TTL) of 120 seconds (Line 27 to 29)
+* Finally, the value is returned to the caller (Line 47).</p>
+
+<p>Quite simple, no?</p>
+
+<p>It is possible to optimize a little bit the application/code with few additions:</p>
+
+<ul>
+<li>Make the TTL configurable by adding a new entry in the <code>ms:config</code> cache</li>
+<li>Use <a href="https://redis.io/topics/pipelining">pipelining</a> to reduce the round trip time (RTT)</li>
+</ul>
+
+
+<h3>Running the application</h3>
+
+<p>In the project, the service connects to a <code>local</code> instance of Redis on port <code>6379</code>. If you want to use a different instance or configure a password/user, you have to edit the <code>/redis-microservices-demo/caching-service/application.properties</code>.</p>
+
+<h4>Cloning and Building</h4>
+
+<pre><code>&gt; git clone https://github.com/tgrall/redis-microservices-demo.git
+
+&gt; cd redis-microservices-demo/caching-service
+
+&gt; mvn clean package
+</code></pre>
+
+<h4>Running the application</h4>
+
+<p>The application is a Spring Boot application, run the following command to start it:</p>
+
+<pre><code>&gt; mvn spring-boot:run
+</code></pre>
+
+<p>Then you should save your <a href="https://www.patreon.com/join/omdb">OMDB API key</a> in Redis using the following call:</p>
+
+<pre><code>&gt; curl -X POST http://localhost:8084/api/1.0/caching/configuration/omdb_api\?key\=[YOUR_KEY]
+</code></pre>
+
+<p>Now you can call the service itself to retrieve the ratings of the movie &ldquo;WarGames&rdquo;</p>
+
+<pre><code>&gt; curl -X GET http://localhost:8084/api/1.0/caching/ratings/tt0086567
+</code></pre>
+
+<p>Call it multiple times, and you will see that the first call is *slow&#8221; (100ms or more). Then subsequent requests will be a lot faster, as the data are coming out of Redis. After tow minutes, the data is removed from the cache automatically (expiration), and the OMDB service will be called again.</p>
+
+<p>You can also force the service to no use the cache using the following call:</p>
+
+<pre><code>&gt; curl -X GET http://localhost:8084/api/1.0/caching/ratings/tt0086567?cache=0
+</code></pre>
+
+<h3>Conclusion</h3>
+
+<p>The pattern used here is called &ldquo;Cache-Aside&rdquo;; and usually pretty easy to implement. It is interesting to notice that many libraries such as Spring provide built-in features to implement such caches.</p>
+
+<p>That said, this is not a silver bullet, you still have to look at the following points when you are implementing such caching service:</p>
+
+<ul>
+<li>Loading the cache: in the example, the cache is populated when the service is called. This lazy loading approach is excellent since the cache is only filled with data that are used by the application. However, the first call is paying the price of higher latency, so on your application, you may require to load the data at startup to avoid any hit miss.</li>
+<li>Cache Invalidation and Lifetime: When caching data, it is essential to look at the invalidation strategy, when and how I can update the data in the cache, but also how long the data will stay in the cache. In the example above, each data will remain for two minutes.</li>
+</ul>
+
+
+<p>So now you are all set to implement a simple cache and have consistent fast access to your application data, independently of the backend.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to Use SSL/TLS With Redis Enterprise]]></title>

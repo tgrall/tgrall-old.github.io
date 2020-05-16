@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="Not familiar with Oracle JDeveloper? Take a look to the new Oracle JDeveloper 10g (10.1.3.1) matrix, this document exposes in a simple matrix the &hellip;">
+  <meta name="description" content="Install Oracle RAC 10_g_ on Oracle Enterprise Linux using VMware Server is a very interesting article on using Oracle RAC using Oracle Linux on &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,38 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/01/15/otn-article-install-oracle-rac-10g-on-oracle-enterprise-linux-using-vmware-server/">OTN Article: Install Oracle RAC 10g on Oracle Enterprise Linux Using VMware Server</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-01-15T21:56:27+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>9:56 pm</span></time>
+        
+           | <a href="/blog/2007/01/15/otn-article-install-oracle-rac-10g-on-oracle-enterprise-linux-using-vmware-server/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/01/15/otn-article-install-oracle-rac-10g-on-oracle-enterprise-linux-using-vmware-server/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.oracle.com/technology/pub/articles/chan-ubl-vmware.html">Install Oracle RAC 10_g_ on Oracle Enterprise Linux using VMware Server</a> is a very interesting article on using Oracle RAC using Oracle Linux on VMWare.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -608,75 +640,6 @@ and password in the client (Stub) using some properties on the Stub.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2006/11/28/oc4j-sending-system-level-message-in-the-console-window/">OC4J: Sending System Level Message in the Console Window</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2006-11-28T20:46:33+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2006</span></span> <span class='time'>8:46 pm</span></time>
-        
-           | <a href="/blog/2006/11/28/oc4j-sending-system-level-message-in-the-console-window/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2006/11/28/oc4j-sending-system-level-message-in-the-console-window/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>OracleAS 10gR3, so OC4J standalone, is using the standard <a href="http://java.sun.com/j2se/1.4.2/docs/guide/util/logging/overview.html">Java logging framework</a>. Some of the
-benefits are easy configuration, and extensibility. The configuration of the level of logging of the different loggers has been exposes in
-the Oracle Application Server Console. To see the logger configuration, click on the Administration Tab and then Logger Configuration, you can then configure the different loggers.</p>
-
-<p><img src="http://static.flickr.com/106/304730770_8db9728d3a_o.png"></p>
-
-<p>By default the logger will write all the information in the default log.xml file, and for application lever logger it will go in the application.log. You may want to send the information in the console during development to debug/analyze your application. This is done using the configuration of the Handler. This information is currently not available in the Application Server Console, so I am documenting in the next steps how
-to send the information in the console (terminal window).</p>
-
-<p>The configuration of the OracleAS Logging is saved in the <code>$ORACLE_HOME/j2ee/home/config/j2ee-logging.xml</code> file. In this file you  can see that Oracle has defined
-various handlers where information can be sent:</p>
-
-<ul>
-<li><code>console-handler</code> : Log the information in the console (the one we want to use in this sample)</li>
-<li><code>oc4j-handler</code> : the default handler for most of the loggers, saving the information in the $ORACLE_HOME/j2ee/home/log/oc4j/log.xml using the Oracle Logger formatting</li>
-<li><code>oracle-webservices-management-auditing-handler</code> : the handler used by the Web Services Auditing feature in the $ORACLE_HOME/j2ee/home/log/wsmgmt/auditing/log.xml</li>
-<li><code>oracle-webservices-management-logging-handler</code> : the handler used by the Web Service Logging feature in the $ORACLE_HOME/j2ee/home/log/wsmgmt/logging/log.xml</li>
-</ul>
-
-
-<p>As you may know, OracleAS Web Service provides out of the box support for Auditing of the SOAP messages. You just need to go in the administration page of the Web Service and enable the auditing. By default the messages are logged in the auditing log pointed above. But during development it is really interesting to see the SOAP Messages in the console without having to configure a Proxy to capture the request/response. The easiest way to do that is to edit the <code>j2ee-logging.xml</code> file and associate the <code>console-handler</code> to the auditing logger using the following configuration:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;logger</span> <span class="na">name=</span><span class="s">&quot;oracle.webservices.management.auditing&quot;</span> <span class="na">level=</span><span class="s">&quot;NOTIFICATION:1&quot;</span> <span class="na">useParentHandlers=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;handler</span> <span class="na">name=</span><span class="s">&quot;oracle-webservices-management-auditing-handler&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;handler</span> <span class="na">name=</span><span class="s">&quot;console-handler&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/logger&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>by doing this you will see the SOAP Message in the OC4J console that is running in your system.</p>
-
-<p><img src="http://static.flickr.com/103/308538842_ed574a1c08_o.png"></p>
-
-<p>You can also use this configuration with any loggers available in OC4J.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/15">&larr; Older</a>
@@ -694,6 +657,10 @@ various handlers where information can be sent:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -707,10 +674,6 @@ various handlers where information can be sent:</p>
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>

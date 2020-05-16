@@ -9,7 +9,7 @@
   <meta name="author" content="Tug Grall">
 
   
-  <meta name="description" content="A friend of mine was looking for an easy way to import some XML content in his database. You have many ways to do it. But the easiest for a Java/ &hellip;">
+  <meta name="description" content="In the previous entry I showed how you can easily take an XML feed and insert the content in the database. Let&rsquo;s do the opposite now, meaning &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,113 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2007/02/20/groovy-101-extracting-xml-from-your-database/">Groovy 101: Extracting XML From Your Database</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2007-02-20T06:04:12+01:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>6:04 am</span></time>
+        
+           | <a href="/blog/2007/02/20/groovy-101-extracting-xml-from-your-database/#disqus_thread"
+             data-disqus-identifier="http://tgrall.github.io/blog/2007/02/20/groovy-101-extracting-xml-from-your-database/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In the previous entry I showed how you can easily take an XML feed and insert the content in the database. Let&rsquo;s do the opposite now, meaning taking the data out of your database as XML. In this post I am using the Sql Dataset again but to create an XML document, using the Groovy MarkupBuilder.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='groovy'><span class='line'><span class="kn">import</span> <span class="nn">groovy.sql.Sql</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">groovy.xml.MarkupBuilder</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">def</span> <span class="n">sql</span> <span class="o">=</span> <span class="n">Sql</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="s2">&quot;jdbc:oracle:thin:@//tgrall-linux:1521/XE&quot;</span><span class="o">,</span>
+</span><span class='line'><span class="s2">&quot;HR&quot;</span><span class="o">,</span> <span class="s2">&quot;HR&quot;</span><span class="o">,</span> <span class="s2">&quot;oracle.jdbc.driver.OracleDriver&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kt">def</span> <span class="n">set</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="na">dataSet</span><span class="o">(</span><span class="s2">&quot;EMPLOYEES&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">def</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringWriter</span><span class="o">()</span>
+</span><span class='line'><span class="kt">def</span> <span class="n">xml</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MarkupBuilder</span><span class="o">(</span><span class="n">writer</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">xml</span><span class="o">.</span><span class="na">employees</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">set</span><span class="o">.</span><span class="na">each</span> <span class="o">{</span> <span class="n">emp</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="n">employee</span><span class="o">(</span><span class="nl">first:</span> <span class="n">emp</span><span class="o">.</span><span class="na">first_name</span> <span class="o">,</span> <span class="nl">last:</span> <span class="n">emp</span><span class="o">.</span><span class="na">last_name</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">email</span><span class="o">(</span> <span class="n">emp</span><span class="o">.</span><span class="na">email</span> <span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">println</span> <span class="n">writer</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see, I use the builder to create XML Elements and attributes employee(first: emp.first_name , last: emp.last_name), I do reference the current record of the dataset (emp), and all this in very simple and concise code.
+This will give a result like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;employees&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;employee</span> <span class="na">first=</span><span class="s">&quot;&#39;Steven&#39;&quot;</span> <span class="na">last=</span><span class="s">&quot;&#39;King&#39;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;email&gt;</span>SKING<span class="nt">&lt;/email&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/employee&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;employee</span> <span class="na">first=</span><span class="s">&quot;&#39;Neena&#39;&quot;</span> <span class="na">last=</span><span class="s">&quot;&#39;Kochhar&#39;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;email&gt;</span>NKOCHHAR<span class="nt">&lt;/email&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/employee&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;employee</span> <span class="na">first=</span><span class="s">&quot;&#39;Lex&#39;&quot;</span> <span class="na">last=</span><span class="s">&quot;&#39;De&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;email&gt;</span>LDEHAAN<span class="nt">&lt;/email&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/employee&gt;</span>
+</span><span class='line'>  ...
+</span><span class='line'><span class="nt">&lt;/employees&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So once again quite simple.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -741,38 +848,6 @@ help you to learn more about ODI using a comprehensive scenario.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2007/01/15/otn-article-install-oracle-rac-10g-on-oracle-enterprise-linux-using-vmware-server/">OTN Article: Install Oracle RAC 10g on Oracle Enterprise Linux Using VMware Server</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2007-01-15T21:56:27+01:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2007</span></span> <span class='time'>9:56 pm</span></time>
-        
-           | <a href="/blog/2007/01/15/otn-article-install-oracle-rac-10g-on-oracle-enterprise-linux-using-vmware-server/#disqus_thread"
-             data-disqus-identifier="http://tgrall.github.io/blog/2007/01/15/otn-article-install-oracle-rac-10g-on-oracle-enterprise-linux-using-vmware-server/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://www.oracle.com/technology/pub/articles/chan-ubl-vmware.html">Install Oracle RAC 10_g_ on Oracle Enterprise Linux using VMware Server</a> is a very interesting article on using Oracle RAC using Oracle Linux on VMWare.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/14">&larr; Older</a>
@@ -790,6 +865,10 @@ help you to learn more about ODI using a comprehensive scenario.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/05/16/simple-caching-service-with-redis/">Simple Caching Service With Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/01/02/how-to-use-ssl-slash-tls-with-redis-enterprise/">How to Use SSL/TLS With Redis Enterprise</a>
       </li>
     
@@ -803,10 +882,6 @@ help you to learn more about ODI using a comprehensive scenario.</p>
     
       <li class="post">
         <a href="/blog/2019/09/02/getting-with-redis-streams-and-java/">Getting Started With Redis Streams &amp; Java</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/04/23/getting-started-with-mapr-db-json-rest-api/">Getting Started With MapR-DB JSON REST API</a>
       </li>
     
   </ul>
